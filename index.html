@@ -7,6 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,15 +31,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
 
   <style>
     :root {
@@ -112,16 +104,15 @@
     .loader-bar { width: 120px; height: 2px; background: rgba(255,255,255,0.05); border-radius: 1px; overflow: hidden; }
     .loader-bar-fill { height: 100%; width: 0%; background: var(--brand); border-radius: 1px; }
 
-    /* Noise Overlay */
+    /* Noise Overlay — static PNG for performance */
     .noise-overlay {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 9990;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.02;
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClLOS0AAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABnRSTlMFBQUFBQVMIymzAAAASklEQVQ4y2MYBaNg2AImKAMYGBhYoAwmBigDGBihDCYGGAMYGOEMJgYEgwnOYIIzmOAMJjiDCc5ggjOY4AwmOIMJzmCCM0bBYAcALlkFnVMrHJ0AAAAASUVORK5CYII=");
       background-repeat: repeat;
-      background-size: 256px 256px;
     }
 
     /* Background glows */
@@ -240,6 +231,7 @@
       gap: 48px;
       animation: marqueeScroll 25s linear infinite;
       white-space: nowrap;
+      will-change: transform;
     }
     .marquee-track span {
       color: transparent;
@@ -251,8 +243,8 @@
       opacity: 0.2;
     }
     @keyframes marqueeScroll {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-50%, 0, 0); }
     }
 
     /* Orbital Visual */
@@ -278,6 +270,7 @@
       from { transform: translate(-50%, -50%) rotate(0deg); }
       to { transform: translate(-50%, -50%) rotate(360deg); }
     }
+    .orbit { will-change: transform; }
 
     /* Tilt Cards */
     .tilt-card {
@@ -323,12 +316,80 @@
     /* Reveal base */
     .reveal { opacity: 0; transform: translateY(40px); }
 
+    /* Carved logo endmark */
+    .carved-section {
+      background: var(--bg);
+    }
+    .carved-logo-wrap {
+      will-change: transform;
+    }
+    .carved-logo {
+      filter: invert(1) brightness(0.25) contrast(1.3)
+        drop-shadow(0px 2px 0px rgba(255,255,255,0.04))
+        drop-shadow(0px -1px 0px rgba(0,0,0,0.9));
+      mix-blend-mode: screen;
+      opacity: 1;
+    }
+
+    /* Glitch hover effect */
+    .glitch-title {
+      position: relative;
+      display: inline-block;
+      cursor: default;
+    }
+    .glitch-title::before,
+    .glitch-title::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .glitch-title::before {
+      color: #0ff;
+      z-index: -1;
+    }
+    .glitch-title::after {
+      color: var(--brand);
+      z-index: -1;
+    }
+    .glitch-title:hover::before {
+      opacity: 0.8;
+      animation: glitch-shift-1 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    }
+    .glitch-title:hover::after {
+      opacity: 0.8;
+      animation: glitch-shift-2 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+    }
+    @keyframes glitch-shift-1 {
+      0% { clip-path: inset(40% 0 61% 0); transform: translate(-2px, -1px); }
+      20% { clip-path: inset(92% 0 1% 0); transform: translate(1px, 2px); }
+      40% { clip-path: inset(43% 0 1% 0); transform: translate(-1px, 1px); }
+      60% { clip-path: inset(25% 0 58% 0); transform: translate(2px, -1px); }
+      80% { clip-path: inset(54% 0 7% 0); transform: translate(-1px, 2px); }
+      100% { clip-path: inset(58% 0 43% 0); transform: translate(0); }
+    }
+    @keyframes glitch-shift-2 {
+      0% { clip-path: inset(65% 0 13% 0); transform: translate(2px, 1px); }
+      20% { clip-path: inset(79% 0 14% 0); transform: translate(-2px, -1px); }
+      40% { clip-path: inset(48% 0 24% 0); transform: translate(1px, -2px); }
+      60% { clip-path: inset(70% 0 7% 0); transform: translate(-1px, 1px); }
+      80% { clip-path: inset(15% 0 62% 0); transform: translate(2px, 1px); }
+      100% { clip-path: inset(51% 0 29% 0); transform: translate(0); }
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .cursor-dot, .cursor-ring { display: none !important; }
       body { cursor: auto; }
       #navbar { padding: 16px 20px !important; }
       #navbar.scrolled { padding: 12px 20px !important; }
+      .hero-content { padding-left: 16px !important; padding-right: 16px !important; }
+      .hero-content h1 { word-break: break-word; }
     }
   </style>
 </head>
@@ -356,7 +417,7 @@
   <nav id="navbar">
     <div class="max-w-[1400px] mx-auto flex items-center justify-between">
       <a href="#hero" class="nav-logo">
-        <img src="brand_assets/apex-logo-full-colour-rgb-1200px@72ppi.png" alt="AP3X" class="h-7 w-auto">
+        <img src="brand_assets/apex-logo-inverted-rgb-1200px@72ppi.png" alt="AP3X" class="h-7 w-auto">
       </a>
       <div class="nav-links hidden md:flex gap-10">
         <a href="#about" class="text-[var(--text-dim)] no-underline font-body text-[13px] font-normal tracking-[0.08em] uppercase">About</a>
@@ -381,13 +442,13 @@
 
   <!-- ========== HERO ========== -->
   <section id="hero" class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-    <canvas id="hero-canvas" class="absolute inset-0 w-full h-full"></canvas>
+    <canvas id="canvas3d" class="absolute inset-0 w-full h-full"></canvas>
 
-    <div class="hero-content relative z-10 text-center px-6">
+    <div class="hero-content relative z-10 text-center px-6 pointer-events-none">
       <!-- Dark vignette behind text -->
       <div class="absolute inset-[-120px] bg-[radial-gradient(ellipse_at_center,rgba(5,5,5,0.65)_0%,transparent_70%)] -z-10"></div>
 
-      <h1 class="font-display font-extrabold text-[clamp(48px,10vw,120px)] leading-[0.92] tracking-[-0.04em] uppercase mb-6">
+      <h1 class="font-display font-extrabold text-[clamp(32px,9vw,120px)] leading-[0.92] tracking-[-0.04em] uppercase mb-6">
         <span class="line block overflow-hidden"><span class="line-inner">Precision</span></span>
         <span class="line block overflow-hidden"><span class="line-inner">Beyond</span></span>
         <span class="line block overflow-hidden"><span class="line-inner text-brand">Limits</span></span>
@@ -397,12 +458,12 @@
         Engineering tomorrow's solutions at the apex of innovation
       </p>
 
-      <a href="#about" class="cta-btn inline-flex items-center gap-3 px-10 py-4 bg-transparent border border-brand text-white font-body text-[13px] font-medium tracking-[0.1em] uppercase no-underline cursor-none opacity-0 translate-y-5">
+      <a href="#about" class="cta-btn inline-flex items-center gap-3 px-10 py-4 bg-transparent border border-brand text-white font-body text-[13px] font-medium tracking-[0.1em] uppercase no-underline cursor-none opacity-0 translate-y-5 pointer-events-auto">
         <span>Discover More</span>
       </a>
     </div>
 
-    <div class="scroll-indicator absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-0">
+    <div class="scroll-indicator absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-0 pointer-events-none">
       <span class="text-[11px] tracking-[0.15em] uppercase text-[var(--text-dim)]">Scroll</span>
       <div class="scroll-line"></div>
     </div>
@@ -433,7 +494,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 items-center">
       <div>
         <h2 class="reveal font-display font-bold text-[clamp(30px,4vw,50px)] leading-[1.1] tracking-[-0.03em] mb-6">
-          We don't follow trends.<br/>We set the <span class="text-brand">standard.</span>
+          We don't follow trends.<br/>We set the <span class="glitch-title text-brand" data-text="standard.">standard.</span>
         </h2>
         <p class="reveal text-[15px] leading-[1.8] text-[var(--text-dim)] font-light max-w-lg">
           AP3X is a next-generation technology firm that architects digital solutions engineered for performance, scale, and impact. We combine strategic vision with technical excellence to build what others think impossible.
@@ -456,7 +517,7 @@
   <section id="services" class="relative max-w-[1400px] mx-auto px-6 md:px-12 py-24 md:py-32">
     <div class="section-label flex items-center gap-4 text-[12px] tracking-[0.2em] uppercase text-[var(--text-muted)] mb-12">02 / Services</div>
 
-    <h2 class="reveal font-display font-bold text-[clamp(30px,4vw,50px)] tracking-[-0.03em] mb-16">What We Architect</h2>
+    <h2 class="reveal font-display font-bold text-[clamp(30px,4vw,50px)] tracking-[-0.03em] mb-16"><span class="glitch-title" data-text="What We Architect">What We Architect</span></h2>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Card 1 -->
@@ -527,7 +588,7 @@
   <!-- ========== CTA / CONTACT ========== -->
   <section id="contact" class="relative text-center max-w-[1400px] mx-auto px-6 md:px-12 py-32 md:py-40 overflow-hidden">
     <h2 class="reveal font-display font-extrabold text-[clamp(36px,6vw,68px)] leading-[1.05] tracking-[-0.04em] mb-12">
-      Ready to reach<br/>the <span class="text-brand">apex</span>?
+      Ready to reach<br/>the <span class="glitch-title text-brand" data-text="apex">apex</span>?
     </h2>
     <a href="mailto:hello@ap3x.com" class="cta-btn reveal inline-flex items-center gap-3 px-14 py-5 bg-transparent border border-brand text-white font-body text-[14px] font-medium tracking-[0.1em] uppercase no-underline cursor-none">
       <span>Start a Conversation</span>
@@ -547,154 +608,33 @@
     </div>
   </footer>
 
+  <!-- ========== CARVED LOGO ENDMARK ========== -->
+  <section class="carved-section relative overflow-hidden" style="height: 100vh; background: var(--bg);">
+    <div class="carved-logo-wrap absolute inset-0 flex items-center justify-center">
+      <img
+        src="brand_assets/apex-logo-greyscale-rgb-1200px@72ppi.png"
+        alt="AP3X"
+        class="carved-logo w-[70vw] max-w-[900px] h-auto select-none"
+        draggable="false"
+      >
+    </div>
+  </section>
+
   <!-- ============================================================ -->
-  <!-- THREE.JS — Interactive Crystal Hero                          -->
+  <!-- SPLINE — Interactive 3D Hero                                 -->
   <!-- ============================================================ -->
   <script type="module">
-    import * as THREE from 'three';
-    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+    import { Application } from 'https://unpkg.com/@splinetool/runtime@1.9.82/build/runtime.js';
 
-    const canvas = document.getElementById('hero-canvas');
-    const scene = new THREE.Scene();
+    const canvas = document.getElementById('canvas3d');
+    const app = new Application(canvas);
+    app.load('https://prod.spline.design/jsJbyCXRTA-k8imS/scene.splinecode');
 
-    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.z = 4.5;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-
-    /* ---- Crystal with Fresnel Shader ---- */
-    const crystalGeo = new THREE.IcosahedronGeometry(1.5, 1);
-
-    const crystalMat = new THREE.ShaderMaterial({
-      vertexShader: `
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        void main() {
-          vec3 viewDir = normalize(-vPosition);
-          float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 2.8);
-          vec3 base = vec3(0.02, 0.02, 0.04);
-          vec3 edge = vec3(0.878, 0.118, 0.169);
-          vec3 blue = vec3(0.15, 0.2, 0.6);
-          float wave = sin(vPosition.y * 4.0 + uTime * 0.8) * 0.5 + 0.5;
-          vec3 accent = mix(edge, blue, wave * 0.25);
-          vec3 color = mix(base, accent, fresnel * 0.85);
-          color += edge * fresnel * fresnel * 0.4;
-          gl_FragColor = vec4(color, 0.88 + fresnel * 0.12);
-        }
-      `,
-      uniforms: { uTime: { value: 0 } },
-      transparent: true,
-      side: THREE.DoubleSide,
-    });
-    const crystal = new THREE.Mesh(crystalGeo, crystalMat);
-    scene.add(crystal);
-
-    /* ---- Wireframe overlay ---- */
-    const wireMat = new THREE.MeshBasicMaterial({ color: 0xE01E2B, wireframe: true, transparent: true, opacity: 0.12 });
-    const wireframe = new THREE.Mesh(crystalGeo.clone(), wireMat);
-    wireframe.scale.setScalar(1.015);
-    scene.add(wireframe);
-
-    /* ---- Inner glow ---- */
-    const glowMat = new THREE.MeshBasicMaterial({ color: 0xE01E2B, transparent: true, opacity: 0.15 });
-    const glow = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), glowMat);
-    scene.add(glow);
-
-    /* ---- Particles ---- */
-    const pCount = 350;
-    const pGeo = new THREE.BufferGeometry();
-    const pPos = new Float32Array(pCount * 3);
-    for (let i = 0; i < pCount; i++) {
-      const r = 2 + Math.random() * 4.5;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      pPos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      pPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      pPos[i * 3 + 2] = r * Math.cos(phi);
-    }
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
-      color: 0xE01E2B, size: 0.012, transparent: true, opacity: 0.45, sizeAttenuation: true,
-    }));
-    scene.add(particles);
-
-    /* ---- Lights ---- */
-    const light1 = new THREE.PointLight(0xE01E2B, 4, 12);
-    const light2 = new THREE.PointLight(0x2244AA, 2.5, 12);
-    scene.add(light1, light2, new THREE.AmbientLight(0x111122, 0.4));
-
-    /* ---- Post-processing bloom ---- */
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.4, 0.82));
-    composer.addPass(new OutputPass());
-
-    /* ---- Mouse tracking ---- */
-    let mx = 0, my = 0, tx = 0, ty = 0;
-    window.addEventListener('mousemove', e => {
-      mx = (e.clientX / window.innerWidth - 0.5) * 2;
-      my = (e.clientY / window.innerHeight - 0.5) * 2;
-    });
-
-    /* ---- Resize ---- */
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      composer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    /* ---- Animate ---- */
-    function animate() {
-      requestAnimationFrame(animate);
-      const t = performance.now() * 0.001;
-
-      crystalMat.uniforms.uTime.value = t;
-
-      tx += (mx - tx) * 0.025;
-      ty += (my - ty) * 0.025;
-
-      crystal.rotation.y = tx * 0.5 + t * 0.12;
-      crystal.rotation.x = ty * 0.3 + Math.sin(t * 0.4) * 0.08;
-      crystal.rotation.z = Math.sin(t * 0.25) * 0.04;
-      crystal.position.y = Math.sin(t * 0.7) * 0.08;
-      wireframe.rotation.copy(crystal.rotation);
-      wireframe.position.y = crystal.position.y;
-
-      glowMat.opacity = 0.12 + Math.sin(t * 1.8) * 0.04;
-      glow.scale.setScalar(0.28 + Math.sin(t * 1.3) * 0.04);
-      glow.position.y = crystal.position.y;
-
-      particles.rotation.y += 0.0004;
-      particles.rotation.x += 0.00015;
-
-      light1.position.set(Math.sin(t * 0.45) * 3, Math.cos(t * 0.3) * 2, Math.cos(t * 0.45) * 3);
-      light2.position.set(Math.cos(t * 0.35) * 3, Math.sin(t * 0.5) * 2, Math.sin(t * 0.35) * 3);
-
-      // Scroll fade
+    // Scroll fade
+    window.addEventListener('scroll', () => {
       const scrollProg = Math.min(window.scrollY / window.innerHeight, 1);
       canvas.style.opacity = 1 - scrollProg * 0.85;
-
-      composer.render();
-    }
-    animate();
+    });
   </script>
 
   <!-- ============================================================ -->
@@ -704,17 +644,17 @@
     gsap.registerPlugin(ScrollTrigger);
 
     /* ---- Preloader ---- */
-    const preloaderTl = gsap.timeline({ delay: 0.2 });
+    const preloaderTl = gsap.timeline({ delay: 0.1 });
     preloaderTl
-      .to('.loader-bar-fill', { width: '100%', duration: 1.4, ease: 'power2.inOut' })
-      .to('#preloader', { opacity: 0, duration: 0.4, ease: 'power2.inOut' })
+      .to('.loader-bar-fill', { width: '100%', duration: 0.6, ease: 'power2.inOut' })
+      .to('#preloader', { opacity: 0, duration: 0.25, ease: 'power2.inOut' })
       .set('#preloader', { display: 'none' })
-      .from('.nav-logo', { opacity: 0, y: -16, duration: 0.5, ease: 'power3.out' })
-      .from('.nav-links a', { opacity: 0, y: -12, stagger: 0.08, duration: 0.4, ease: 'power3.out' }, '-=0.3')
-      .to('.hero-content h1 .line-inner', { y: '0%', duration: 0.9, stagger: 0.14, ease: 'power3.out' }, '-=0.4')
-      .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
-      .to('.hero-content .cta-btn', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.2')
-      .to('.scroll-indicator', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.2');
+      .from('.nav-logo', { opacity: 0, y: -16, duration: 0.4, ease: 'power3.out' })
+      .from('.nav-links a', { opacity: 0, y: -12, stagger: 0.06, duration: 0.3, ease: 'power3.out' }, '-=0.25')
+      .to('.hero-content h1 .line-inner', { y: '0%', duration: 0.7, stagger: 0.1, ease: 'power3.out' }, '-=0.3')
+      .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.25')
+      .to('.hero-content .cta-btn', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+      .to('.scroll-indicator', { opacity: 1, duration: 0.4, ease: 'power2.out' }, '-=0.15');
 
     /* ---- Nav scroll glass ---- */
     ScrollTrigger.create({
@@ -763,6 +703,21 @@
         },
       });
     });
+
+    /* ---- Carved logo scroll reveal ---- */
+    gsap.fromTo('.carved-logo-wrap',
+      { scale: 0.55, opacity: 0 },
+      {
+        scale: 1, opacity: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.carved-section',
+          start: 'top bottom',
+          end: 'center 60%',
+          scrub: 0.6,
+        },
+      }
+    );
 
     /* ---- Custom cursor ---- */
     const dot = document.querySelector('.cursor-dot');

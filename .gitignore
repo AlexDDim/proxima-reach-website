@@ -2,3 +2,5 @@ node_modules/
 temporary screenshots/
 package-lock.json
 .claude/settings.local.json
+
+.vercel
