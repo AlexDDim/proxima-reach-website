@@ -3,2067 +3,1529 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AP3X — Web3 Growth & GTM Partner</title>
-
+  <title>Proxima Reach — Your Business Within Reach</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="dist/tailwind.css">
-
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="vendor/three.min.js"></script>
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --brand: #E01E2B;
-      --brand-glow: #FF2D3B;
-      --bg: #121218;
-      --surface: #1A1A22;
-      --elevated: #22222C;
-      --border: rgba(255,255,255,0.08);
-      --text: #F0F0F0;
-      --text-dim: #888;
-      --text-muted: #555;
+      --bg:          #06060d;
+      --bg2:         #0b0918;
+      --purple:      #7c3aed;
+      --purple-dim:  #4c1d95;
+      --purple-glow: rgba(124, 58, 237, 0.18);
+      --gold:        #d4a853;
+      --gold-light:  #f2cc72;
+      --gold-dark:   #8a6318;
+      --gold-glow:   rgba(212, 168, 83, 0.18);
+      --white:       #f0ecff;
+      --white-dim:   rgba(240, 236, 255, 0.55);
+      --white-faint: rgba(240, 236, 255, 0.18);
+      --ff-display:  'Bebas Neue', sans-serif;
+      --ff-ui:       'Barlow Condensed', sans-serif;
+      --ff-body:     'DM Sans', sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+
     body {
       background: var(--bg);
-      color: var(--text);
-      font-family: 'Outfit', sans-serif;
-      overflow-x: clip;
-      cursor: none;
+      color: var(--white);
+      font-family: var(--ff-body);
+      overflow-x: hidden;
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 3px; }
+    /* ─── GRAIN ──────────────────────────────────────────── */
+    #grain {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9998;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
 
-    /* Custom Cursor */
-    .cursor-dot {
-      position: fixed;
-      top: -3px;
-      left: -3px;
-      width: 6px;
-      height: 6px;
-      background: var(--brand);
-      border-radius: 50%;
-      pointer-events: none;
+    /* ─── LOADER ─────────────────────────────────────────── */
+    #loader {
+      position: fixed; inset: 0;
       z-index: 9999;
-      will-change: transform;
-    }
-    .cursor-ring {
-      --ring-size: 36px;
-      position: fixed;
-      width: var(--ring-size);
-      height: var(--ring-size);
-      border: 1px solid rgba(224, 30, 43, 0.35);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      top: calc(var(--ring-size) / 2 * -1);
-      left: calc(var(--ring-size) / 2 * -1);
-      will-change: transform;
-      transition: width 0.4s cubic-bezier(0.16,1,0.3,1), height 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease;
-    }
-    .cursor-ring.hover {
-      --ring-size: 44px;
-      border-color: rgba(224, 30, 43, 0.6);
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0;
+      overflow: hidden;
     }
 
-    /* Preloader */
-    #preloader {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      pointer-events: all;
+    /* star-field bg */
+    #loader::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 90%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 60% 30%, rgba(212,168,83,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 5%  45%, rgba(212,168,83,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 95% 80%, rgba(124,58,237,0.5) 0%, transparent 100%);
     }
-    .preloader-curtain {
+
+    /* central purple ambient glow */
+    #loader::after {
+      content: '';
       position: absolute;
-      left: 0;
-      right: 0;
-      height: 50.5%;
-      background: #0A0A0F;
+      width: 500px; height: 500px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* The orbit scene wrapper */
+    .loader-scene {
+      position: relative;
+      width: 300px; height: 300px;
+      margin-bottom: 2rem;
+      flex-shrink: 0;
+    }
+
+    /* Faint orbit-path rings */
+    .orbit-path {
+      position: absolute;
+      top: 50%; left: 50%;
+      border-radius: 50%;
+      border: 1px solid rgba(212,168,83,0.1);
+      transform: translate(-50%, -50%);
+    }
+    .orbit-path.outer { width: 280px; height: 280px; border-color: rgba(212,168,83,0.12); }
+    .orbit-path.inner { width: 180px; height: 180px; border-color: rgba(124,58,237,0.15); }
+
+    /* Arms that spin — centered on the scene */
+    .horn-arm {
+      position: absolute;
+      top: calc(50% - 140px);
+      left: calc(50% - 140px);
+      width: 280px; height: 280px;
+    }
+
+    .horn-arm.inner-arm {
+      top: calc(50% - 90px);
+      left: calc(50% - 90px);
+      width: 180px; height: 180px;
+    }
+
+    /* The horn/spike shape — at the TOP CENTER of each arm */
+    .horn-tip {
+      position: absolute;
+      top: -2px; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 20px solid var(--gold-light);
+      filter: drop-shadow(0 0 8px rgba(242,204,114,0.95))
+              drop-shadow(0 0 18px rgba(212,168,83,0.7))
+              drop-shadow(0 0 35px rgba(212,168,83,0.35));
+    }
+
+    /* Trail horns get smaller + more transparent */
+    .horn-arm.t1 .horn-tip { border-bottom-color: rgba(242,204,114,0.55); border-bottom-width: 16px; border-left-width: 4px; border-right-width: 4px; filter: none; }
+    .horn-arm.t2 .horn-tip { border-bottom-color: rgba(212,168,83,0.32);  border-bottom-width: 13px; border-left-width: 3px; border-right-width: 3px; filter: none; }
+    .horn-arm.t3 .horn-tip { border-bottom-color: rgba(212,168,83,0.16);  border-bottom-width: 10px; border-left-width: 3px; border-right-width: 3px; filter: none; }
+
+    /* Inner orbit — purple spark */
+    .horn-arm.inner-arm .horn-tip {
+      border-bottom-color: #c084fc;
+      border-bottom-width: 14px;
+      border-left-width: 4px; border-right-width: 4px;
+      filter: drop-shadow(0 0 6px rgba(192,132,252,0.9)) drop-shadow(0 0 14px rgba(124,58,237,0.7));
+    }
+
+    /* Logo in center of scene */
+    #loader-logo {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.82);
+      width: 150px; height: auto;
+      opacity: 0;
+      mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 42%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 42%, transparent 100%);
+      filter: drop-shadow(0 0 35px rgba(212, 168, 83, 0.6))
+              drop-shadow(0 0 12px rgba(124,58,237,0.4));
       z-index: 2;
     }
-    .preloader-curtain--top { top: 0; border-bottom: 1px solid rgba(224,30,43,0.2); }
-    .preloader-curtain--bottom { bottom: 0; border-top: 1px solid rgba(224,30,43,0.2); }
-    .preloader-center {
+
+    /* Gold ring that pulses around the logo */
+    .loader-logo-ring {
       position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
+      top: 50%; left: 50%;
+      width: 110px; height: 110px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(212,168,83,0.25);
+      opacity: 0;
+      z-index: 1;
+    }
+
+    #loader-tagline {
+      font-family: var(--ff-ui);
+      font-size: 0.68rem; letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      opacity: 0;
+      margin-bottom: 1.25rem;
+    }
+
+    #loader-track {
+      width: 200px; height: 1px;
+      background: rgba(212, 168, 83, 0.12);
+      position: relative; overflow: hidden;
+    }
+
+    #loader-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+      background-size: 200% 100%;
+      animation: shimmer 1.6s ease infinite;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── NAVBAR ─────────────────────────────────────────── */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1rem 3.5rem 0;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      transition: padding 0.4s ease, background 0.5s ease, border-color 0.5s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    #nav.stuck {
+      padding: 0.75rem 3.5rem;
       align-items: center;
-      justify-content: center;
-      z-index: 3;
+      background: rgba(6, 6, 13, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom-color: rgba(212, 168, 83, 0.08);
     }
-    .preloader-brand {
-      margin-bottom: 28px;
-      opacity: 0;
+
+    .nav-logo-img {
+      height: 250px; width: auto;
+      mask-image: radial-gradient(ellipse 85% 80% at 50% 48%, black 48%, rgba(0,0,0,0.5) 65%, transparent 85%);
+      -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 48%, black 48%, rgba(0,0,0,0.5) 65%, transparent 85%);
+      filter: drop-shadow(0 0 14px rgba(212,168,83,0.5)) brightness(1.15);
+      transition: height 0.4s ease, filter 0.4s ease;
     }
-    .preloader-brand img {
-      height: 28px;
-      width: auto;
-      display: block;
+
+    #nav.stuck .nav-logo-img {
+      height: 46px;
+      filter: drop-shadow(0 0 8px rgba(212,168,83,0.35)) brightness(1.1);
     }
-    .preloader-counter {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 300;
-      font-size: clamp(60px, 12vw, 140px);
-      letter-spacing: -0.04em;
-      color: var(--text);
-      line-height: 1;
-      opacity: 0;
+
+    /* right-side group: links + CTA pinned top-right */
+    .nav-right {
+      display: flex; align-items: center; gap: 3rem;
+      padding-top: 1.5rem;
+      transition: padding-top 0.4s ease;
+    }
+
+    #nav.stuck .nav-right { padding-top: 0; }
+
+    .nav-links {
+      list-style: none;
+      display: flex; align-items: center; gap: 3rem;
+    }
+
+    .nav-links a {
+      font-family: var(--ff-ui);
+      font-size: 0.78rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--white-dim); text-decoration: none;
+      transition: color 0.3s ease;
       position: relative;
     }
-    .preloader-counter .counter-suffix {
-      font-size: 0.3em;
-      vertical-align: super;
-      color: var(--brand);
-      margin-left: 4px;
-      opacity: 0;
-    }
-    .preloader-status {
-      font-family: 'Outfit', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-      margin-top: 32px;
-      opacity: 0;
-    }
-    .preloader-line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 50%;
-      height: 1px;
-      background: var(--brand);
-      z-index: 4;
-      transform: scaleX(0);
-      transform-origin: left center;
-    }
-    .preloader-corners {
-      position: absolute;
-      z-index: 3;
-      opacity: 0;
-    }
-    .preloader-corners--tl { top: 40px; left: 40px; }
-    .preloader-corners--tr { top: 40px; right: 40px; }
-    .preloader-corners--bl { bottom: 40px; left: 40px; }
-    .preloader-corners--br { bottom: 40px; right: 40px; }
-    .preloader-corner-line {
-      background: rgba(255,255,255,0.15);
-      position: absolute;
-    }
-    .preloader-corners--tl .preloader-corner-line:first-child,
-    .preloader-corners--tr .preloader-corner-line:first-child {
-      width: 30px; height: 1px; top: 0;
-    }
-    .preloader-corners--tl .preloader-corner-line:last-child,
-    .preloader-corners--tr .preloader-corner-line:last-child {
-      width: 1px; height: 30px; top: 0;
-    }
-    .preloader-corners--bl .preloader-corner-line:first-child,
-    .preloader-corners--br .preloader-corner-line:first-child {
-      width: 30px; height: 1px; bottom: 0;
-    }
-    .preloader-corners--bl .preloader-corner-line:last-child,
-    .preloader-corners--br .preloader-corner-line:last-child {
-      width: 1px; height: 30px; bottom: 0;
-    }
-    .preloader-corners--tl .preloader-corner-line:first-child { left: 0; }
-    .preloader-corners--tl .preloader-corner-line:last-child { left: 0; }
-    .preloader-corners--tr .preloader-corner-line:first-child { right: 0; }
-    .preloader-corners--tr .preloader-corner-line:last-child { right: 0; }
-    .preloader-corners--bl .preloader-corner-line:first-child { left: 0; }
-    .preloader-corners--bl .preloader-corner-line:last-child { left: 0; bottom: 0; }
-    .preloader-corners--br .preloader-corner-line:first-child { right: 0; }
-    .preloader-corners--br .preloader-corner-line:last-child { right: 0; bottom: 0; }
 
-    /* Noise Overlay — static PNG for performance */
-    .noise-overlay {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9990;
-      opacity: 0.02;
-      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClLOS0AAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABnRSTlMFBQUFBQVMIymzAAAASklEQVQ4y2MYBaNg2AImKAMYGBhYoAwmBigDGBihDCYGGAMYGOEMJgYEgwnOYIIzmOAMJjiDCc5ggjOY4AwmOIMJzmCCM0bBYAcALlkFnVMrHJ0AAAAASUVORK5CYII=");
-      background-repeat: repeat;
+    .nav-links a::after {
+      content: ''; position: absolute;
+      bottom: -4px; left: 0; right: 0; height: 1px;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.35s ease;
     }
 
-    /* Persistent grid pattern — flows across all sections */
-    .grid-overlay {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9989;
-      background:
-        repeating-linear-gradient(
-          0deg,
-          rgba(255,255,255,0.03) 0px,
-          rgba(255,255,255,0.03) 1px,
-          transparent 1px,
-          transparent 80px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,0.03) 0px,
-          rgba(255,255,255,0.03) 1px,
-          transparent 1px,
-          transparent 80px
-        );
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    .nav-cta {
+      font-family: var(--ff-ui);
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--bg); text-decoration: none;
+      background: linear-gradient(130deg, var(--gold-dark) 0%, var(--gold-light) 55%, var(--gold) 100%);
+      padding: 0.65rem 1.75rem;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
     }
 
-    /* Background glows */
-    .bg-glow {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(120px);
+    .nav-cta:hover { transform: translateY(-2px); opacity: 0.9; }
+
+    /* ─── HERO ───────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      width: 100%; height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    #hero-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(124,58,237,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 1;
+    }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      gap: 1.25rem;
+    }
+
+    .hero-logo-wrap {
+      opacity: 0; transform: translateY(20px);
+    }
+
+    .hero-logo-img {
+      width: 240px; height: auto;
+      mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 42%, rgba(0,0,0,0.5) 62%, transparent 82%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 42%, rgba(0,0,0,0.5) 62%, transparent 82%);
+      filter: drop-shadow(0 0 60px rgba(212,168,83,0.45)) drop-shadow(0 0 25px rgba(124,58,237,0.35));
+    }
+
+    .hero-eyebrow {
+      font-family: var(--ff-ui);
+      font-size: 0.72rem; font-weight: 500;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0; transform: translateY(10px);
+    }
+
+    .hero-title {
+      font-family: var(--ff-display);
+      font-size: clamp(4rem, 9vw, 8rem);
+      line-height: 0.92; letter-spacing: 0.03em;
+      color: var(--white);
+      opacity: 0;
+    }
+
+    .hero-title .line { display: block; overflow: hidden; }
+
+    .hero-title .line-inner {
+      display: block;
+      transform: translateY(110%);
+    }
+
+    .hero-title .accent { color: var(--gold); }
+
+    .hero-sub {
+      font-family: var(--ff-ui);
+      font-size: 0.8rem; font-weight: 300;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--white-dim);
+      opacity: 0; transform: translateY(10px);
+    }
+
+    .hero-btns {
+      display: flex; gap: 0.9rem; margin-top: 0.5rem;
+      opacity: 0; transform: translateY(10px);
+    }
+
+    .btn-gold {
+      font-family: var(--ff-ui);
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--bg); text-decoration: none;
+      background: linear-gradient(130deg, var(--gold-dark), var(--gold-light), var(--gold));
+      padding: 0.85rem 2.25rem;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+    }
+    .btn-gold:hover { transform: translateY(-3px) scale(1.02); opacity: 0.88; }
+
+    .btn-ghost {
+      font-family: var(--ff-ui);
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--white-dim); text-decoration: none;
+      padding: 0.85rem 2.25rem;
+      border: 1px solid var(--white-faint);
+      transition: color 0.3s ease, border-color 0.3s ease, transform 0.35s ease;
+    }
+    .btn-ghost:hover {
+      color: var(--gold-light);
+      border-color: rgba(212,168,83,0.45);
+      transform: translateY(-3px);
+    }
+
+
+    /* ─── SECTION SHARED ─────────────────────────────────── */
+    .s-label {
+      font-family: var(--ff-ui);
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.9rem;
+    }
+
+    .s-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2.8rem, 5.5vw, 5rem);
+      line-height: 0.96; letter-spacing: 0.03em;
+      color: var(--white);
+    }
+
+    .s-desc {
+      font-size: 0.95rem; line-height: 1.85;
+      color: var(--white-dim); max-width: 460px;
+    }
+
+    /* ─── SOLUTIONS ──────────────────────────────────────── */
+    #solutions {
+      position: relative;
+      padding: 9rem 5rem;
+      background: var(--bg2);
+      overflow: hidden;
+    }
+
+    #solutions::before {
+      content: '';
+      position: absolute; top: -180px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 900px;
+      background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 65%);
       pointer-events: none;
-      z-index: 0;
+    }
+
+    .sol-header { margin-bottom: 4.5rem; }
+
+    .sol-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .sol-card {
+      position: relative; padding: 2.25rem 2rem;
+      background: rgba(255,255,255,0.022);
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      transition: border-color 0.4s ease, background 0.4s ease;
+    }
+
+    .sol-card:hover {
+      border-color: rgba(212,168,83,0.28);
+      background: rgba(255,255,255,0.038);
+    }
+
+    .sol-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.06) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .sol-card:hover::before { opacity: 1; }
+
+    .sol-num {
+      font-family: var(--ff-display);
+      font-size: 4rem; line-height: 1;
+      color: rgba(212,168,83,0.1);
+      margin-bottom: 0.75rem;
+      transition: color 0.4s ease;
+    }
+    .sol-card:hover .sol-num { color: rgba(212,168,83,0.2); }
+
+    .sol-problem {
+      font-family: var(--ff-ui);
+      font-size: 1.15rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--white); margin-bottom: 0.65rem;
+    }
+
+    .sol-divider {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-family: var(--ff-ui);
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.75rem;
+    }
+
+    .sol-divider::before {
+      content: '';
+      display: block; width: 22px; height: 1px;
+      background: var(--gold);
+    }
+
+    .sol-answer {
+      font-size: 0.875rem; line-height: 1.75;
+      color: var(--white-dim);
+    }
+
+    .sol-line {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0); transition: transform 0.55s ease;
+    }
+    .sol-card:hover .sol-line { transform: scaleX(1); }
+
+    /* ─── SERVICES ───────────────────────────────────────── */
+    #services {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    #services::before {
+      content: '';
+      position: absolute; bottom: -200px; right: -100px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .srv-header {
+      position: relative; z-index: 2;
+      padding: 0 5rem; margin-bottom: 2rem;
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+
+    .srv-hint {
+      font-family: var(--ff-ui);
+      font-size: 0.65rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--white-dim);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+
+    .srv-hint::before {
+      content: '';
+      display: block; width: 28px; height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    #srv-track {
+      position: relative; z-index: 2;
+      display: flex; gap: 1.25rem;
+      padding: 0.5rem 5rem 1.5rem;
+      width: max-content;
       will-change: transform;
     }
 
-    /* Nav */
-    #navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 24px 48px;
-      transition: padding 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease, backdrop-filter 0.4s ease;
-    }
-    #navbar.scrolled {
-      padding: 16px 48px;
-      background: rgba(18, 18, 24, 0.45);
-      backdrop-filter: blur(20px) saturate(1.4);
-      -webkit-backdrop-filter: blur(20px) saturate(1.4);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-    }
-    .nav-logo-img {
-      height: 40px;
-      transform-origin: left center;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    #navbar.scrolled .nav-logo-img {
-      transform: scale(0.8);
-    }
-    .nav-links a {
+    .srv-card {
       position: relative;
+      width: 320px; min-height: 400px;
+      padding: 2.25rem 2rem;
+      background: linear-gradient(150deg, rgba(255,255,255,0.04) 0%, rgba(124,58,237,0.04) 100%);
+      border: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0; overflow: hidden; cursor: default;
+      transition: border-color 0.4s ease, transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .srv-card:hover {
+      border-color: rgba(212,168,83,0.22);
+      transform: translateY(-8px);
+    }
+
+    .srv-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--gold));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .srv-card:hover::after { transform: scaleX(1); }
+
+    .srv-card-glow {
+      position: absolute; top: -40%; right: -30%;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .srv-icon {
+      width: 48px; height: 48px;
+      margin-bottom: 1.5rem; position: relative;
+    }
+
+    .srv-icon svg { width: 100%; height: 100%; }
+
+    .srv-icon-ring {
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,168,83,0.14) 0%, transparent 70%);
+    }
+
+    .srv-tag {
+      font-family: var(--ff-ui);
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.65rem;
+    }
+
+    .srv-name {
+      font-family: var(--ff-display);
+      font-size: 1.75rem; letter-spacing: 0.04em;
+      color: var(--white); margin-bottom: 0.9rem;
+    }
+
+    .srv-desc {
+      font-size: 0.84rem; line-height: 1.78;
+      color: var(--white-dim); margin-bottom: 1.5rem;
+    }
+
+    .srv-features {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+
+    .srv-features li {
+      font-family: var(--ff-ui);
+      font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(240,236,255,0.38);
+      display: flex; align-items: center; gap: 0.5rem;
       transition: color 0.3s ease;
     }
-    .nav-links a::after {
+    .srv-card:hover .srv-features li { color: rgba(240,236,255,0.62); }
+
+    .srv-features li::before {
       content: '';
-      position: absolute;
-      bottom: -4px; left: 0;
-      width: 0%; height: 1px;
-      background: var(--brand);
-      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: block; width: 4px; height: 4px;
+      background: var(--gold); flex-shrink: 0;
     }
-    .nav-links a:hover { color: var(--text) !important; }
-    .nav-links a:hover::after { width: 100%; }
 
-    /* Hamburger */
-    .hamburger span {
-      display: block;
-      width: 24px; height: 1px;
-      background: var(--text);
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-    .hamburger.active span:first-child { transform: rotate(45deg) translate(2.5px, 2.5px); }
-    .hamburger.active span:last-child { transform: rotate(-45deg) translate(2.5px, -2.5px); }
-
-    /* Mobile Menu */
-    #mobile-menu {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 99;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-    #mobile-menu.active { opacity: 1; pointer-events: all; }
-
-    /* Hero */
-    #hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 220px;
-      background: linear-gradient(to bottom, transparent 0%, var(--bg) 85%);
-      z-index: 5;
-      pointer-events: none;
-    }
-    .hero-content h1 .line-inner { display: block; transform: translateY(110%); }
-
-    /* Glassmorphism badge */
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 18px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      margin-bottom: 28px;
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    .hero-badge .pulse-dot {
+    /* ─── CONTACT ────────────────────────────────────────── */
+    #contact {
       position: relative;
-      width: 8px;
-      height: 8px;
-    }
-    .hero-badge .pulse-dot::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: #34D399;
-      border-radius: 50%;
-      animation: dotPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    .hero-badge .pulse-dot::after {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      background: #34D399;
-      border-radius: 50%;
-      opacity: 0;
-      animation: dotPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-    @keyframes dotPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-    @keyframes dotPing {
-      0% { transform: scale(1); opacity: 0.6; }
-      75%, 100% { transform: scale(2.2); opacity: 0; }
-    }
-
-    /* CTA Button */
-    /* Cyberpunk button */
-    .cybr-btn {
-      --primary: hsl(var(--primary-hue), 85%, calc(var(--primary-lightness, 50) * 1%));
-      --shadow-primary: hsl(var(--shadow-primary-hue), 90%, 50%);
-      --primary-hue: 355;
-      --primary-lightness: 45;
-      --color: hsl(0, 0%, 100%);
-      --font-size: 13px;
-      --shadow-primary-hue: 180;
-      --shadow-secondary-hue: 60;
-      --shadow-secondary: hsl(var(--shadow-secondary-hue), 90%, 60%);
-      --clip: polygon(0 0, 100% 0, 100% 100%, 85% 100%, 8% 100%, 0 70%);
-      --border: 0.28em;
-      --shimmy-distance: 5;
-      --clip-one: polygon(0 2%, 100% 2%, 100% 95%, 8% 95%, 0 70%);
-      --clip-two: polygon(0 78%, 100% 78%, 100% 100%, 8% 100%, 0 78%);
-      --clip-three: polygon(0 44%, 100% 44%, 100% 54%, 8% 54%, 0 54%);
-      --clip-four: polygon(0 0, 100% 0, 100% 0, 8% 0, 0 0);
-      --clip-five: polygon(0 0, 100% 0, 100% 0, 8% 0, 0 0);
-      --clip-six: polygon(0 40%, 100% 40%, 100% 85%, 8% 85%, 0 70%);
-      --clip-seven: polygon(0 63%, 100% 63%, 100% 80%, 8% 80%, 0 70%);
-      font-family: var(--font-body);
-      color: var(--color);
-      cursor: pointer;
-      background: transparent;
-      text-transform: uppercase;
-      font-size: var(--font-size);
-      outline: transparent;
-      letter-spacing: 2px;
-      position: relative;
-      font-weight: 700;
-      border: 0;
-      width: 15em;
-      height: 3.2em;
-      line-height: 3.2;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      transition: background 0.2s;
-    }
-    .cybr-btn:hover {
-      --primary: hsl(var(--primary-hue), 85%, calc(var(--primary-lightness, 50) * 0.8%));
-    }
-    .cybr-btn:active {
-      --primary: hsl(var(--primary-hue), 85%, calc(var(--primary-lightness, 50) * 0.6%));
-    }
-    .cybr-btn:after,
-    .cybr-btn:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      clip-path: var(--clip);
-      z-index: -1;
-    }
-    .cybr-btn:before {
-      background: var(--shadow-primary);
-      transform: translate(var(--border), 0);
-    }
-    .cybr-btn:after {
-      background: var(--primary);
-    }
-    .cybr-btn__glitch {
-      position: absolute;
-      top: calc(var(--border) * -1);
-      left: calc(var(--border) * -1);
-      right: calc(var(--border) * -1);
-      bottom: calc(var(--border) * -1);
-      background: var(--shadow-primary);
-      text-shadow: 2px 2px var(--shadow-primary), -2px -2px var(--shadow-secondary);
-      clip-path: var(--clip);
-      animation: glitch 2s infinite;
-      display: none;
-    }
-    .cybr-btn:hover .cybr-btn__glitch {
-      display: block;
-    }
-    .cybr-btn__glitch:before {
-      content: '';
-      position: absolute;
-      top: calc(var(--border) * 1);
-      right: calc(var(--border) * 1);
-      bottom: calc(var(--border) * 1);
-      left: calc(var(--border) * 1);
-      clip-path: var(--clip);
-      background: var(--primary);
-      z-index: -1;
-    }
-    .cybr-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; }
-    @keyframes glitch {
-      0% { clip-path: var(--clip-one); }
-      2%, 8% { clip-path: var(--clip-two); transform: translate(calc(var(--shimmy-distance) * -1%), 0); }
-      6% { clip-path: var(--clip-two); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
-      9% { clip-path: var(--clip-two); transform: translate(0, 0); }
-      10% { clip-path: var(--clip-three); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
-      13% { clip-path: var(--clip-three); transform: translate(0, 0); }
-      14%, 21% { clip-path: var(--clip-four); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
-      25% { clip-path: var(--clip-five); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
-      30% { clip-path: var(--clip-five); transform: translate(calc(var(--shimmy-distance) * -1%), 0); }
-      35%, 45% { clip-path: var(--clip-six); transform: translate(calc(var(--shimmy-distance) * -1%)); }
-      40% { clip-path: var(--clip-six); transform: translate(calc(var(--shimmy-distance) * 1%)); }
-      50% { clip-path: var(--clip-six); transform: translate(0, 0); }
-      55% { clip-path: var(--clip-seven); transform: translate(calc(var(--shimmy-distance) * 1%), 0); }
-      60% { clip-path: var(--clip-seven); transform: translate(0, 0); }
-      31%, 61%, 100% { clip-path: var(--clip-four); }
-    }
-
-    /* Scroll Indicator — vertical line + text */
-    .scroll-indicator {
-      position: absolute;
-      bottom: 40px;
-      right: 48px;
-      left: auto;
-      transform: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      pointer-events: none;
-    }
-    .scroll-indicator .scroll-text {
-      font-family: var(--font-body);
-      font-size: 12px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
-      writing-mode: vertical-rl;
-    }
-    .scroll-indicator .scroll-line {
-      width: 1px;
-      height: 140px;
-      background: rgba(255,255,255,0.15);
-      position: relative;
+      padding: 9rem 5rem 0;
+      background: var(--bg2);
       overflow: hidden;
     }
-    .scroll-indicator .scroll-line::before {
+
+    #contact::after {
       content: '';
-      position: absolute;
-      top: -100%;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--brand);
-      animation: scrollLine 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    }
-    @keyframes scrollLine {
-      0% { top: -100%; }
-      50% { top: 100%; }
-      100% { top: 100%; }
-    }
-
-    /* Section label line */
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* Marquee */
-    .marquee-track {
-      display: flex;
-      gap: 48px;
-      animation: marqueeScroll 25s linear infinite;
-      white-space: nowrap;
-      will-change: transform;
-    }
-    .marquee-track span {
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(255,255,255,0.10);
-    }
-    .marquee-track .dot {
-      -webkit-text-stroke: 0;
-      color: var(--brand);
-      opacity: 0.2;
-    }
-    @keyframes marqueeScroll {
-      from { transform: translate3d(0, 0, 0); }
-      to { transform: translate3d(-50%, 0, 0); }
-    }
-
-    /* Orbital Visual */
-    .orbit {
-      position: absolute;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 50%;
-      top: 50%; left: 50%;
-    }
-    .orbit-1 { width: 100%; height: 100%; animation: orbitSpin 25s linear infinite; }
-    .orbit-2 { width: 70%; height: 70%; animation: orbitSpin 18s linear infinite reverse; }
-    .orbit-3 { width: 40%; height: 40%; animation: orbitSpin 12s linear infinite; }
-    .orbit-dot {
-      position: absolute;
-      top: 0; left: 50%;
-      width: 8px; height: 8px;
-      background: var(--brand);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 16px rgba(224,30,43,0.5);
-    }
-    @keyframes orbitSpin {
-      from { transform: translate(-50%, -50%) rotate(0deg); }
-      to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-    .orbit { will-change: transform; }
-
-    /* Solutions horizontal scroll */
-    .solutions-scroll-wrap {
-      overflow: hidden;
-    }
-    .solutions-track {
-      display: flex;
-      gap: 0;
-      width: fit-content;
-      padding-left: calc(50vw - 280px);
-      padding-right: calc(50vw - 280px);
-    }
-    .sol-card {
-      width: 55vw;
-      max-width: 720px;
-      min-width: 360px;
-      flex-shrink: 0;
-      padding: 0 16px;
-    }
-    .sol-card-inner {
-      padding: clamp(36px, 4vw, 52px);
-      height: 100%;
-      min-height: 420px;
-      display: flex;
-      flex-direction: row-reverse;
-      align-items: center;
-      gap: clamp(24px, 2.5vw, 36px);
-      transform: none !important;
-    }
-    .sol-visual {
-      flex-shrink: 0;
-      width: 30%;
-      max-width: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.85;
-    }
-    .sol-visual svg { width: 100%; height: auto; }
-    .sol-text { flex: 1; min-width: 0; }
-    .sol-text p:not([class*="uppercase"]) { font-size: 15px; }
-    @media (max-width: 768px) {
-      .sol-card { width: 85vw; }
-      .sol-card-inner { flex-direction: column; gap: 20px; }
-      .sol-visual { width: 100%; max-width: 200px; }
-    }
-
-    /* Animated chart bars */
-    /* Bar chart: rise then breathe */
-    .bar-rise {
-      animation: barRise 2s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-                 barBreathe 3s ease-in-out 2.5s infinite;
-    }
-    @keyframes barRise {
-      from { transform: scaleY(0); }
-      to { transform: scaleY(1); }
-    }
-    @keyframes barBreathe {
-      0%, 100% { opacity: var(--bar-o, 1); }
-      50% { opacity: calc(var(--bar-o, 1) * 0.7); }
-    }
-    /* Network nodes pulse */
-    .node-pulse { animation: nodePulse 3s ease-in-out infinite; }
-    @keyframes nodePulse {
-      0%, 100% { r: 3; opacity: 0.6; }
-      50% { r: 5; opacity: 1; }
-    }
-    /* Network lines pulse */
-    .line-pulse { animation: linePulse 3s ease-in-out infinite; }
-    @keyframes linePulse {
-      0%, 100% { stroke-opacity: 0.1; }
-      50% { stroke-opacity: 0.4; }
-    }
-    /* Network SVG slow drift rotation */
-    .network-drift { animation: networkDrift 20s linear infinite; transform-origin: center; }
-    @keyframes networkDrift {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    /* Trend line: draw then pulse */
-    .trend-draw {
-      animation: trendDraw 2s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-                 trendPulse 3s ease-in-out 2.5s infinite;
-    }
-    @keyframes trendDraw {
-      from { stroke-dashoffset: 400; }
-      to { stroke-dashoffset: 0; }
-    }
-    @keyframes trendPulse {
-      0%, 100% { stroke-opacity: 1; }
-      50% { stroke-opacity: 0.5; }
-    }
-    /* Trend area fill pulse */
-    .trend-glow { animation: trendGlow 3s ease-in-out infinite; }
-    @keyframes trendGlow {
-      0%, 100% { filter: drop-shadow(0 0 4px rgba(224,30,43,0.3)); }
-      50% { filter: drop-shadow(0 0 12px rgba(224,30,43,0.6)); }
-    }
-    /* Signal wave broadcast animation */
-    .signal-wave {
-      stroke-dasharray: 200;
-      stroke-dashoffset: 200;
-      animation: signalSend 3s ease-out infinite;
-    }
-    @keyframes signalSend {
-      0% { stroke-dashoffset: 200; opacity: 0; }
-      20% { opacity: var(--wave-o, 0.5); }
-      80% { stroke-dashoffset: 0; opacity: var(--wave-o, 0.5); }
-      100% { stroke-dashoffset: 0; opacity: 0; }
-    }
-
-    /* Tilt Cards */
-    .tilt-card {
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .tilt-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--brand), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .tilt-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.02) 45%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.02) 55%, transparent 60%);
-      transform: translateX(-100%);
-      transition: transform 0.6s ease;
-      border-radius: 12px;
+      position: absolute; top: -150px; right: -100px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 65%);
       pointer-events: none;
     }
-    .tilt-card:hover { border-color: rgba(224, 30, 43, 0.12) !important; box-shadow: 0 8px 40px rgba(224, 30, 43, 0.05); }
-    .tilt-card:hover::before { opacity: 1; }
-    .tilt-card:hover::after { transform: translateX(100%); }
-    .tilt-card:hover .card-num { color: rgba(224, 30, 43, 0.08) !important; }
 
-    /* Stats divider */
-    .stat-divider { width: 1px; background: var(--border); align-self: stretch; }
-
-    /* Impact Grid */
-    .impact-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-    @media (max-width: 1024px) {
-      .impact-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 560px) {
-      .impact-grid { grid-template-columns: 1fr; }
-    }
-    .impact-card {
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 32px 28px;
-      background: rgba(255,255,255,0.02);
-      transition: border-color 0.3s ease, background 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 160px;
-    }
-    .impact-card:hover {
-      border-color: rgba(224,30,43,0.2);
-      background: rgba(255,255,255,0.04);
-    }
-    .impact-card.span-2 {
-      grid-column: span 2;
-    }
-    @media (max-width: 560px) {
-      .impact-card.span-2 { grid-column: span 1; }
-    }
-    .impact-card .stat-val {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(36px, 4.5vw, 56px);
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-    .impact-card .stat-val .accent {
-      color: var(--brand);
-    }
-    .impact-card .stat-desc {
-      font-family: var(--font-body);
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-    .impact-card .stat-desc strong {
-      color: rgba(255,255,255,0.7);
-      font-weight: 500;
+    .ct-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 7rem; max-width: 1100px; margin: 0 auto;
+      position: relative; z-index: 1;
     }
 
-    /* Contact */
-    #contact { position: relative; }
+    .ct-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+      line-height: 0.96; margin-bottom: 1.25rem;
+    }
+    .ct-title span { color: var(--gold); }
 
-    /* Reveal base */
-    .reveal { opacity: 0; transform: translateY(40px); }
+    .ct-desc {
+      font-size: 0.92rem; line-height: 1.85;
+      color: var(--white-dim); max-width: 380px;
+      margin-bottom: 2.5rem;
+    }
 
-    /* Process toggle */
-    .process-toggle {
-      width: 52px;
-      height: 28px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 999px;
-      position: relative;
-      display: inline-block;
-      vertical-align: middle;
-      margin: 0 6px;
-      cursor: pointer;
-      transition: background 0.35s ease, border-color 0.35s ease;
+    .ct-links { display: flex; flex-direction: column; gap: 0; }
+
+    .ct-link {
+      display: flex; align-items: center; gap: 1rem;
+      text-decoration: none; color: var(--white-dim);
+      font-size: 0.88rem; font-family: var(--ff-body);
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: color 0.3s ease, padding-left 0.3s ease;
     }
-    .process-toggle::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 20px;
-      height: 20px;
-      background: rgba(255,255,255,0.4);
-      border-radius: 50%;
-      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.35s ease;
-      animation: togglePulse 2s ease-in-out infinite;
+    .ct-link:hover { color: var(--gold-light); padding-left: 0.5rem; }
+
+    .ct-link svg { width: 18px; height: 18px; opacity: 0.55; flex-shrink: 0; }
+
+    .ct-right { display: flex; flex-direction: column; justify-content: flex-start; padding-top: 1rem; }
+
+    .social-label {
+      font-family: var(--ff-ui);
+      font-size: 0.68rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.25rem;
     }
-    .process-toggle.active::after {
-      animation: none;
+
+    .socials { display: flex; gap: 0.85rem; margin-bottom: 3rem; }
+
+    .soc-link {
+      display: flex; align-items: center; justify-content: center;
+      width: 46px; height: 46px;
+      border: 1px solid rgba(212,168,83,0.2);
+      color: var(--white-dim); text-decoration: none;
+      transition: border-color 0.3s ease, color 0.3s ease,
+                  background 0.3s ease,
+                  transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
     }
-    @keyframes togglePulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
-      50% { box-shadow: 0 0 10px 4px rgba(255,255,255,0.18); }
+    .soc-link:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+      background: rgba(212,168,83,0.08);
+      transform: translateY(-5px);
     }
-    .process-toggle.active {
-      background: var(--brand);
-      border-color: var(--brand);
+
+    .ct-callout {
+      font-size: 0.9rem; line-height: 1.8;
+      color: var(--white-dim); margin-bottom: 2rem;
     }
-    .process-toggle.active::after {
-      transform: translateX(24px);
-      background: #fff;
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    #footer {
+      position: relative; z-index: 1;
+      margin-top: 6rem; padding: 2rem 5rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px; margin-left: auto; margin-right: auto;
     }
-    /* Candle track */
-    .process-track {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: clamp(20px, 3.5vw, 48px);
-      padding: 0 24px;
-      position: relative;
+
+    .footer-logo {
+      height: 38px; width: auto;
+      mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 38%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 38%, transparent 100%);
+      opacity: 0.75;
     }
-    .process-phase {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+
+    .footer-copy {
+      font-family: var(--ff-ui);
+      font-size: 0.68rem; letter-spacing: 0.1em;
+      color: rgba(240,236,255,0.22);
     }
-    .phase-candle-wrap {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      margin-bottom: 16px;
+
+    .footer-pad { padding-bottom: 3rem; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .sol-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    .phase-meta {
-      min-height: 60px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    .phase-candle {
-      width: clamp(40px, 5.5vw, 64px);
-      border-radius: 6px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.6s ease, box-shadow 0.6s ease;
-    }
-    /* Wick */
-    .phase-candle::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 10px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 2px;
-      transition: background 0.6s ease;
-    }
-    /* Red fill that rises from bottom */
-    .phase-candle-fill {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 0%;
-      background: linear-gradient(to top, #E01E2B, #ff3344);
-      border-radius: 0 0 5px 5px;
-      transition: height 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .process-phase.lit .phase-candle {
-      border-color: rgba(224,30,43,0.3);
-      box-shadow: 0 0 24px rgba(224,30,43,0.15), 0 0 48px rgba(224,30,43,0.06);
-    }
-    .process-phase.lit .phase-candle::before {
-      background: var(--brand);
-    }
-    .process-phase.lit .phase-candle-fill {
-      height: 100%;
-    }
-    .phase-num {
-      font-family: var(--font-display);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      transition: color 0.5s ease;
-    }
-    .process-phase.lit .phase-num { color: var(--brand); }
-    .phase-label {
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-dim);
-      line-height: 1.4;
-      max-width: 130px;
-      transition: color 0.5s ease;
-    }
-    .process-phase.lit .phase-label { color: var(--text); }
-    .confetti-container {
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      pointer-events: none;
-      z-index: 10;
-    }
-    .confetti-particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 1px;
-      opacity: 0;
-    }
+
     @media (max-width: 768px) {
-      .process-track { flex-wrap: wrap; gap: 20px; }
-      .process-phase { flex: 0 0 calc(33.333% - 16px); }
-      .phase-candle { width: 36px; }
-    }
-    @media (max-width: 480px) {
-      .process-phase { flex: 0 0 calc(50% - 12px); }
-    }
-
-    /* Testimonials columns */
-    .testimonial-col {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      animation: testimonialScroll var(--scroll-duration, 30s) linear infinite;
-    }
-    @keyframes testimonialScroll {
-      from { transform: translate3d(0, 0, 0); }
-      to { transform: translate3d(0, -50%, 0); }
-    }
-    .testimonial-card {
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 320px;
-      width: 100%;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .testimonial-card:hover {
-      border-color: rgba(224, 30, 43, 0.1);
-      box-shadow: 0 4px 32px rgba(224, 30, 43, 0.04);
-    }
-    .testimonials-mask {
-      -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
-      mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
-    }
-
-    /* Carved logo endmark */
-    /* Sticky footer glow animations */
-    @keyframes footerGlow1 {
-      0%, 100% { transform: scale(1); opacity: 0.04; }
-      50% { transform: scale(1.1); opacity: 0.07; }
-    }
-    @keyframes footerGlow2 {
-      0%, 100% { transform: scale(1); opacity: 0.03; }
-      50% { transform: scale(1.2); opacity: 0.06; }
-    }
-
-    /* Glitch hover effect */
-
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .cursor-dot, .cursor-ring { display: none !important; }
-      body { cursor: auto; }
-      #navbar { padding: 16px 20px !important; }
-      #navbar.scrolled { padding: 12px 20px !important; }
-      .hero-content { padding-left: 16px !important; padding-right: 16px !important; }
-      .hero-content h1 { word-break: break-word; }
+      #nav { padding: 1.25rem 1.5rem; }
+      #nav.stuck { padding: 0.9rem 1.5rem; }
+      .nav-links { display: none; }
+      #solutions { padding: 6rem 1.5rem; }
+      .sol-grid { grid-template-columns: 1fr; }
+      .srv-header { padding: 0 1.5rem; }
+      #srv-track { padding: 0.5rem 1.5rem 1rem; }
+      #contact { padding: 6rem 1.5rem 0; }
+      .ct-grid { grid-template-columns: 1fr; gap: 3rem; }
+      #footer { flex-direction: column; gap: 1rem; margin-top: 3rem; padding: 2rem 1.5rem; }
+      .hero-title { font-size: clamp(3rem, 13vw, 5.5rem); }
     }
   </style>
 </head>
+<body>
 
-<body class="font-body">
+  <div id="grain" aria-hidden="true"></div>
 
-  <!-- Preloader -->
-  <div id="preloader">
-    <div class="preloader-curtain preloader-curtain--top"></div>
-    <div class="preloader-curtain preloader-curtain--bottom"></div>
-    <div class="preloader-line"></div>
-    <div class="preloader-center">
-      <div class="preloader-corners preloader-corners--tl"><div class="preloader-corner-line"></div><div class="preloader-corner-line"></div></div>
-      <div class="preloader-corners preloader-corners--tr"><div class="preloader-corner-line"></div><div class="preloader-corner-line"></div></div>
-      <div class="preloader-corners preloader-corners--bl"><div class="preloader-corner-line"></div><div class="preloader-corner-line"></div></div>
-      <div class="preloader-corners preloader-corners--br"><div class="preloader-corner-line"></div><div class="preloader-corner-line"></div></div>
-      <div class="preloader-brand"><img src="brand_assets/apex-logo-inverted-rgb-1200px@72ppi.png" alt="AP3X"></div>
-      <div class="preloader-counter"><span class="counter-digits">000</span><span class="counter-suffix">%</span></div>
-      <div class="preloader-status">Initializing</div>
+  <!-- ─── LOADER ──────────────────────────────────────────── -->
+  <div id="loader" role="status" aria-label="Loading">
+
+    <div class="loader-scene">
+      <!-- faint orbit path circles -->
+      <div class="orbit-path outer"></div>
+      <div class="orbit-path inner"></div>
+
+      <!-- outer orbit: main horn + 3 trailing ghosts -->
+      <div class="horn-arm main" id="ha-main"><div class="horn-tip"></div></div>
+      <div class="horn-arm t1"   id="ha-t1">  <div class="horn-tip"></div></div>
+      <div class="horn-arm t2"   id="ha-t2">  <div class="horn-tip"></div></div>
+      <div class="horn-arm t3"   id="ha-t3">  <div class="horn-tip"></div></div>
+
+      <!-- inner orbit: purple spark -->
+      <div class="horn-arm inner-arm" id="ha-inner"><div class="horn-tip"></div></div>
+
+      <!-- pulsing gold ring behind logo -->
+      <div class="loader-logo-ring" id="logo-ring"></div>
+
+      <!-- logo centred -->
+      <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" id="loader-logo">
     </div>
+
+    <p id="loader-tagline">Your Business Within Reach</p>
+    <div id="loader-track"><div id="loader-bar"></div></div>
   </div>
 
-  <!-- Custom Cursor -->
-  <div class="cursor-dot"></div>
-  <div class="cursor-ring"></div>
-
-  <!-- Noise Overlay -->
-  <div class="noise-overlay"></div>
-
-  <!-- Grid Pattern Overlay -->
-  <div class="grid-overlay"></div>
-
-  <!-- Background Glows — contained to prevent mobile overflow -->
-  <div style="position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;">
-    <div class="bg-glow" style="width:700px;height:700px;background:#E01E2B;top:-300px;right:-250px;opacity:0.05;"></div>
-    <div class="bg-glow" style="width:500px;height:500px;background:#1a2a6c;bottom:20%;left:-200px;opacity:0.045;"></div>
-  </div>
-
-  <!-- Navigation -->
-  <nav id="navbar">
-    <div class="max-w-[1400px] mx-auto flex items-center justify-between">
-      <a href="#hero" class="nav-logo">
-        <img src="brand_assets/apex-logo-inverted-rgb-1200px@72ppi.png" alt="AP3X" class="nav-logo-img w-auto">
-      </a>
-      <div class="nav-links hidden md:flex gap-10">
-        <a href="#about" data-text="About" class="text-[var(--text-dim)] no-underline font-body text-[13px] font-normal tracking-[0.08em] uppercase">About</a>
-        <a href="#services" data-text="Solutions" class="text-[var(--text-dim)] no-underline font-body text-[13px] font-normal tracking-[0.08em] uppercase">Solutions</a>
-        <a href="#impact" data-text="Impact" class="text-[var(--text-dim)] no-underline font-body text-[13px] font-normal tracking-[0.08em] uppercase">Impact</a>
-        <a href="#contact" data-text="Contact" class="text-[var(--text-dim)] no-underline font-body text-[13px] font-normal tracking-[0.08em] uppercase">Contact</a>
-      </div>
-      <button class="hamburger flex md:hidden flex-col gap-[6px] bg-transparent border-none cursor-none p-2" aria-label="Menu">
-        <span></span>
-        <span></span>
-      </button>
+  <!-- ─── NAVBAR ──────────────────────────────────────────── -->
+  <nav id="nav" aria-label="Main navigation">
+    <a href="#hero">
+      <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" class="nav-logo-img">
+    </a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#solutions">Solutions</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#contact" class="nav-cta">Get in Touch</a>
     </div>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div id="mobile-menu">
-    <a href="#about" class="text-white no-underline font-display text-3xl font-bold uppercase tracking-tight">About</a>
-    <a href="#services" class="text-white no-underline font-display text-3xl font-bold uppercase tracking-tight">Solutions</a>
-    <a href="#impact" class="text-white no-underline font-display text-3xl font-bold uppercase tracking-tight">Impact</a>
-    <a href="#contact" class="text-white no-underline font-display text-3xl font-bold uppercase tracking-tight">Contact</a>
-  </div>
+  <!-- ─── HERO ────────────────────────────────────────────── -->
+  <section id="hero">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
 
-  <!-- ========== HERO ========== -->
-  <section id="hero" class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-    <canvas id="canvas3d" class="absolute inset-0 w-full h-full" style="transform: scale(1.15);"></canvas>
+    <div class="hero-content">
+      <p class="hero-eyebrow">SMM &middot; Content &middot; Growth &middot; Branding</p>
 
-    <div class="hero-content relative z-10 text-center px-6 pointer-events-none">
-      <!-- Dark vignette behind text -->
-      <div class="absolute inset-[-120px] bg-[radial-gradient(ellipse_at_center,rgba(18,18,24,0.65)_0%,transparent_70%)] -z-10"></div>
-
-      <div class="hero-badge">
-        <span class="pulse-dot"></span>
-        <span class="text-[12px] font-medium tracking-[0.1em] uppercase text-white/70">110+ Projects Helped</span>
-      </div>
-
-      <h1 class="font-display font-extrabold text-[clamp(32px,9vw,120px)] leading-[0.92] tracking-[-0.04em] uppercase mb-6">
-        <span class="line block overflow-hidden"><span class="line-inner">Growth Beyond</span></span>
-        <span class="line block overflow-hidden"><span class="line-inner text-brand">Limits</span></span>
+      <h1 class="hero-title">
+        <span class="line"><span class="line-inner">YOUR BUSINESS</span></span>
+        <span class="line"><span class="line-inner"><span class="accent">WITHIN</span> REACH</span></span>
       </h1>
 
-      <p class="hero-tagline text-[clamp(14px,1.5vw,17px)] text-[var(--text-dim)] font-light tracking-wide mb-12 max-w-lg mx-auto opacity-0 translate-y-5">
-        Helping projects raise capital, build high-conviction communities, and launch tokens with real market momentum.
-      </p>
+      <p class="hero-sub">Social Media Agency &middot; Est. 2024</p>
 
-      <a href="https://t.me/krisslavev" target="_blank" rel="noopener noreferrer" class="cybr-btn opacity-0 translate-y-5 pointer-events-auto cursor-none">
-        Get In Touch
-        <span aria-hidden class="cybr-btn__glitch">Get In Touch</span>
-      </a>
+      <div class="hero-btns">
+        <a href="#services" class="btn-gold">Our Services</a>
+        <a href="#contact"  class="btn-ghost">Let&#8217;s Talk</a>
+      </div>
     </div>
 
-    <div class="scroll-indicator z-[4]">
-      <span class="scroll-text">Scroll</span>
-      <div class="scroll-line"></div>
+  </section>
+
+  <!-- ─── SOLUTIONS ────────────────────────────────────────── -->
+  <section id="solutions">
+    <div class="sol-header">
+      <p class="s-label">The Problem Space</p>
+      <h2 class="s-title">CHALLENGES<br>WE ELIMINATE</h2>
+    </div>
+
+    <div class="sol-grid">
+
+      <div class="sol-card">
+        <div class="sol-num">01</div>
+        <h3 class="sol-problem">Invisible Online Presence</h3>
+        <div class="sol-divider">Our solution</div>
+        <p class="sol-answer">Your brand exists — but no one sees it. We build a commanding multi-platform presence engineered to be found, followed, and remembered.</p>
+        <div class="sol-line"></div>
+      </div>
+
+      <div class="sol-card">
+        <div class="sol-num">02</div>
+        <h3 class="sol-problem">Dead Engagement</h3>
+        <div class="sol-divider">Our solution</div>
+        <p class="sol-answer">Posting into the void with zero reaction. Our content strategies are designed to spark conversation and grow loyal communities around your brand.</p>
+        <div class="sol-line"></div>
+      </div>
+
+      <div class="sol-card">
+        <div class="sol-num">03</div>
+        <h3 class="sol-problem">Wasted Ad Spend</h3>
+        <div class="sol-divider">Our solution</div>
+        <p class="sol-answer">Running paid campaigns with no clear ROI. We architect data-driven ads that convert — every pound and dollar working at peak efficiency.</p>
+        <div class="sol-line"></div>
+      </div>
+
+      <div class="sol-card">
+        <div class="sol-num">04</div>
+        <h3 class="sol-problem">Inconsistent Identity</h3>
+        <div class="sol-divider">Our solution</div>
+        <p class="sol-answer">Scattered visuals and messaging erode trust. We craft a cohesive brand identity that commands instant recognition across every touchpoint.</p>
+        <div class="sol-line"></div>
+      </div>
+
+      <div class="sol-card">
+        <div class="sol-num">05</div>
+        <h3 class="sol-problem">No Search Visibility</h3>
+        <div class="sol-divider">Our solution</div>
+        <p class="sol-answer">Your competitors rank. You don't. Our SEO strategies place you at the top of searches that actually drive qualified, high-intent traffic.</p>
+        <div class="sol-line"></div>
+      </div>
+
+      <div class="sol-card">
+        <div class="sol-num">06</div>
+        <h3 class="sol-problem">Flying Blind on Data</h3>
+        <div class="sol-divider">Our solution</div>
+        <p class="sol-answer">Making decisions without insight is guesswork. We implement analytics frameworks that show exactly what's working, what isn't, and why.</p>
+        <div class="sol-line"></div>
+      </div>
+
     </div>
   </section>
 
-  <!-- ========== MARQUEE ========== -->
-  <div class="overflow-hidden border-b border-white/[0.04] py-8">
-    <div class="marquee-track font-display text-[clamp(36px,5vw,56px)] font-extrabold uppercase tracking-tight">
-      <span>Strategy</span><span class="dot mx-6">&middot;</span>
-      <span>Distribution</span><span class="dot mx-6">&middot;</span>
-      <span>Capital</span><span class="dot mx-6">&middot;</span>
-      <span>Growth</span><span class="dot mx-6">&middot;</span>
-      <span>Strategy</span><span class="dot mx-6">&middot;</span>
-      <span>Distribution</span><span class="dot mx-6">&middot;</span>
-      <span>Capital</span><span class="dot mx-6">&middot;</span>
-      <span>Growth</span><span class="dot mx-6">&middot;</span>
-      <span>Strategy</span><span class="dot mx-6">&middot;</span>
-      <span>Distribution</span><span class="dot mx-6">&middot;</span>
-      <span>Capital</span><span class="dot mx-6">&middot;</span>
-      <span>Growth</span><span class="dot mx-6">&middot;</span>
-    </div>
-  </div>
-
-  <!-- ========== ABOUT ========== -->
-  <section id="about" class="relative max-w-[1400px] mx-auto px-6 md:px-12 py-24 md:py-32">
-    <div class="section-label flex items-center gap-4 text-[12px] tracking-[0.2em] uppercase text-[var(--text-muted)] mb-12">01 / About</div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 items-center">
+  <!-- ─── SERVICES ─────────────────────────────────────────── -->
+  <section id="services">
+    <div class="srv-header">
       <div>
-        <h2 class="reveal font-display font-bold text-[clamp(30px,4vw,50px)] leading-[1.1] tracking-[-0.03em] mb-6">
-          We don't chase hype.<br/>We engineer <span class="text-brand">momentum.</span>
-        </h2>
-        <p class="reveal text-[15px] leading-[1.8] text-[var(--text-dim)] font-light max-w-lg">
-          Ap3x is a research-driven Web3 capital and growth partner connecting ambitious projects with strategic investors, influential communities, and the network needed to scale.
-        </p>
+        <p class="s-label">What We Do</p>
+        <h2 class="s-title">OUR SERVICES</h2>
+      </div>
+      <div class="srv-hint">Scroll to explore all services</div>
+    </div>
+
+    <div id="srv-track">
+
+      <div class="srv-card">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="13" stroke="rgba(212,168,83,0.45)" stroke-width="1.5"/>
+            <circle cx="16" cy="18" r="2.5" fill="#d4a853"/>
+            <circle cx="32" cy="18" r="2.5" fill="#d4a853"/>
+            <path d="M17 29c1.8 3.5 13.2 3.5 14 0" stroke="#d4a853" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="24" cy="6"  r="3" fill="#7c3aed" opacity="0.8"/>
+            <circle cx="40" cy="18" r="3" fill="#7c3aed" opacity="0.8"/>
+            <circle cx="8"  cy="18" r="3" fill="#7c3aed" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="srv-tag">Platform Growth</div>
+        <h3 class="srv-name">SOCIAL MEDIA<br>MANAGEMENT</h3>
+        <p class="srv-desc">Full-spectrum management of your social channels — strategy, scheduling, community, and growth handled with precision.</p>
+        <ul class="srv-features">
+          <li>Platform Strategy</li>
+          <li>Community Management</li>
+          <li>Growth Campaigns</li>
+          <li>Monthly Reporting</li>
+        </ul>
       </div>
 
-      <!-- Orbital Visual -->
-      <div class="reveal relative w-full aspect-square max-w-[380px] mx-auto overflow-hidden">
-        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
-        <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
-        <div class="orbit orbit-3"><div class="orbit-dot"></div></div>
-        <div class="absolute top-1/2 left-1/2 w-3 h-3 bg-brand rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_30px_rgba(224,30,43,0.4)]"></div>
+      <div class="srv-card">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="12" width="32" height="24" rx="2" stroke="rgba(212,168,83,0.45)" stroke-width="1.5"/>
+            <line x1="15" y1="21" x2="33" y2="21" stroke="#d4a853" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="15" y1="27" x2="26" y2="27" stroke="#d4a853" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="37" cy="12" r="5" fill="#4c1d95"/>
+            <line x1="35" y1="12" x2="39" y2="12" stroke="#d4a853" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="37" y1="10" x2="37" y2="14" stroke="#d4a853" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="srv-tag">Creative Studio</div>
+        <h3 class="srv-name">CONTENT<br>CREATION</h3>
+        <p class="srv-desc">Scroll-stopping visuals and sharp copy that tell your brand story. Every piece engineered to perform across every format.</p>
+        <ul class="srv-features">
+          <li>Visual Design</li>
+          <li>Video &amp; Reels</li>
+          <li>Copywriting</li>
+          <li>Content Calendars</li>
+        </ul>
       </div>
+
+      <div class="srv-card">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="8,36 18,24 26,30 36,16 44,22" stroke="#d4a853" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="8"  cy="36" r="2.2" fill="#d4a853"/>
+            <circle cx="44" cy="22" r="2.2" fill="rgba(212,168,83,0.5)"/>
+            <polyline points="36,10 44,10 44,18" stroke="rgba(212,168,83,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="srv-tag">Paid Performance</div>
+        <h3 class="srv-name">ADS<br>OPTIMISATION</h3>
+        <p class="srv-desc">Paid campaigns engineered for maximum ROI. Precise targeting, relentless testing, and fearless scaling of what converts.</p>
+        <ul class="srv-features">
+          <li>Meta &amp; Google Ads</li>
+          <li>Audience Targeting</li>
+          <li>A/B Testing</li>
+          <li>ROI Tracking</li>
+        </ul>
+      </div>
+
+      <div class="srv-card">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="14" stroke="rgba(212,168,83,0.35)" stroke-width="1.5"/>
+            <ellipse cx="24" cy="24" rx="7" ry="14" stroke="rgba(212,168,83,0.6)" stroke-width="1.5"/>
+            <line x1="10" y1="24" x2="38" y2="24" stroke="#d4a853" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="12" y1="17" x2="36" y2="17" stroke="rgba(212,168,83,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="12" y1="31" x2="36" y2="31" stroke="rgba(212,168,83,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="srv-tag">Organic Discovery</div>
+        <h3 class="srv-name">SEARCH ENGINE<br>OPTIMISATION</h3>
+        <p class="srv-desc">Dominate organic rankings that deliver sustained, high-intent traffic. Technical, on-page, and off-page — the full stack.</p>
+        <ul class="srv-features">
+          <li>Technical SEO Audit</li>
+          <li>Keyword Strategy</li>
+          <li>On-Page Optimisation</li>
+          <li>Link Building</li>
+        </ul>
+      </div>
+
+      <div class="srv-card">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8"  y="28" width="6" height="14" rx="1" fill="rgba(212,168,83,0.35)"/>
+            <rect x="18" y="20" width="6" height="22" rx="1" fill="rgba(212,168,83,0.55)"/>
+            <rect x="28" y="13" width="6" height="29" rx="1" fill="#d4a853"/>
+            <polyline points="8,22 14,14 22,20 32,10" stroke="#d4a853" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="srv-tag">Data Intelligence</div>
+        <h3 class="srv-name">ANALYTICS &amp;<br>REPORTING</h3>
+        <p class="srv-desc">Transform raw numbers into strategic decisions. Custom dashboards and deep-dive reports revealing where every click comes from.</p>
+        <ul class="srv-features">
+          <li>Custom Dashboards</li>
+          <li>Competitor Analysis</li>
+          <li>Monthly Deep Dives</li>
+          <li>Growth Forecasting</li>
+        </ul>
+      </div>
+
+      <div class="srv-card">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 10 L27.5 17.5 L36 18.6 L30 24.4 L31.5 33 L24 29 L16.5 33 L18 24.4 L12 18.6 L20.5 17.5 Z"
+                  stroke="#d4a853" stroke-width="1.6" stroke-linejoin="round" fill="rgba(212,168,83,0.08)"/>
+            <circle cx="24" cy="24" r="3.5" fill="#d4a853"/>
+          </svg>
+        </div>
+        <div class="srv-tag">Identity Design</div>
+        <h3 class="srv-name">BRAND<br>DEVELOPMENT</h3>
+        <p class="srv-desc">Your brand is far more than a logo. We architect complete visual identities that make you unmistakable — from mark to messaging.</p>
+        <ul class="srv-features">
+          <li>Logo &amp; Visual Identity</li>
+          <li>Brand Guidelines</li>
+          <li>Tone of Voice</li>
+          <li>Brand Strategy</li>
+        </ul>
+      </div>
+
+      <div class="srv-card" style="border-color: rgba(212,168,83,0.14); background: linear-gradient(150deg, rgba(212,168,83,0.05) 0%, rgba(124,58,237,0.06) 100%);">
+        <div class="srv-card-glow"></div>
+        <div class="srv-icon">
+          <div class="srv-icon-ring"></div>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="6" stroke="#d4a853" stroke-width="1.6" fill="rgba(212,168,83,0.1)"/>
+            <circle cx="24" cy="9"  r="3" fill="#4c1d95" stroke="rgba(212,168,83,0.5)" stroke-width="1.2"/>
+            <circle cx="37" cy="17" r="3" fill="#4c1d95" stroke="rgba(212,168,83,0.5)" stroke-width="1.2"/>
+            <circle cx="37" cy="31" r="3" fill="#4c1d95" stroke="rgba(212,168,83,0.5)" stroke-width="1.2"/>
+            <circle cx="24" cy="39" r="3" fill="#4c1d95" stroke="rgba(212,168,83,0.5)" stroke-width="1.2"/>
+            <circle cx="11" cy="31" r="3" fill="#4c1d95" stroke="rgba(212,168,83,0.5)" stroke-width="1.2"/>
+            <circle cx="11" cy="17" r="3" fill="#4c1d95" stroke="rgba(212,168,83,0.5)" stroke-width="1.2"/>
+            <line x1="24" y1="12" x2="24" y2="18" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
+            <line x1="34" y1="19" x2="30" y2="22" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
+            <line x1="34" y1="29" x2="30" y2="26" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
+            <line x1="24" y1="36" x2="24" y2="30" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
+            <line x1="14" y1="29" x2="18" y2="26" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
+            <line x1="14" y1="19" x2="18" y2="22" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="srv-tag">And More</div>
+        <h3 class="srv-name">CUSTOM<br>SOLUTIONS</h3>
+        <p class="srv-desc">Every business is different. If your challenge goes beyond a standard category, we build a tailored strategy from the ground up.</p>
+        <ul class="srv-features">
+          <li>Influencer Outreach</li>
+          <li>Email Marketing</li>
+          <li>PR &amp; Media</li>
+          <li>Strategic Consultation</li>
+        </ul>
+      </div>
+
     </div>
   </section>
 
+  <!-- ─── CONTACT ──────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="ct-grid">
 
-  <!-- ========== SERVICES (Horizontal Scroll) ========== -->
-  <section id="services" class="relative overflow-x-hidden">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-12 pt-24 md:pt-32 pb-12">
-      <div class="section-label flex items-center gap-4 text-[12px] tracking-[0.2em] uppercase text-[var(--text-muted)] mb-12">02 / Solutions</div>
-      <h2 class="reveal font-display font-bold text-[clamp(30px,4vw,50px)] tracking-[-0.03em]">What We Deliver</h2>
-    </div>
-
-    <div class="solutions-scroll-wrap">
-      <div class="solutions-track">
-        <!-- Card 1: Fundraising — Stacked coins/capital rising -->
-        <div class="sol-card">
-          <div class="sol-card-inner tilt-card relative bg-[var(--surface)] border border-white/[0.06] rounded-2xl overflow-hidden" style="transform-style:preserve-3d">
-            <div class="sol-visual">
-              <svg viewBox="0 0 360 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="trend-glow">
-                <!-- Grid -->
-                <line x1="30" y1="175" x2="340" y2="175" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                <line x1="30" y1="130" x2="340" y2="130" stroke="rgba(255,255,255,0.03)" stroke-width="0.5" stroke-dasharray="4 4"/>
-                <line x1="30" y1="85" x2="340" y2="85" stroke="rgba(255,255,255,0.03)" stroke-width="0.5" stroke-dasharray="4 4"/>
-                <line x1="30" y1="40" x2="340" y2="40" stroke="rgba(255,255,255,0.03)" stroke-width="0.5" stroke-dasharray="4 4"/>
-                <!-- Gradient fill -->
-                <defs>
-                  <linearGradient id="fundFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#E01E2B" stop-opacity="0.2"/>
-                    <stop offset="100%" stop-color="#E01E2B" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                <path d="M30 160 Q90 155 130 140 T200 100 T270 55 L330 30 L330 175 L30 175Z" fill="url(#fundFill)"/>
-                <!-- Stair-step capital raises -->
-                <path class="trend-draw" d="M30 160 L90 160 L90 140 L150 140 L150 110 L210 110 L210 75 L270 75 L270 45 L330 30" stroke="#E01E2B" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="400"/>
-                <!-- Milestone dots -->
-                <circle cx="90" cy="140" r="4" fill="#E01E2B" opacity="0.5" class="node-pulse" style="animation-delay:0.3s"/>
-                <circle cx="150" cy="110" r="4" fill="#E01E2B" opacity="0.6" class="node-pulse" style="animation-delay:0.6s"/>
-                <circle cx="210" cy="75" r="4.5" fill="#E01E2B" opacity="0.7" class="node-pulse" style="animation-delay:0.9s"/>
-                <circle cx="270" cy="45" r="5" fill="#E01E2B" opacity="0.85" class="node-pulse" style="animation-delay:1.2s"/>
-                <circle cx="330" cy="30" r="5.5" fill="#E01E2B" class="node-pulse" style="animation-delay:1.5s"/>
-                <!-- Labels -->
-                <text x="90" y="165" font-family="var(--font-body)" font-size="7" fill="rgba(255,255,255,0.3)" text-anchor="middle">SEED</text>
-                <text x="210" y="90" font-family="var(--font-body)" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">PRIVATE</text>
-                <text x="330" y="22" font-family="var(--font-body)" font-size="7" fill="rgba(255,255,255,0.5)" text-anchor="middle">STRATEGIC</text>
-              </svg>
-            </div>
-            <div class="sol-text">
-              <div class="card-num font-display text-[64px] font-extrabold text-[var(--elevated)] leading-none mb-3 transition-colors duration-300">01</div>
-              <h3 class="font-display text-[clamp(24px,2.8vw,34px)] font-bold tracking-tight mb-1">Capital</h3>
-              <p class="text-[13px] uppercase tracking-[0.08em] text-[var(--brand)] font-medium mb-4">Fundraising & Capital Access</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">We help projects secure early-stage funding through our network of venture funds, angel investors, friends-and-family groups, and high-net-worth crypto communities.</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light mt-3">Our focus is connecting teams with strategic investors who bring both capital and long-term ecosystem support.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 2: Community — Network constellation -->
-        <div class="sol-card">
-          <div class="sol-card-inner tilt-card relative bg-[var(--surface)] border border-white/[0.06] rounded-2xl overflow-hidden" style="transform-style:preserve-3d">
-            <div class="sol-visual">
-              <svg viewBox="0 0 360 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="network-drift">
-                <!-- Concentric community rings -->
-                <circle cx="180" cy="100" r="75" stroke="rgba(255,255,255,0.03)" stroke-width="0.5" fill="none"/>
-                <circle cx="180" cy="100" r="50" stroke="rgba(255,255,255,0.05)" stroke-width="0.5" fill="none"/>
-                <circle cx="180" cy="100" r="25" stroke="rgba(255,255,255,0.07)" stroke-width="0.5" fill="none"/>
-                <!-- Connection lines from center -->
-                <line class="line-pulse" x1="180" y1="100" x2="110" y2="50" stroke="#E01E2B" stroke-width="1"/>
-                <line class="line-pulse" x1="180" y1="100" x2="260" y2="40" stroke="#E01E2B" stroke-width="1" style="animation-delay:0.3s"/>
-                <line class="line-pulse" x1="180" y1="100" x2="100" y2="145" stroke="#E01E2B" stroke-width="1" style="animation-delay:0.6s"/>
-                <line class="line-pulse" x1="180" y1="100" x2="280" y2="140" stroke="#E01E2B" stroke-width="1" style="animation-delay:0.9s"/>
-                <line class="line-pulse" x1="180" y1="100" x2="70" y2="95" stroke="#E01E2B" stroke-width="1" style="animation-delay:1.2s"/>
-                <line class="line-pulse" x1="180" y1="100" x2="300" y2="85" stroke="#E01E2B" stroke-width="1" style="animation-delay:0.4s"/>
-                <!-- Peer connections -->
-                <line class="line-pulse" x1="110" y1="50" x2="260" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" style="animation-delay:0.7s"/>
-                <line class="line-pulse" x1="100" y1="145" x2="280" y2="140" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" style="animation-delay:1s"/>
-                <line class="line-pulse" x1="70" y1="95" x2="110" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" style="animation-delay:1.3s"/>
-                <line class="line-pulse" x1="300" y1="85" x2="280" y2="140" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" style="animation-delay:0.5s"/>
-                <!-- Community member nodes -->
-                <circle class="node-pulse" cx="110" cy="50" r="4" fill="rgba(255,255,255,0.3)" style="animation-delay:0.2s"/>
-                <circle class="node-pulse" cx="260" cy="40" r="4" fill="rgba(255,255,255,0.3)" style="animation-delay:0.5s"/>
-                <circle class="node-pulse" cx="100" cy="145" r="3.5" fill="rgba(255,255,255,0.25)" style="animation-delay:0.8s"/>
-                <circle class="node-pulse" cx="280" cy="140" r="3.5" fill="rgba(255,255,255,0.25)" style="animation-delay:1.1s"/>
-                <circle class="node-pulse" cx="70" cy="95" r="3" fill="rgba(255,255,255,0.2)" style="animation-delay:1.4s"/>
-                <circle class="node-pulse" cx="300" cy="85" r="3" fill="rgba(255,255,255,0.2)" style="animation-delay:0.6s"/>
-                <!-- Inner ring members -->
-                <circle class="node-pulse" cx="155" cy="85" r="2.5" fill="#E01E2B" opacity="0.4" style="animation-delay:0.3s"/>
-                <circle class="node-pulse" cx="205" cy="80" r="2.5" fill="#E01E2B" opacity="0.4" style="animation-delay:0.7s"/>
-                <circle class="node-pulse" cx="165" cy="120" r="2.5" fill="#E01E2B" opacity="0.4" style="animation-delay:1s"/>
-                <circle class="node-pulse" cx="200" cy="125" r="2.5" fill="#E01E2B" opacity="0.4" style="animation-delay:0.4s"/>
-                <!-- Center hub -->
-                <circle cx="180" cy="100" r="10" fill="#E01E2B" opacity="0.15"/>
-                <circle cx="180" cy="100" r="6" fill="#E01E2B" opacity="0.5" class="node-pulse"/>
-                <circle cx="180" cy="100" r="18" stroke="#E01E2B" stroke-width="0.5" opacity="0.12" fill="none" class="node-pulse" style="animation-delay:0.5s"/>
-              </svg>
-            </div>
-            <div class="sol-text">
-              <div class="card-num font-display text-[64px] font-extrabold text-[var(--elevated)] leading-none mb-3 transition-colors duration-300">02</div>
-              <h3 class="font-display text-[clamp(24px,2.8vw,34px)] font-bold tracking-tight mb-1">Community</h3>
-              <p class="text-[13px] uppercase tracking-[0.08em] text-[var(--brand)] font-medium mb-4">Community Building & Early Credibility</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">We help projects establish strong brand awareness and an engaged community across crypto-native audiences.</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light mt-3">Through our close network of projects and ecosystem partners, we facilitate early collaborations and partnerships that build credibility and accelerate community growth.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3: Mindshare — Signal waves / broadcast -->
-        <div class="sol-card">
-          <div class="sol-card-inner tilt-card relative bg-[var(--surface)] border border-white/[0.06] rounded-2xl overflow-hidden" style="transform-style:preserve-3d">
-            <div class="sol-visual">
-              <svg viewBox="0 0 360 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Broadcast waves emanating from center-left -->
-                <path class="signal-wave" d="M80 100 Q120 60 180 60" stroke="#E01E2B" stroke-width="1.5" fill="none" opacity="0.6" stroke-linecap="round" style="animation-delay:0s"/>
-                <path class="signal-wave" d="M80 100 Q130 45 210 45" stroke="#E01E2B" stroke-width="1.2" fill="none" opacity="0.4" stroke-linecap="round" style="animation-delay:0.3s"/>
-                <path class="signal-wave" d="M80 100 Q140 30 240 35" stroke="#E01E2B" stroke-width="1" fill="none" opacity="0.25" stroke-linecap="round" style="animation-delay:0.6s"/>
-                <path class="signal-wave" d="M80 100 Q120 140 180 140" stroke="#E01E2B" stroke-width="1.5" fill="none" opacity="0.6" stroke-linecap="round" style="animation-delay:0.15s"/>
-                <path class="signal-wave" d="M80 100 Q130 155 210 155" stroke="#E01E2B" stroke-width="1.2" fill="none" opacity="0.4" stroke-linecap="round" style="animation-delay:0.45s"/>
-                <path class="signal-wave" d="M80 100 Q140 170 240 165" stroke="#E01E2B" stroke-width="1" fill="none" opacity="0.25" stroke-linecap="round" style="animation-delay:0.75s"/>
-                <!-- Center line -->
-                <path class="signal-wave" d="M80 100 L300 100" stroke="#E01E2B" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round" style="animation-delay:0.1s"/>
-                <!-- Receiver dots at wave ends -->
-                <circle cx="180" cy="60" r="3" fill="rgba(255,255,255,0.25)" class="node-pulse" style="animation-delay:0.2s"/>
-                <circle cx="210" cy="45" r="2.5" fill="rgba(255,255,255,0.2)" class="node-pulse" style="animation-delay:0.5s"/>
-                <circle cx="240" cy="35" r="2" fill="rgba(255,255,255,0.15)" class="node-pulse" style="animation-delay:0.8s"/>
-                <circle cx="180" cy="140" r="3" fill="rgba(255,255,255,0.25)" class="node-pulse" style="animation-delay:0.35s"/>
-                <circle cx="210" cy="155" r="2.5" fill="rgba(255,255,255,0.2)" class="node-pulse" style="animation-delay:0.65s"/>
-                <circle cx="240" cy="165" r="2" fill="rgba(255,255,255,0.15)" class="node-pulse" style="animation-delay:0.95s"/>
-                <circle cx="300" cy="100" r="3.5" fill="rgba(255,255,255,0.3)" class="node-pulse" style="animation-delay:0.4s"/>
-                <!-- Source point -->
-                <circle cx="80" cy="100" r="8" fill="#E01E2B" opacity="0.15"/>
-                <circle cx="80" cy="100" r="5" fill="#E01E2B" opacity="0.5" class="node-pulse"/>
-              </svg>
-            </div>
-            <div class="sol-text">
-              <div class="card-num font-display text-[64px] font-extrabold text-[var(--elevated)] leading-none mb-3 transition-colors duration-300">03</div>
-              <h3 class="font-display text-[clamp(24px,2.8vw,34px)] font-bold tracking-tight mb-1">Mindshare</h3>
-              <p class="text-[13px] uppercase tracking-[0.08em] text-[var(--brand)] font-medium mb-4">Mindshare & Strategic Distribution</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">We help projects generate organic mindshare across influential crypto communities and curated alpha groups.</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light mt-3">This drives narrative momentum, attracts investor attention, and keeps the project consistently present in market conversations.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 4: GTM & TGE — Bar chart with rising bars -->
-        <div class="sol-card">
-          <div class="sol-card-inner tilt-card relative bg-[var(--surface)] border border-white/[0.06] rounded-2xl overflow-hidden" style="transform-style:preserve-3d">
-            <div class="sol-visual">
-              <svg viewBox="0 0 360 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Grid lines -->
-                <line x1="40" y1="30" x2="40" y2="175" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                <line x1="40" y1="175" x2="340" y2="175" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                <line x1="40" y1="130" x2="340" y2="130" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4 4"/>
-                <line x1="40" y1="85" x2="340" y2="85" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4 4"/>
-                <line x1="40" y1="40" x2="340" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4 4"/>
-                <!-- Bars rising -->
-                <rect class="bar-rise" x="60" y="140" width="28" height="35" rx="3" fill="rgba(255,255,255,0.06)" style="transform-origin:60px 175px;animation-delay:0.1s"/>
-                <rect class="bar-rise" x="100" y="120" width="28" height="55" rx="3" fill="rgba(255,255,255,0.08)" style="transform-origin:100px 175px;animation-delay:0.25s"/>
-                <rect class="bar-rise" x="140" y="100" width="28" height="75" rx="3" fill="rgba(255,255,255,0.1)" style="transform-origin:140px 175px;animation-delay:0.4s"/>
-                <rect class="bar-rise" x="180" y="80" width="28" height="95" rx="3" fill="#E01E2B" opacity="0.25" style="transform-origin:180px 175px;animation-delay:0.55s"/>
-                <rect class="bar-rise" x="220" y="58" width="28" height="117" rx="3" fill="#E01E2B" opacity="0.4" style="transform-origin:220px 175px;animation-delay:0.7s"/>
-                <rect class="bar-rise" x="260" y="42" width="28" height="133" rx="3" fill="#E01E2B" opacity="0.55" style="transform-origin:260px 175px;animation-delay:0.85s"/>
-                <rect class="bar-rise" x="300" y="28" width="28" height="147" rx="3" fill="#E01E2B" opacity="0.75" style="transform-origin:300px 175px;animation-delay:1s"/>
-                <!-- Trend line -->
-                <path class="trend-draw" d="M74 150 L114 132 L154 112 L194 90 L234 68 L274 50 L314 32" stroke="#E01E2B" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="400" style="animation-delay:0.5s"/>
-                <circle cx="314" cy="32" r="4" fill="#E01E2B" class="node-pulse"/>
-                <!-- TGE label -->
-                <text x="314" y="22" font-family="var(--font-body)" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">TGE</text>
-              </svg>
-            </div>
-            <div class="sol-text">
-              <div class="card-num font-display text-[64px] font-extrabold text-[var(--elevated)] leading-none mb-3 transition-colors duration-300">04</div>
-              <h3 class="font-display text-[clamp(24px,2.8vw,34px)] font-bold tracking-tight mb-1">Market Momentum</h3>
-              <p class="text-[13px] uppercase tracking-[0.08em] text-[var(--brand)] font-medium mb-4">GTM Strategy & TGE Execution</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">We design and execute go-to-market strategies that position projects for successful token launches.</p>
-              <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light mt-3">From exchange relationships and liquidity to strong trading volume, price discovery, and sustained revenue growth.</p>
-            </div>
-          </div>
+      <div>
+        <p class="s-label">Let&#8217;s Connect</p>
+        <h2 class="ct-title">READY TO<br><span>ELEVATE?</span></h2>
+        <p class="ct-desc">Your next level of growth starts with a single conversation. Reach out — let&#8217;s build something remarkable together.</p>
+        <div class="ct-links">
+          <a href="tel:+00000000000" class="ct-link">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+            </svg>
+            +1 (555) 000-0000
+          </a>
+          <a href="mailto:hello@proximareach.com" class="ct-link">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+            </svg>
+            hello@proximareach.com
+          </a>
         </div>
       </div>
+
+      <div class="ct-right">
+        <p class="social-label">Follow the journey</p>
+        <div class="socials">
+          <a href="#" class="soc-link" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+            </svg>
+          </a>
+          <a href="#" class="soc-link" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5"/>
+              <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </a>
+          <a href="#" class="soc-link" aria-label="TikTok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.27 8.27 0 004.84 1.55V6.78a4.84 4.84 0 01-1.07-.09z"/>
+            </svg>
+          </a>
+        </div>
+        <p class="ct-callout">We partner with brands ready to dominate their digital space. If that&#8217;s you — let&#8217;s make it happen.</p>
+        <a href="mailto:hello@proximareach.com" class="btn-gold" style="display:inline-block;">Start the Conversation &#8594;</a>
+      </div>
+
     </div>
+
+    <div id="footer">
+      <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" class="footer-logo">
+      <p class="footer-copy">&#169; 2026 Proxima Reach. All rights reserved.</p>
+    </div>
+    <div class="footer-pad"></div>
   </section>
 
+  <!-- ─── THREE.JS HERO SCENE ──────────────────────────────── -->
+  <script>
+  (function() {
+    const canvas = document.getElementById('hero-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  <!-- ========== PROCESS — TOGGLE CANDLES ========== -->
-  <section id="process" class="relative max-w-[1400px] mx-auto px-6 md:px-12 py-24 md:py-32">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="reveal font-display font-bold text-[clamp(28px,4vw,48px)] tracking-[-0.03em] leading-[1.15]">
-        From Concept <span class="process-toggle" id="processToggle" role="switch" aria-checked="false" tabindex="0"></span> to TGE
-      </h2>
-      <p class="reveal text-[15px] text-[var(--text-dim)] font-light mt-5 leading-relaxed max-w-md mx-auto">
-        We handle the entire pipeline — strategy, community, distribution, and launch — so you can focus on building.
-      </p>
-    </div>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 14);
 
-    <div class="process-track" id="processTrack">
-      <div class="confetti-container" id="confettiContainer"></div>
+    /* ── Stars ───────────────────────────────────────────── */
+    const starCount = 1800;
+    const starPos = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      starPos[i*3]   = (Math.random() - 0.5) * 120;
+      starPos[i*3+1] = (Math.random() - 0.5) * 120;
+      starPos[i*3+2] = (Math.random() - 0.5) * 80 - 10;
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    scene.add(new THREE.Points(starGeo,
+      new THREE.PointsMaterial({ size: 0.055, color: 0xffffff, transparent: true, opacity: 0.55 })
+    ));
 
-      <div class="process-phase reveal" data-delay="0">
-        <div class="phase-candle-wrap"><div class="phase-candle" style="height:80px"><div class="phase-candle-fill"></div></div></div>
-        <div class="phase-meta"><span class="phase-num">01</span><span class="phase-label">Market Positioning & Narrative</span></div>
-      </div>
-
-      <div class="process-phase reveal" data-delay="1">
-        <div class="phase-candle-wrap"><div class="phase-candle" style="height:110px"><div class="phase-candle-fill"></div></div></div>
-        <div class="phase-meta"><span class="phase-num">02</span><span class="phase-label">Fundraising & Strategic Investors</span></div>
-      </div>
-
-      <div class="process-phase reveal" data-delay="2">
-        <div class="phase-candle-wrap"><div class="phase-candle" style="height:140px"><div class="phase-candle-fill"></div></div></div>
-        <div class="phase-meta"><span class="phase-num">03</span><span class="phase-label">Community & Ecosystem Credibility</span></div>
-      </div>
-
-      <div class="process-phase reveal" data-delay="3">
-        <div class="phase-candle-wrap"><div class="phase-candle" style="height:175px"><div class="phase-candle-fill"></div></div></div>
-        <div class="phase-meta"><span class="phase-num">04</span><span class="phase-label">GTM Strategy & Distribution</span></div>
-      </div>
-
-      <div class="process-phase reveal" data-delay="4">
-        <div class="phase-candle-wrap"><div class="phase-candle" style="height:210px"><div class="phase-candle-fill"></div></div></div>
-        <div class="phase-meta"><span class="phase-num">05</span><span class="phase-label">TGE Execution</span></div>
-      </div>
-
-      <div class="process-phase reveal" data-delay="5">
-        <div class="phase-candle-wrap"><div class="phase-candle" style="height:250px"><div class="phase-candle-fill"></div></div></div>
-        <div class="phase-meta"><span class="phase-num">06</span><span class="phase-label">Post-Launch Growth</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== TESTIMONIALS (hidden) ========== -->
-  <div style="display:none;">
-  <section class="relative max-w-[1400px] mx-auto px-6 md:px-12 py-24 md:py-32">
-    <div class="text-center max-w-lg mx-auto mb-12">
-      <div class="reveal inline-block border border-white/[0.08] rounded-lg py-1 px-4 text-[12px] tracking-[0.15em] uppercase text-[var(--text-muted)] mb-5">Testimonials</div>
-      <h2 class="reveal font-display font-bold text-[clamp(30px,4vw,50px)] tracking-[-0.03em] leading-[1.1] mb-4">
-        What our <span class="text-brand">partners</span> say
-      </h2>
-      <p class="reveal text-[15px] text-[var(--text-dim)] font-light leading-relaxed">
-        The results speak through those who've launched with us.
-      </p>
-    </div>
-
-    <div class="testimonials-mask flex justify-center gap-6 overflow-hidden" style="max-height: 740px;">
-      <!-- Column 1 -->
-      <div class="testimonial-col" style="--scroll-duration: 28s; padding-bottom: 24px;">
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"AP3X's GTM strategy completely reshaped our narrative before launch. The community they built wasn't just big — it was deeply engaged and converted at a rate we'd never seen."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Founding Team</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">World Mobile</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"The fundraising execution was surgical. AP3X connected us with the right VCs and angel investors at exactly the right time, securing capital that fueled our entire growth phase."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Core Team</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Arcium</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"From community zero to a thriving ecosystem in weeks. AP3X's KOL network and alpha-group distribution gave us the attention we needed when it mattered most."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Growth Lead</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">EstateX</div>
-            </div>
-          </div>
-        </div>
-        <!-- Duplicate for loop -->
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"AP3X's GTM strategy completely reshaped our narrative before launch. The community they built wasn't just big — it was deeply engaged and converted at a rate we'd never seen."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Founding Team</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">World Mobile</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"The fundraising execution was surgical. AP3X connected us with the right VCs and angel investors at exactly the right time, securing capital that fueled our entire growth phase."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Core Team</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Arcium</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"From community zero to a thriving ecosystem in weeks. AP3X's KOL network and alpha-group distribution gave us the attention we needed when it mattered most."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Growth Lead</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">EstateX</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Column 2 (hidden on mobile) -->
-      <div class="testimonial-col hidden md:flex" style="--scroll-duration: 34s; padding-bottom: 24px;">
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"AP3X doesn't just advise — they execute. Their team embedded with ours and drove chart performance that turned skeptics into believers."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Co-Founder</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">BluWhale</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"We needed more than a marketing partner — we needed someone who understood tokenomics, market timing, and investor psychology. AP3X delivered on all three."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/26.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Head of Growth</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">AITECH</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"The TGE went beyond our most optimistic projections. AP3X's ability to rally the right communities at the right moment is unmatched in this space."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/52.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">CEO</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Defi App</div>
-            </div>
-          </div>
-        </div>
-        <!-- Duplicate for loop -->
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"AP3X doesn't just advise — they execute. Their team embedded with ours and drove chart performance that turned skeptics into believers."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Co-Founder</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">BluWhale</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"We needed more than a marketing partner — we needed someone who understood tokenomics, market timing, and investor psychology. AP3X delivered on all three."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/26.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Head of Growth</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">AITECH</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"The TGE went beyond our most optimistic projections. AP3X's ability to rally the right communities at the right moment is unmatched in this space."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/52.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">CEO</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Defi App</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Column 3 (hidden on mobile + tablet) -->
-      <div class="testimonial-col hidden lg:flex" style="--scroll-duration: 31s; padding-bottom: 24px;">
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"AP3X's network of T1 exchanges and market makers gave us access we couldn't have built on our own. The liquidity depth post-launch was exactly what we needed."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Founder</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">KiiChain</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"Working with AP3X felt like gaining a growth co-founder. They don't just build hype — they build sustainable ecosystems that compound over time."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/90.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Operations Lead</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Fjord Foundry</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"Their advisory on investor positioning and community narrative was a game-changer. We went from unknown to oversubscribed in our raise within weeks."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">CMO</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Heurist</div>
-            </div>
-          </div>
-        </div>
-        <!-- Duplicate for loop -->
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"AP3X's network of T1 exchanges and market makers gave us access we couldn't have built on our own. The liquidity depth post-launch was exactly what we needed."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Founder</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">KiiChain</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"Working with AP3X felt like gaining a growth co-founder. They don't just build hype — they build sustainable ecosystems that compound over time."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/90.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">Operations Lead</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Fjord Foundry</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p class="text-[14px] leading-[1.75] text-[var(--text-dim)] font-light">"Their advisory on investor positioning and community narrative was a game-changer. We went from unknown to oversubscribed in our raise within weeks."</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="" class="w-10 h-10 rounded-full object-cover">
-            <div>
-              <div class="text-[13px] font-medium tracking-tight">CMO</div>
-              <div class="text-[12px] text-[var(--text-muted)] tracking-tight">Heurist</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  </div><!-- end hidden testimonials -->
-
-
-  <!-- ========== IMPACT / STATS ========== -->
-  <section id="impact" class="relative max-w-[1400px] mx-auto px-6 md:px-12 py-24 md:py-32">
-    <div class="section-label flex items-center gap-4 text-[12px] tracking-[0.2em] uppercase text-[var(--text-muted)] mb-16">03 / Impact</div>
-
-    <div class="impact-grid">
-      <!-- Row 1 — lead with the biggest numbers -->
-      <div class="impact-card span-2 reveal">
-        <div class="stat-val" style="font-size:clamp(28px,4vw,56px);"><span class="accent">$</span><span class="stat-number" data-target="1000000000" data-format="comma">0</span><span class="accent">+</span></div>
-        <div class="stat-desc"><strong>Trading Volume</strong> Generated</div>
-      </div>
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="110">0</span><span class="accent">+</span></div>
-        <div class="stat-desc"><strong>Projects</strong> Helped</div>
-      </div>
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="80">0</span><span class="accent">+</span></div>
-        <div class="stat-desc"><strong>Tokens</strong> Launched</div>
-      </div>
-
-      <!-- Row 2 -->
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="accent">$</span><span class="stat-number" data-target="500">0</span><span class="accent">M+</span></div>
-        <div class="stat-desc"><strong>Capital</strong> Secured</div>
-      </div>
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="1">0</span><span class="accent">B+</span></div>
-        <div class="stat-desc"><strong>Social Media</strong> Impressions</div>
-      </div>
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="3000" data-format="comma">0</span><span class="accent">+</span></div>
-        <div class="stat-desc"><strong>KOLs &amp; Influencers</strong> Network</div>
-      </div>
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="50">0</span><span class="accent">+</span></div>
-        <div class="stat-desc"><strong>Exchange &amp; Strategic</strong> Partners</div>
-      </div>
-
-      <!-- Row 3 -->
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="30">0</span><span class="accent">+</span></div>
-        <div class="stat-desc"><strong>Communities</strong> Built</div>
-      </div>
-      <div class="impact-card reveal">
-        <div class="stat-val"><span class="stat-number" data-target="200">0</span><span class="accent">K+</span></div>
-        <div class="stat-desc"><strong>Crypto-Native</strong> Community Reach</div>
-      </div>
-      <div class="impact-card span-2 reveal">
-        <div class="stat-val" style="font-size:clamp(22px,2.8vw,34px);line-height:1.2;">Thousands of <span class="accent">Smart Followers</span> Attracted</div>
-        <div class="stat-desc">Real engagement from crypto-native audiences — not bots, not noise</div>
-      </div>
-    </div>
-  </section>
-
-
-  <div class="max-w-[1400px] mx-auto px-6 md:px-12"><div class="h-px bg-white/[0.06]"></div></div>
-
-  <!-- ========== CTA / CONTACT ========== -->
-  <section id="contact" class="relative text-center max-w-[1400px] mx-auto px-6 md:px-12 py-32 md:py-40 overflow-hidden">
-    <h2 class="reveal font-display font-extrabold text-[clamp(36px,6vw,68px)] leading-[1.05] tracking-[-0.04em] mb-12">
-      Building something<br/><span class="text-brand">ambitious</span>?
-    </h2>
-    <a href="https://t.me/krisslavev" target="_blank" rel="noopener noreferrer" class="cybr-btn reveal cursor-none">
-      Get In Touch
-      <span aria-hidden class="cybr-btn__glitch">Get In Touch</span>
-    </a>
-    <p class="reveal mt-6 text-xs italic text-[var(--text-muted)]">P.S. Currently supporting a limited number of projects</p>
-  </section>
-
-  <!-- Shiny edge line at footer boundary -->
-  <div class="w-full h-px" style="background: linear-gradient(to right, transparent 5%, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 70%, transparent 95%);"></div>
-
-  <!-- ========== STICKY FOOTER (clip-path reveal) ========== -->
-  <div class="relative h-[70vh]" style="clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%);">
-    <div class="relative h-[calc(100vh+70vh)]" style="top: -100vh;">
-      <footer id="siteFooter" class="h-[70vh] sticky overflow-hidden" style="top: calc(100vh - 70vh); background: #141419;">
-
-        <!-- Top shadow cast by content above -->
-        <div class="absolute top-0 left-0 w-full h-32 pointer-events-none z-20" style="background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 40%, transparent 100%);"></div>
-
-        <div class="max-w-[1400px] mx-auto flex flex-col items-center justify-between h-full relative px-6 md:px-12 py-12 md:py-16">
-
-          <!-- Top content -->
-          <div class="flex flex-col items-center w-full pt-4 relative z-10">
-            <!-- Catchy phrase -->
-            <p class="font-display text-[clamp(16px,2vw,22px)] font-semibold tracking-[-0.02em] text-center text-white/60 mb-10">
-              Turning bold ideas into market-ready momentum.
-            </p>
-
-            <!-- Social links -->
-            <div class="flex gap-6 mb-10">
-              <a href="https://x.com/ap3xio" target="_blank" rel="noopener noreferrer" class="text-white/30 hover:text-white transition-colors duration-300 group" aria-label="X / Twitter">
-                <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              </a>
-              <a href="https://www.linkedin.com/company/108871972" target="_blank" rel="noopener noreferrer" class="text-white/30 hover:text-white transition-colors duration-300 group" aria-label="LinkedIn">
-                <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              </a>
-              <a href="https://t.me/krisslavev" target="_blank" rel="noopener noreferrer" class="text-white/30 hover:text-white transition-colors duration-300 group" aria-label="Telegram">
-                <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-              </a>
-              <a href="mailto:info@ap3x.io" class="text-white/30 hover:text-white transition-colors duration-300 group" aria-label="Email">
-                <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
-              </a>
-            </div>
-
-            <!-- Nav links -->
-            <div class="flex flex-wrap justify-center gap-8 text-[13px] font-medium tracking-[0.06em] uppercase">
-              <a href="#about" class="text-white/30 hover:text-white transition-colors duration-300">About</a>
-              <a href="#services" class="text-white/30 hover:text-white transition-colors duration-300">Solutions</a>
-              <a href="#impact" class="text-white/30 hover:text-white transition-colors duration-300">Impact</a>
-              <a href="#contact" class="text-white/30 hover:text-white transition-colors duration-300">Contact</a>
-            </div>
-          </div>
-
-          <!-- Copyright — bottom right -->
-          <p class="absolute bottom-4 right-6 md:right-12 text-[11px] text-white/20 z-10">&copy; 2026 AP3X. All rights reserved.</p>
-        </div>
-
-        <!-- Large engraved brand logo -->
-        <!-- Background logo with inset shadow for depth -->
-        <div class="absolute left-1/2 -translate-x-1/2 bottom-[10rem] md:bottom-[8rem] pointer-events-none select-none w-[75vw] max-w-[900px]" style="opacity: 0.09; mask-image: linear-gradient(to bottom, white 50%, transparent); -webkit-mask-image: linear-gradient(to bottom, white 50%, transparent);">
-          <img src="brand_assets/text-apex-logo-one-colour-rgb-1200px@72ppi.png" alt="" class="w-full h-auto" draggable="false" style="filter: brightness(0.3) saturate(0) drop-shadow(0px 1px 1px rgba(255,255,255,0.15)) drop-shadow(0px -1px 1px rgba(0,0,0,0.6));">
-        </div>
-
-        <!-- Logo icon centered above bottom line -->
-        <div class="absolute left-1/2 -translate-x-1/2 bottom-[4rem] md:bottom-[3rem] z-10">
-          <div class="border-2 border-white/[0.08] hover:border-white/[0.2] transition-colors duration-400 rounded-2xl p-3 backdrop-blur-sm" style="background: rgba(255,255,255,0.03); box-shadow: 0 0 30px rgba(0,0,0,0.5);">
-            <img src="brand_assets/apex-logo-mark-full-colour-rgb-1200px@72ppi.png" alt="AP3X" class="w-10 sm:w-14 md:w-20 h-10 sm:h-14 md:h-20 object-contain">
-          </div>
-        </div>
-
-        <!-- Horizontal divider line -->
-        <div class="absolute bottom-[5.5rem] md:bottom-[4.5rem] left-0 w-full h-px" style="background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);"></div>
-
-      </footer>
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- SPLINE — Interactive 3D Hero                                 -->
-  <!-- ============================================================ -->
-  <script type="module">
-    const canvas = document.getElementById('canvas3d');
-    const isMobile = window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-
-    if (!isMobile) {
-      // Defer Spline load until after page is interactive
-      window.addEventListener('load', async () => {
-        const { Application } = await import('https://unpkg.com/@splinetool/runtime@1.9.82/build/runtime.js');
-        const app = new Application(canvas);
-        app.load('brand_assets/scene-clean.splinecode');
-      }, { once: true });
-    } else {
-      canvas.style.display = 'none';
+    /* ── Orbit ring helper ───────────────────────────────── */
+    function makeRingGroup(radius, ringColor, ringOpacity, nodeColor, nodeCount, nodeSize, rx, ry, rz) {
+      const g = new THREE.Group();
+      g.rotation.set(rx, ry, rz);
+      g.add(new THREE.Mesh(
+        new THREE.TorusGeometry(radius, 0.022, 8, 180),
+        new THREE.MeshBasicMaterial({ color: ringColor, transparent: true, opacity: ringOpacity, side: THREE.DoubleSide })
+      ));
+      const nodeGroup = new THREE.Group();
+      const nGeo = new THREE.SphereGeometry(nodeSize, 8, 8);
+      const nMat = new THREE.MeshBasicMaterial({ color: nodeColor });
+      for (let i = 0; i < nodeCount; i++) {
+        const a = (i / nodeCount) * Math.PI * 2;
+        const n = new THREE.Mesh(nGeo, nMat);
+        n.position.set(Math.cos(a) * radius, Math.sin(a) * radius, 0);
+        nodeGroup.add(n);
+      }
+      g.add(nodeGroup);
+      return { group: g, nodeGroup };
     }
 
-    // Scroll fade (RAF-throttled)
-    let canvasTicking = false;
-    window.addEventListener('scroll', () => {
-      if (!canvasTicking) {
-        canvasTicking = true;
-        requestAnimationFrame(() => {
-          const scrollProg = Math.min(window.scrollY / window.innerHeight, 1);
-          canvas.style.opacity = 1 - scrollProg * 0.85;
-          canvasTicking = false;
+    const orbitRoot = new THREE.Group();
+    scene.add(orbitRoot);
+    const r1 = makeRingGroup(5.5, 0xd4a853, 0.45, 0xf2cc72, 3, 0.12, Math.PI*0.1,  0,           0);
+    const r2 = makeRingGroup(4.0, 0x9b5cf6, 0.5,  0xc084fc, 4, 0.09, Math.PI*0.35, Math.PI*0.2,  0);
+    const r3 = makeRingGroup(2.8, 0xd4a853, 0.38, 0xf2cc72, 2, 0.10, Math.PI*0.5,  Math.PI*0.15, Math.PI*0.1);
+    const r4 = makeRingGroup(7.2, 0x8a6318, 0.2,  0xd4a853, 2, 0.07, Math.PI*0.05, Math.PI*0.35, 0);
+    [r1, r2, r3, r4].forEach(r => orbitRoot.add(r.group));
+
+    /* ── Central glow ────────────────────────────────────── */
+    const glowMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.8, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0x9b5cf6, transparent: true, opacity: 0.22 })
+    );
+    const haloMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1.6, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0x6d28d9, transparent: true, opacity: 0.08, side: THREE.BackSide })
+    );
+    scene.add(glowMesh, haloMesh);
+
+    /* ── Glow sprite factory (additive blending halo) ────── */
+    function makeGlowSprite(hexColor, size) {
+      const s = 128;
+      const c = document.createElement('canvas');
+      c.width = c.height = s;
+      const ctx = c.getContext('2d');
+      const r = (hexColor >> 16) & 255, g = (hexColor >> 8) & 255, b = hexColor & 255;
+      const grad = ctx.createRadialGradient(s/2, s/2, 0, s/2, s/2, s/2);
+      grad.addColorStop(0,   `rgba(${r},${g},${b},1)`);
+      grad.addColorStop(0.35,`rgba(${r},${g},${b},0.5)`);
+      grad.addColorStop(0.7, `rgba(${r},${g},${b},0.15)`);
+      grad.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, s, s);
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: new THREE.CanvasTexture(c),
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      }));
+      sp.scale.setScalar(size);
+      return sp;
+    }
+
+    /* ── Space body definitions ──────────────────────────── */
+    const BODY_DATA = [
+      { radius:0.30, color:0xc9903a, glow:0xf2cc72, tx: 5.0,  ty: 1.8,  tz: 0.5,  parallax:0.25, ring:true,  fs:0.35, fp:0.0  },
+      { radius:0.22, color:0x7c3aed, glow:0xc084fc, tx:-4.5,  ty:-0.8,  tz: 0.0,  parallax:0.35, ring:false, fs:0.42, fp:1.1  },
+      { radius:0.14, color:0xd4a853, glow:0xf2cc72, tx: 2.5,  ty: 3.5,  tz: 1.0,  parallax:0.50, ring:false, fs:0.55, fp:2.3  },
+      { radius:0.08, color:0xe8f4ff, glow:0xbae6fd, tx: 6.5,  ty:-1.5,  tz: 2.0,  parallax:0.70, ring:false, fs:0.68, fp:0.7  },
+      { radius:0.12, color:0x9b5cf6, glow:0xd8b4fe, tx:-3.5,  ty: 2.5,  tz: 1.5,  parallax:0.55, ring:false, fs:0.48, fp:3.5  },
+      { radius:0.18, color:0xb45309, glow:0xfbbf24, tx: 4.2,  ty:-2.8,  tz:-0.5,  parallax:0.30, ring:false, fs:0.38, fp:1.8  },
+      { radius:0.10, color:0x1d4ed8, glow:0x93c5fd, tx:-2.0,  ty:-3.2,  tz: 0.8,  parallax:0.60, ring:false, fs:0.52, fp:4.2  },
+      { radius:0.07, color:0xd97706, glow:0xfcd34d, tx:-5.5,  ty: 2.0,  tz: 1.0,  parallax:0.65, ring:false, fs:0.72, fp:2.9  },
+      { radius:0.20, color:0x6d28d9, glow:0xa78bfa, tx:-4.0,  ty:-3.0,  tz:-1.0,  parallax:0.28, ring:true,  fs:0.32, fp:5.1  },
+      { radius:0.06, color:0xfef3c7, glow:0xfef9c3, tx:-1.5,  ty: 4.0,  tz: 2.0,  parallax:0.75, ring:false, fs:0.80, fp:0.4  },
+      { radius:0.09, color:0xf0f9ff, glow:0xbae6fd, tx: 3.0,  ty:-3.8,  tz: 1.5,  parallax:0.60, ring:false, fs:0.58, fp:3.0  },
+      { radius:0.15, color:0x065f46, glow:0x34d399, tx:-6.0,  ty:-1.5,  tz: 0.0,  parallax:0.38, ring:false, fs:0.44, fp:1.6  },
+    ];
+
+    const spaceBodies = [];
+    const bodyMeshes  = []; // for raycasting
+
+    BODY_DATA.forEach(data => {
+      const group = new THREE.Group();
+      group.position.set(0, 0, 0);
+      group.scale.setScalar(0); // hidden until splash
+
+      // Planet sphere
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(data.radius, 24, 24),
+        new THREE.MeshBasicMaterial({ color: data.color })
+      );
+      group.add(mesh);
+      bodyMeshes.push(mesh);
+
+      // Glow halo sprite
+      group.add(makeGlowSprite(data.glow, data.radius * 9));
+
+      // Optional ring
+      if (data.ring) {
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(data.radius * 1.9, data.radius * 0.14, 6, 64),
+          new THREE.MeshBasicMaterial({ color: data.glow, transparent: true, opacity: 0.45, side: THREE.DoubleSide })
+        );
+        ring.rotation.x = Math.PI * 0.38;
+        group.add(ring);
+      }
+
+      scene.add(group);
+      spaceBodies.push({
+        group,
+        tx: data.tx, ty: data.ty, tz: data.tz,
+        currentY: 0,          // GSAP will tween this
+        parallax: data.parallax,
+        floatSpeed: data.fs,
+        floatPhase: data.fp,
+      });
+    });
+
+    /* ── Splash burst ring ───────────────────────────────── */
+    function spawnBurst() {
+      const burstMat = new THREE.MeshBasicMaterial({
+        color: 0xf2cc72, transparent: true, opacity: 0.7, side: THREE.DoubleSide
+      });
+      [0.015, 0.025].forEach((tube, i) => {
+        const b = new THREE.Mesh(new THREE.TorusGeometry(0.1, tube, 6, 80), burstMat.clone());
+        scene.add(b);
+        gsap.to(b.scale,      { x:55, y:55, z:55, duration:1.2, ease:'expo.out', delay: i*0.12 });
+        gsap.to(b.material,   { opacity:0,       duration:0.9,  ease:'power2.in', delay: i*0.12,
+          onComplete: () => { scene.remove(b); b.geometry.dispose(); b.material.dispose(); }
+        });
+      });
+    }
+
+    /* ── Trigger splash ──────────────────────────────────── */
+    let splashDone = false;
+    function triggerSplash() {
+      if (splashDone) return;
+      splashDone = true;
+
+      spawnBurst();
+
+      spaceBodies.forEach((body, i) => {
+        const delay = i * 0.055;
+
+        // Scale in from 0
+        gsap.to(body.group.scale, { x:1, y:1, z:1, duration:0.65, ease:'back.out(2.2)', delay });
+
+        // Fly to target X and Z
+        gsap.to(body.group.position, { x: body.tx, z: body.tz, duration:1.1 + Math.random()*0.35, ease:'expo.out', delay });
+
+        // GSAP tweens the JS property currentY — tick loop reads it
+        gsap.to(body, { currentY: body.ty, duration:1.1 + Math.random()*0.35, ease:'expo.out', delay });
+      });
+    }
+
+    /* ── Raycasting — hover ──────────────────────────────── */
+    const raycaster = new THREE.Raycaster();
+    const pointer   = new THREE.Vector2();
+    let hoveredGroup = null;
+
+    window.addEventListener('mousemove', e => {
+      pointer.x =  (e.clientX / window.innerWidth)  * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      if (!splashDone) return;
+
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(bodyMeshes);
+
+      if (hits.length > 0) {
+        const g = hits[0].object.parent;
+        if (hoveredGroup !== g) {
+          if (hoveredGroup) gsap.to(hoveredGroup.scale, { x:1, y:1, z:1, duration:0.4, ease:'power2.out' });
+          hoveredGroup = g;
+          gsap.to(g.scale, { x:1.4, y:1.4, z:1.4, duration:0.35, ease:'back.out(2)' });
+          canvas.style.cursor = 'pointer';
+        }
+      } else {
+        if (hoveredGroup) {
+          gsap.to(hoveredGroup.scale, { x:1, y:1, z:1, duration:0.4, ease:'power2.out' });
+          hoveredGroup = null;
+        }
+        canvas.style.cursor = 'default';
+      }
+
+      // existing mouse parallax
+      mx = (e.clientX / window.innerWidth  - 0.5) * 2;
+      my = -(e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    /* ── Scroll parallax ─────────────────────────────────── */
+    let scrollY = 0;
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+    /* ── Mouse parallax vars ─────────────────────────────── */
+    let mx = 0, my = 0, tx = 0, ty = 0;
+
+    /* ── Expose to GSAP ──────────────────────────────────── */
+    window._heroThree = { camera, orbitRoot, triggerSplash };
+
+    /* ── Fallback: auto-trigger if GSAP call never fires ─── */
+    setTimeout(triggerSplash, 4200);
+
+    /* ── Render loop ─────────────────────────────────────── */
+    const clock = new THREE.Clock();
+    function tick() {
+      requestAnimationFrame(tick);
+      const t = clock.getElapsedTime();
+
+      tx += (mx - tx) * 0.04;
+      ty += (my - ty) * 0.04;
+
+      orbitRoot.rotation.y = t * 0.07 + tx * 0.28;
+      orbitRoot.rotation.x = t * 0.025 + ty * 0.18;
+
+      r1.nodeGroup.rotation.z =  t * 0.11;
+      r2.nodeGroup.rotation.z = -t * 0.17;
+      r3.nodeGroup.rotation.z =  t * 0.23;
+      r4.nodeGroup.rotation.z = -t * 0.09;
+
+      const pulse = 1 + Math.sin(t * 1.4) * 0.05;
+      glowMesh.scale.setScalar(pulse);
+      haloMesh.scale.setScalar(pulse * 1.1);
+
+      // Float + scroll parallax for space bodies
+      if (splashDone) {
+        spaceBodies.forEach(b => {
+          const floatY    = Math.sin(t * b.floatSpeed + b.floatPhase) * 0.13;
+          const scrollOff = scrollY * 0.0025 * b.parallax;
+          b.group.position.y = b.currentY + floatY - scrollOff;
         });
       }
-    }, { passive: true });
+
+      renderer.render(scene, camera);
+    }
+    tick();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  })();
   </script>
 
-  <!-- ============================================================ -->
-  <!-- GSAP Animations & Interactions                               -->
-  <!-- ============================================================ -->
+  <!-- ─── GSAP ANIMATIONS ──────────────────────────────────── -->
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    /* ---- Preloader ---- */
-    const counterEl = document.querySelector('.counter-digits');
-    const statusEl = document.querySelector('.preloader-status');
-    const scrambleChars = '0123456789';
-    const statusWords = ['Initializing', 'Loading Assets', 'Compiling', 'Rendering', 'Launching'];
-    let counterObj = { value: 0 };
-    let statusIndex = 0;
-
-    // Counter scramble animation
-    function updateCounter(val) {
-      const num = Math.floor(val);
-      const str = String(num).padStart(3, '0');
-      counterEl.textContent = str;
-      // Update status text at thresholds
-      const newIndex = num < 20 ? 0 : num < 45 ? 1 : num < 65 ? 2 : num < 85 ? 3 : 4;
-      if (newIndex !== statusIndex) {
-        statusIndex = newIndex;
-        // Scramble the status text
-        const target = statusWords[newIndex];
-        let iter = 0;
-        const scrambleStatus = setInterval(() => {
-          statusEl.textContent = target.split('').map((c, i) => {
-            if (c === ' ') return ' ';
-            if (i < iter) return target[i];
-            return String.fromCharCode(65 + Math.floor(Math.random() * 26));
-          }).join('');
-          if (iter >= target.length) clearInterval(scrambleStatus);
-          iter += 0.8;
-        }, 25);
+    /* ── LOADER ── */
+    const loaderTl = gsap.timeline({
+      onComplete() {
+        document.getElementById('loader').style.display = 'none';
+        heroIn();
       }
+    });
+
+    // Arms start at staggered rotations so they trail behind the main horn
+    gsap.set('#ha-main',  { rotation: 0,    transformOrigin: '50% 50%' });
+    gsap.set('#ha-t1',    { rotation: -18,  transformOrigin: '50% 50%' });
+    gsap.set('#ha-t2',    { rotation: -36,  transformOrigin: '50% 50%' });
+    gsap.set('#ha-t3',    { rotation: -58,  transformOrigin: '50% 50%' });
+    gsap.set('#ha-inner', { rotation: 0,    transformOrigin: '50% 50%' });
+
+    // Outer horn: 3 full orbits over 2.4s — all arms advance by the same amount
+    const orbits = 3;
+    const orbitDur = 2.4;
+    const orbitEase = 'power1.inOut';
+    loaderTl
+      // Logo fades in
+      .to('#loader-logo',   { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.4)',
+                              transformOrigin: '50% 50%' }, 0.2)
+      // Logo ring pulses in
+      .to('#logo-ring',     { opacity: 1, scale: 1.15, duration: 0.5, ease: 'power2.out' }, 0.3)
+      .to('#logo-ring',     { scale: 1, opacity: 0.6, duration: 0.4, ease: 'power2.inOut' }, 0.8)
+
+      // Outer horns orbit 3× simultaneously (all start at t=0.4)
+      .to('#ha-main',  { rotation: orbits * 360,           duration: orbitDur, ease: orbitEase }, 0.4)
+      .to('#ha-t1',    { rotation: orbits * 360 - 18,      duration: orbitDur, ease: orbitEase }, 0.4)
+      .to('#ha-t2',    { rotation: orbits * 360 - 36,      duration: orbitDur, ease: orbitEase }, 0.4)
+      .to('#ha-t3',    { rotation: orbits * 360 - 58,      duration: orbitDur, ease: orbitEase }, 0.4)
+
+      // Inner purple spark: 5 orbits (faster, opposite direction after 2)
+      .to('#ha-inner', { rotation: 5 * 360,                duration: orbitDur, ease: 'power2.inOut' }, 0.4)
+
+      // Tagline letter by letter (staggered opacity via single fade here)
+      .to('#loader-tagline', { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.6)
+
+      // Progress bar fills as orbits happen
+      .to('#loader-bar', { width: '100%', duration: orbitDur - 0.1, ease: 'power1.inOut' }, 0.45)
+
+      // On finish: logo pulses, ring expands and fades, horns freeze
+      .to('#logo-ring', { scale: 2.2, opacity: 0, duration: 0.5, ease: 'power2.in' }, 2.7)
+      .to('#loader-logo', { scale: 1.06, filter: 'drop-shadow(0 0 60px rgba(212,168,83,0.9)) drop-shadow(0 0 25px rgba(124,58,237,0.6))', duration: 0.3, ease: 'power2.in' }, 2.7)
+
+      // Trigger splash + slide loader up
+      .call(() => { if (window._heroThree) window._heroThree.triggerSplash(); }, null, 3.0)
+      .to('#loader', { yPercent: -100, duration: 0.9, ease: 'expo.inOut' }, 3.0);
+
+    /* HERO ENTRANCE */
+    function heroIn() {
+      const tl = gsap.timeline();
+      tl
+        .to('.hero-eyebrow',           { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' })
+        .to('.hero-title',             { opacity: 1, duration: 0.01 }, '-=0.3')
+        .to('.hero-title .line-inner', { y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.15 }, '-=0.01')
+        .to('.hero-sub',               { opacity: 1, y: 0, duration: 0.6,  ease: 'power3.out' }, '-=0.45')
+        .to('.hero-btns',              { opacity: 1, y: 0, duration: 0.6,  ease: 'power3.out' }, '-=0.35')
+;
     }
 
-    const preloaderTl = gsap.timeline({ delay: 0.2 });
-
-    preloaderTl
-      // Phase 1: Fade in corners + brand + counter
-      .to('.preloader-corners', { opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out' })
-      .to('.preloader-brand', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.2')
-      .to('.preloader-counter', { opacity: 1, duration: 0.3, ease: 'power2.out' }, '-=0.3')
-      .to('.counter-suffix', { opacity: 1, duration: 0.2 }, '-=0.1')
-      .to('.preloader-status', { opacity: 1, duration: 0.3 }, '-=0.2')
-
-      // Phase 2: Count from 0 → 100 with easing
-      .to(counterObj, {
-        value: 100,
-        duration: 1.8,
-        ease: 'power2.inOut',
-        onUpdate: () => updateCounter(counterObj.value)
-      }, '-=0.1')
-
-      // Phase 3: Brief hold + red line sweeps
-      .to('.preloader-line', { scaleX: 1, duration: 0.5, ease: 'power3.inOut' }, '+=0.3')
-
-      // Phase 4: Everything fades out
-      .to('.preloader-center', { opacity: 0, y: -20, duration: 0.4, ease: 'power2.in' }, '-=0.1')
-      .to('.preloader-line', { opacity: 0, duration: 0.25 }, '-=0.2')
-
-      // Phase 5: Curtains split apart
-      .to('.preloader-curtain--top', { yPercent: -100, duration: 1.1, ease: 'expo.inOut' })
-      .to('.preloader-curtain--bottom', { yPercent: 100, duration: 1.1, ease: 'expo.inOut' }, '<')
-
-      // Phase 6: Kill preloader
-      .set('#preloader', { display: 'none', pointerEvents: 'none' })
-
-      // Phase 7: Hero content entrance
-      .from('.nav-logo', { opacity: 0, y: -20, duration: 0.6, ease: 'power3.out' }, '-=0.4')
-      .from('.nav-links a', { opacity: 0, y: -14, stagger: 0.07, duration: 0.4, ease: 'power3.out' }, '-=0.35')
-      .to('.hero-badge', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.2')
-      .to('.hero-content h1 .line-inner', { y: '0%', duration: 0.8, stagger: 0.12, ease: 'power3.out' }, '-=0.35')
-      .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
-      .to('.hero-content .cybr-btn', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.25');
-
-    /* ---- Nav scroll glass ---- */
+    /* NAVBAR SCROLL STATE */
     ScrollTrigger.create({
-      start: 80,
-      onEnter: () => document.getElementById('navbar').classList.add('scrolled'),
-      onLeaveBack: () => document.getElementById('navbar').classList.remove('scrolled'),
+      start: 'top+=80 top',
+      onEnter:     () => document.getElementById('nav').classList.add('stuck'),
+      onLeaveBack: () => document.getElementById('nav').classList.remove('stuck'),
     });
 
-    /* ---- Solutions horizontal scroll with snap + parallax ---- */
-    (() => {
-      const track = document.querySelector('.solutions-track');
-      const cards = gsap.utils.toArray('.sol-card');
-      if (!track || cards.length < 2) return;
+    /* HERO PARALLAX */
+    gsap.to('.hero-content', {
+      y: 70, opacity: 0.2,
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
+    });
 
-      const totalScroll = () => track.scrollWidth - window.innerWidth;
-
-      // Main horizontal scroll
-      const solTween = gsap.to(track, {
-        x: () => -totalScroll(),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#services',
-          start: 'top top',
-          end: () => '+=' + totalScroll(),
-          pin: true,
-          scrub: 0.8,
-          invalidateOnRefresh: true,
-          snap: {
-            snapTo: 1 / (cards.length - 1),
-            duration: { min: 0.25, max: 0.6 },
-            delay: 0.1,
-            ease: 'power1.inOut',
-          },
-        },
-      });
-
-      // Parallax on inner content
-      cards.forEach((card, i) => {
-        const inner = card.querySelector('.sol-card-inner');
-        gsap.fromTo(inner,
-          { x: 80 },
-          {
-            x: -80,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: '#services',
-              start: 'top top',
-              end: () => '+=' + totalScroll(),
-              scrub: 0.5,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-      });
-    })();
-
-    /* ---- Hero parallax (RAF-throttled) ---- */
-    const heroContent = document.querySelector('.hero-content');
-    let heroTicking = false;
-    window.addEventListener('scroll', () => {
-      if (!heroTicking) {
-        heroTicking = true;
-        requestAnimationFrame(() => {
-          const s = window.scrollY;
-          const h = window.innerHeight;
-          if (s < h) {
-            heroContent.style.transform = `translateY(${s * 0.25}px)`;
-            heroContent.style.opacity = 1 - (s / h) * 1.2;
-          }
-          heroTicking = false;
-        });
+    /* THREE.JS CAMERA PULL-BACK ON SCROLL */
+    ScrollTrigger.create({
+      trigger: '#hero', start: 'top top', end: 'bottom top',
+      onUpdate(self) {
+        if (window._heroThree) window._heroThree.camera.position.z = 14 + self.progress * 5;
       }
-    }, { passive: true });
-
-    /* ---- Section reveals ---- */
-    document.querySelectorAll('.reveal').forEach(el => {
-      gsap.fromTo(el,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' },
-        }
-      );
     });
 
-    /* ---- Stats counter ---- */
-    document.querySelectorAll('.stat-number').forEach(el => {
-      const target = parseInt(el.dataset.target);
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 88%',
-        once: true,
-        onEnter: () => {
-          const useComma = el.dataset.format === 'comma';
-          const obj = { val: 0 };
-          gsap.to(obj, {
-            val: target,
-            duration: useComma ? 2.8 : 2.2,
-            ease: 'power2.out',
-            onUpdate: () => { el.textContent = useComma ? Math.round(obj.val).toLocaleString() : Math.round(obj.val); },
-          });
-        },
-      });
+    /* SOLUTIONS REVEAL */
+    gsap.from('#solutions .s-label, #solutions .s-title', {
+      opacity: 0, y: 28, duration: 0.8, stagger: 0.14, ease: 'power3.out',
+      scrollTrigger: { trigger: '#solutions', start: 'top 72%' }
     });
 
-    /* ---- Carved logo clip reveal ---- */
-    /* ---- Custom cursor (elastic) ---- */
-    const dot = document.querySelector('.cursor-dot');
-    const ring = document.querySelector('.cursor-ring');
-    const mouse = { x: 0, y: 0 };
-    const prevMouse = { x: 0, y: 0 };
-    const ringPos = { x: 0, y: 0 };
-    let currentScale = 0;
-    let currentAngle = 0;
-    const speed = 0.1;
-
-    document.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      dot.style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
-    }, { passive: true });
-
-    (function cursorTick() {
-      // Smooth follow
-      ringPos.x += (mouse.x - ringPos.x) * speed;
-      ringPos.y += (mouse.y - ringPos.y) * speed;
-
-      // Velocity for squeeze
-      const dx = mouse.x - prevMouse.x;
-      const dy = mouse.y - prevMouse.y;
-      prevMouse.x = mouse.x;
-      prevMouse.y = mouse.y;
-      const velocity = Math.min(Math.sqrt(dx * dx + dy * dy) * 4, 150);
-
-      // Scale (squeeze along movement axis)
-      const targetScale = (velocity / 150) * 1;
-      currentScale += (targetScale - currentScale) * 0.1;
-
-      // Rotation (orient squeeze toward movement direction)
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      if (velocity > 20) currentAngle = angle;
-
-      ring.style.transform = `translate(${ringPos.x}px, ${ringPos.y}px) rotate(${currentAngle}deg) scale(${1 + currentScale}, ${1 - currentScale})`;
-
-      requestAnimationFrame(cursorTick);
-    })();
-
-    document.querySelectorAll('a, button, .tilt-card').forEach(el => {
-      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
-      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    ScrollTrigger.batch('.sol-card', {
+      onEnter: batch => gsap.from(batch, {
+        opacity: 0, y: 45, duration: 0.8, stagger: 0.1, ease: 'power3.out'
+      }),
+      start: 'top 82%',
+      once: true
     });
 
-    /* ---- Text scramble (nav + buttons) ---- */
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&';
-    function scramble(el, original, rate) {
-      let interval, iteration = 0;
-      const upper = original.toUpperCase();
-      clearInterval(el._scrambleInterval);
-      el._scrambleInterval = setInterval(() => {
-        el.textContent = upper.split('').map((char, i) => {
-          if (char === ' ') return ' ';
-          if (i < iteration) return original[i];
-          return chars[Math.floor(Math.random() * chars.length)];
-        }).join('');
-        if (iteration >= upper.length) clearInterval(el._scrambleInterval);
-        iteration += rate;
-      }, 30);
-    }
-    function unscramble(el) {
-      clearInterval(el._scrambleInterval);
-      el.textContent = el.dataset.text;
-    }
-    // Nav links
-    document.querySelectorAll('.nav-links a[data-text]').forEach(link => {
-      link.addEventListener('mouseenter', () => scramble(link, link.dataset.text, 0.5));
-      link.addEventListener('mouseleave', () => unscramble(link));
-    });
-    // Cyberpunk buttons use CSS glitch effect on hover — no JS scramble needed
+    /* SERVICES HORIZONTAL SCROLL */
+    const track = document.getElementById('srv-track');
 
-    /* ---- Process toggle with candle illumination ---- */
-    const processToggle = document.getElementById('processToggle');
-    const processPhases = document.querySelectorAll('.process-phase');
-    const confettiContainer = document.getElementById('confettiContainer');
-    let processActive = false;
-
-    function spawnConfetti() {
-      const colors = ['#E01E2B', '#FF2D3B', '#fff', '#E01E2B', '#ff6b6b', '#ffd93d'];
-      for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'confetti-particle';
-        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.width = (3 + Math.random() * 5) + 'px';
-        particle.style.height = (3 + Math.random() * 5) + 'px';
-        particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '1px';
-        confettiContainer.appendChild(particle);
-        const angle = (Math.random() * 360) * (Math.PI / 180);
-        const velocity = 100 + Math.random() * 180;
-        const x = Math.cos(angle) * velocity;
-        const y = Math.sin(angle) * velocity - 60;
-        gsap.fromTo(particle,
-          { x: 0, y: 0, opacity: 1, rotation: 0 },
-          {
-            x, y, opacity: 0,
-            rotation: Math.random() * 360,
-            duration: 0.8 + Math.random() * 0.6,
-            ease: 'power2.out',
-            onComplete: () => particle.remove()
-          }
-        );
+    gsap.to('#srv-track', {
+      x: () => -(track.scrollWidth - window.innerWidth),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#services',
+        start: 'top top',
+        end: () => '+=' + (track.scrollWidth - window.innerWidth),
+        pin: true,
+        scrub: 1.1,
+        invalidateOnRefresh: true,
+        anticipatePin: 1
       }
-    }
-
-    function toggleProcess() {
-      processActive = !processActive;
-      processToggle.classList.toggle('active', processActive);
-      processToggle.setAttribute('aria-checked', processActive);
-
-      processPhases.forEach((phase, i) => {
-        if (processActive) {
-          gsap.delayedCall(i * 0.18, () => phase.classList.add('lit'));
-        } else {
-          gsap.delayedCall((processPhases.length - 1 - i) * 0.12, () => phase.classList.remove('lit'));
-        }
-      });
-
-      if (processActive) {
-        setTimeout(spawnConfetti, processPhases.length * 180 + 100);
-      }
-    }
-
-    processToggle.addEventListener('click', toggleProcess);
-    processToggle.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleProcess(); }
     });
 
-    /* ---- Tilt cards ---- */
-    document.querySelectorAll('.tilt-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const x = e.clientX - r.left;
-        const y = e.clientY - r.top;
-        const rotX = (y - r.height / 2) / r.height * -6;
-        const rotY = (x - r.width / 2) / r.width * 6;
-        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
-        setTimeout(() => { card.style.transition = ''; }, 500);
-      });
-      card.addEventListener('mouseenter', () => { card.style.transition = ''; });
+    gsap.from('.srv-header .s-label, .srv-header .s-title, .srv-hint', {
+      opacity: 0, y: 24, stagger: 0.12, duration: 0.75, ease: 'power3.out',
+      scrollTrigger: { trigger: '#services', start: 'top 80%' }
     });
 
-    /* ---- Hamburger menu ---- */
-    const burger = document.querySelector('.hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    burger.addEventListener('click', () => {
-      burger.classList.toggle('active');
-      mobileMenu.classList.toggle('active');
-      document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+    /* CONTACT REVEAL */
+    gsap.from('.ct-grid > div:first-child > *', {
+      opacity: 0, x: -35, duration: 0.85, stagger: 0.13, ease: 'power3.out',
+      scrollTrigger: { trigger: '#contact', start: 'top 72%' }
     });
-    mobileMenu.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        burger.classList.remove('active');
-        mobileMenu.classList.remove('active');
-        document.body.style.overflow = '';
-      });
+
+    gsap.from('.ct-right > *', {
+      opacity: 0, x: 35, duration: 0.85, stagger: 0.13, ease: 'power3.out',
+      scrollTrigger: { trigger: '#contact', start: 'top 72%' }
     });
   </script>
 

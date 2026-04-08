@@ -15,17 +15,20 @@ const num = existing + 1;
 const filename = label ? `screenshot-${num}-${label}.png` : `screenshot-${num}.png`;
 const filepath = join(dir, filename);
 
-const chromePath = 'C:/Users/Kristiyan/.cache/puppeteer/chrome-headless-shell/win64-145.0.7632.77/chrome-headless-shell-win64/chrome-headless-shell.exe';
+const bravePath  = 'C:/Users/alexd/AppData/Local/BraveSoftware/Brave-Browser/Application/brave.exe';
+const chromePath = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe';
+import { existsSync } from 'fs';
+const executablePath = existsSync(bravePath) ? bravePath : chromePath;
 
 const browser = await puppeteer.launch({
-  executablePath: chromePath,
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+  executablePath,
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 900 });
 await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-await new Promise(r => setTimeout(r, 6000)); // wait for Three.js + GSAP animations to render
+await new Promise(r => setTimeout(r, 9000)); // wait for Three.js + GSAP animations to render
 const fullPage = process.argv.includes('--full');
 
 if (fullPage) {
