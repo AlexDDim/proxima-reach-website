@@ -69,153 +69,196 @@
     #loader {
       position: fixed; inset: 0;
       z-index: 9999;
-      background: #000;
+      background: #000008;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 0;
       overflow: hidden;
     }
 
-    /* star-field bg */
-    #loader::before {
-      content: '';
+    /* Live star-field canvas */
+    #loader-stars {
       position: absolute; inset: 0;
-      background-image:
-        radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
-        radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 35% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 70% 90%, rgba(255,255,255,0.35) 0%, transparent 100%),
-        radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 60% 30%, rgba(212,168,83,0.5) 0%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 5%  45%, rgba(212,168,83,0.4) 0%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 95% 80%, rgba(124,58,237,0.5) 0%, transparent 100%);
-    }
-
-    /* central purple ambient glow */
-    #loader::after {
-      content: '';
-      position: absolute;
-      width: 500px; height: 500px;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%);
+      width: 100%; height: 100%;
       pointer-events: none;
     }
 
-    /* The orbit scene wrapper */
-    .loader-scene {
+    /* Deep nebula layers */
+    #loader::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 30% 40%, rgba(124,58,237,0.13) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 45% at 72% 60%, rgba(59,7,100,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(6,6,13,0.4) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* Gold equatorial shimmer line */
+    #loader::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%; transform: translateY(-50%);
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(212,168,83,0.06) 20%, rgba(212,168,83,0.18) 50%, rgba(212,168,83,0.06) 80%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* ── Center stage ── */
+    .loader-stage {
       position: relative;
-      width: 300px; height: 300px;
-      margin-bottom: 2rem;
-      flex-shrink: 0;
-    }
-
-    /* Faint orbit-path rings */
-    .orbit-path {
-      position: absolute;
-      top: 50%; left: 50%;
-      border-radius: 50%;
-      border: 1px solid rgba(212,168,83,0.1);
-      transform: translate(-50%, -50%);
-    }
-    .orbit-path.outer { width: 280px; height: 280px; border-color: rgba(212,168,83,0.12); }
-    .orbit-path.inner { width: 180px; height: 180px; border-color: rgba(124,58,237,0.15); }
-
-    /* Arms that spin — centered on the scene */
-    .horn-arm {
-      position: absolute;
-      top: calc(50% - 140px);
-      left: calc(50% - 140px);
-      width: 280px; height: 280px;
-    }
-
-    .horn-arm.inner-arm {
-      top: calc(50% - 90px);
-      left: calc(50% - 90px);
-      width: 180px; height: 180px;
-    }
-
-    /* The horn/spike shape — at the TOP CENTER of each arm */
-    .horn-tip {
-      position: absolute;
-      top: -2px; left: 50%;
-      transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 20px solid var(--gold-light);
-      filter: drop-shadow(0 0 8px rgba(242,204,114,0.95))
-              drop-shadow(0 0 18px rgba(212,168,83,0.7))
-              drop-shadow(0 0 35px rgba(212,168,83,0.35));
-    }
-
-    /* Trail horns get smaller + more transparent */
-    .horn-arm.t1 .horn-tip { border-bottom-color: rgba(242,204,114,0.55); border-bottom-width: 16px; border-left-width: 4px; border-right-width: 4px; filter: none; }
-    .horn-arm.t2 .horn-tip { border-bottom-color: rgba(212,168,83,0.32);  border-bottom-width: 13px; border-left-width: 3px; border-right-width: 3px; filter: none; }
-    .horn-arm.t3 .horn-tip { border-bottom-color: rgba(212,168,83,0.16);  border-bottom-width: 10px; border-left-width: 3px; border-right-width: 3px; filter: none; }
-
-    /* Inner orbit — purple spark */
-    .horn-arm.inner-arm .horn-tip {
-      border-bottom-color: #c084fc;
-      border-bottom-width: 14px;
-      border-left-width: 4px; border-right-width: 4px;
-      filter: drop-shadow(0 0 6px rgba(192,132,252,0.9)) drop-shadow(0 0 14px rgba(124,58,237,0.7));
-    }
-
-    /* Logo in center of scene */
-    #loader-logo {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0.82);
-      width: 150px; height: auto;
-      opacity: 0;
-      mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 42%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 42%, transparent 100%);
-      filter: drop-shadow(0 0 35px rgba(212, 168, 83, 0.6))
-              drop-shadow(0 0 12px rgba(124,58,237,0.4));
+      display: flex; flex-direction: column;
+      align-items: center;
       z-index: 2;
     }
 
-    /* Gold ring that pulses around the logo */
-    .loader-logo-ring {
+    /* Rotating orbit rings */
+    .loader-orbit-wrap {
+      position: relative;
+      width: 340px; height: 340px;
+      flex-shrink: 0;
+      margin-bottom: -20px;
+    }
+
+    .l-ring {
+      position: absolute; top: 50%; left: 50%;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      border: 1px solid transparent;
+    }
+    .l-ring-1 {
+      width: 320px; height: 320px;
+      border-color: rgba(212,168,83,0.08);
+      box-shadow: inset 0 0 30px rgba(212,168,83,0.02);
+      animation: l-spin-cw 18s linear infinite;
+    }
+    .l-ring-2 {
+      width: 240px; height: 240px;
+      border-color: rgba(124,58,237,0.10);
+      animation: l-spin-ccw 12s linear infinite;
+    }
+    .l-ring-3 {
+      width: 164px; height: 164px;
+      border-color: rgba(212,168,83,0.14);
+      animation: l-spin-cw 7s linear infinite;
+    }
+
+    /* Tick marks on outermost ring */
+    .l-ring-1::before, .l-ring-1::after {
+      content: '';
+      position: absolute;
+      background: rgba(212,168,83,0.5);
+    }
+    .l-ring-1::before { width: 4px; height: 1px; top: -0.5px; left: 50%; transform: translateX(-50%); }
+    .l-ring-1::after  { width: 1px; height: 4px; left: -0.5px; top: 50%; transform: translateY(-50%); }
+
+    @keyframes l-spin-cw  { to { transform: translate(-50%,-50%) rotate(360deg);  } }
+    @keyframes l-spin-ccw { to { transform: translate(-50%,-50%) rotate(-360deg); } }
+
+    /* Orbiting dots */
+    .l-dot {
+      position: absolute; top: 50%; left: 50%;
+      border-radius: 50%;
+      transform-origin: 0 0;
+    }
+    .l-dot-gold {
+      width: 5px; height: 5px;
+      background: var(--gold-light);
+      box-shadow: 0 0 8px 2px rgba(212,168,83,0.8), 0 0 20px rgba(212,168,83,0.4);
+      margin: -2.5px 0 0 -2.5px;
+      animation: l-orbit-gold 3.2s linear infinite;
+    }
+    .l-dot-purple {
+      width: 4px; height: 4px;
+      background: #c084fc;
+      box-shadow: 0 0 7px 2px rgba(192,132,252,0.85), 0 0 16px rgba(124,58,237,0.5);
+      margin: -2px 0 0 -2px;
+      animation: l-orbit-purple 2.1s linear infinite;
+    }
+    .l-dot-white {
+      width: 3px; height: 3px;
+      background: #fff;
+      box-shadow: 0 0 5px 1px rgba(255,255,255,0.7);
+      margin: -1.5px 0 0 -1.5px;
+      animation: l-orbit-white 4.8s linear infinite reverse;
+    }
+
+    @keyframes l-orbit-gold   { to { transform: rotate(360deg)  translateX(160px) rotate(-360deg); } }
+    @keyframes l-orbit-purple { to { transform: rotate(-360deg) translateX(120px) rotate(360deg);  } }
+    @keyframes l-orbit-white  { to { transform: rotate(360deg)  translateX(82px)  rotate(-360deg); } }
+
+    /* Central logo */
+    #loader-logo {
       position: absolute;
       top: 50%; left: 50%;
-      width: 110px; height: 110px;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      border: 1px solid rgba(212,168,83,0.25);
+      transform: translate(-50%, -50%) scale(0.75);
+      width: 180px; height: auto;
       opacity: 0;
-      z-index: 1;
+      clip-path: inset(16px 22px 40px 22px);
+      filter: brightness(2.2) contrast(1.5) saturate(1.3)
+              drop-shadow(0 0 40px rgba(212,168,83,0.5))
+              drop-shadow(0 0 15px rgba(124,58,237,0.35));
+      z-index: 3;
+    }
+
+    /* Radial nebula bloom behind logo */
+    .loader-bloom {
+      position: absolute; top: 50%; left: 50%;
+      width: 260px; height: 260px;
+      transform: translate(-50%, -50%) scale(0.6);
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(212,168,83,0.07) 0%,
+        rgba(124,58,237,0.10) 40%,
+        transparent 72%);
+      opacity: 0;
+      pointer-events: none; z-index: 1;
+    }
+
+    /* Bottom UI */
+    .loader-ui {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.75rem; z-index: 2; position: relative;
+      padding-top: 1.5rem;
     }
 
     #loader-tagline {
       font-family: var(--ff-ui);
-      font-size: 0.68rem; letter-spacing: 0.38em;
+      font-size: 0.62rem; letter-spacing: 0.45em;
       text-transform: uppercase;
-      color: var(--white-dim);
+      color: rgba(212,168,83,0.5);
       opacity: 0;
-      margin-bottom: 1.25rem;
     }
 
     #loader-track {
-      width: 200px; height: 1px;
-      background: rgba(212, 168, 83, 0.12);
+      width: 160px; height: 1px;
+      background: rgba(255,255,255,0.06);
       position: relative; overflow: hidden;
+      border-radius: 1px;
     }
-
     #loader-bar {
       height: 100%; width: 0%;
-      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+      background: linear-gradient(90deg, rgba(212,168,83,0.3), var(--gold-light), rgba(212,168,83,0.3));
       background-size: 200% 100%;
-      animation: shimmer 1.6s ease infinite;
+      animation: l-shimmer 1.8s ease infinite;
     }
-
-    @keyframes shimmer {
+    @keyframes l-shimmer {
       0%   { background-position: 200% 0; }
       100% { background-position: -200% 0; }
+    }
+
+    #loader-pct {
+      font-family: var(--ff-ui);
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.15);
+      opacity: 0;
+    }
+
+    /* Warp-speed flash overlay for exit */
+    #loader-warp {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(212,168,83,0.5) 30%, transparent 70%);
+      opacity: 0; pointer-events: none; z-index: 5;
     }
 
     /* ─── NAVBAR ─────────────────────────────────────────── */
@@ -1015,29 +1058,29 @@
   <!-- ─── LOADER ──────────────────────────────────────────── -->
   <div id="loader" role="status" aria-label="Loading">
 
-    <div class="loader-scene">
-      <!-- faint orbit path circles -->
-      <div class="orbit-path outer"></div>
-      <div class="orbit-path inner"></div>
+    <canvas id="loader-stars"></canvas>
 
-      <!-- outer orbit: main horn + 3 trailing ghosts -->
-      <div class="horn-arm main" id="ha-main"><div class="horn-tip"></div></div>
-      <div class="horn-arm t1"   id="ha-t1">  <div class="horn-tip"></div></div>
-      <div class="horn-arm t2"   id="ha-t2">  <div class="horn-tip"></div></div>
-      <div class="horn-arm t3"   id="ha-t3">  <div class="horn-tip"></div></div>
+    <!-- Orbiting elements -->
+    <div class="loader-stage">
+      <div class="loader-orbit-wrap">
+        <div class="l-ring l-ring-1"></div>
+        <div class="l-ring l-ring-2"></div>
+        <div class="l-ring l-ring-3"></div>
+        <div class="l-dot l-dot-gold"></div>
+        <div class="l-dot l-dot-purple"></div>
+        <div class="l-dot l-dot-white"></div>
+        <div class="loader-bloom" id="loader-bloom"></div>
+        <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" id="loader-logo">
+      </div>
 
-      <!-- inner orbit: purple spark -->
-      <div class="horn-arm inner-arm" id="ha-inner"><div class="horn-tip"></div></div>
-
-      <!-- pulsing gold ring behind logo -->
-      <div class="loader-logo-ring" id="logo-ring"></div>
-
-      <!-- logo centred -->
-      <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" id="loader-logo">
+      <div class="loader-ui">
+        <p id="loader-tagline">PROXIMA REACH</p>
+        <div id="loader-track"><div id="loader-bar"></div></div>
+        <p id="loader-pct">INITIALISING</p>
+      </div>
     </div>
 
-    <p id="loader-tagline">Your Business Within Reach</p>
-    <div id="loader-track"><div id="loader-bar"></div></div>
+    <div id="loader-warp"></div>
   </div>
 
   <!-- ─── NAVBAR ──────────────────────────────────────────── -->
@@ -1826,64 +1869,120 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    /* ── LOADER ── */
+    /* ── LOADER STAR-FIELD CANVAS ── */
+    (function() {
+      const cvs = document.getElementById('loader-stars');
+      const ctx = cvs.getContext('2d');
+      let W, H, stars = [], raf;
+
+      function resize() {
+        W = cvs.width  = window.innerWidth;
+        H = cvs.height = window.innerHeight;
+      }
+      resize();
+
+      // Seed stars
+      const STAR_COUNT = 220;
+      for (let i = 0; i < STAR_COUNT; i++) {
+        stars.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 1.2 + 0.2,
+          a: Math.random(),
+          da: (Math.random() * 0.003 + 0.001) * (Math.random() < 0.5 ? 1 : -1),
+          gold: Math.random() < 0.07,
+          purple: Math.random() < 0.05,
+        });
+      }
+
+      // Shooting stars
+      let shoots = [];
+      function spawnShoot() {
+        shoots.push({ x: Math.random() * W * 0.7, y: Math.random() * H * 0.4, len: 80 + Math.random() * 100, speed: 6 + Math.random() * 8, a: 1 });
+        setTimeout(spawnShoot, 1200 + Math.random() * 2000);
+      }
+      setTimeout(spawnShoot, 600);
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        stars.forEach(s => {
+          s.a = Math.max(0.05, Math.min(1, s.a + s.da));
+          if (s.a <= 0.05 || s.a >= 1) s.da *= -1;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          if (s.gold)   ctx.fillStyle = `rgba(212,168,83,${s.a * 0.9})`;
+          else if (s.purple) ctx.fillStyle = `rgba(192,132,252,${s.a * 0.7})`;
+          else          ctx.fillStyle = `rgba(255,255,255,${s.a * 0.65})`;
+          ctx.fill();
+        });
+
+        shoots = shoots.filter(sh => sh.a > 0.01);
+        shoots.forEach(sh => {
+          const grad = ctx.createLinearGradient(sh.x, sh.y, sh.x + sh.len, sh.y + sh.len * 0.35);
+          grad.addColorStop(0, `rgba(255,255,255,0)`);
+          grad.addColorStop(0.6, `rgba(255,255,255,${sh.a * 0.6})`);
+          grad.addColorStop(1, `rgba(255,255,255,0)`);
+          ctx.beginPath();
+          ctx.moveTo(sh.x, sh.y);
+          ctx.lineTo(sh.x + sh.len, sh.y + sh.len * 0.35);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          sh.x += sh.speed; sh.y += sh.speed * 0.35;
+          sh.a *= 0.93;
+        });
+
+        raf = requestAnimationFrame(draw);
+      }
+      draw();
+      // Stop canvas when loader exits
+      window._stopLoaderCanvas = () => { cancelAnimationFrame(raf); };
+    })();
+
+    /* ── LOADER TIMELINE ── */
     const loaderTl = gsap.timeline({
       onComplete() {
+        window._stopLoaderCanvas?.();
         document.getElementById('loader').style.display = 'none';
         heroIn();
       }
     });
 
-    // Arms start at staggered rotations so they trail behind the main horn
-    gsap.set('#ha-main',  { rotation: 0,    transformOrigin: '50% 50%' });
-    gsap.set('#ha-t1',    { rotation: -18,  transformOrigin: '50% 50%' });
-    gsap.set('#ha-t2',    { rotation: -36,  transformOrigin: '50% 50%' });
-    gsap.set('#ha-t3',    { rotation: -58,  transformOrigin: '50% 50%' });
-    gsap.set('#ha-inner', { rotation: 0,    transformOrigin: '50% 50%' });
-
-    // Outer horn: 3 full orbits over 2.4s — all arms advance by the same amount
-    const orbits = 3;
-    const orbitDur = 2.4;
-    const orbitEase = 'power1.inOut';
     loaderTl
-      // Logo fades in
-      .to('#loader-logo',   { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.4)',
-                              transformOrigin: '50% 50%' }, 0.2)
-      // Logo ring pulses in
-      .to('#logo-ring',     { opacity: 1, scale: 1.15, duration: 0.5, ease: 'power2.out' }, 0.3)
-      .to('#logo-ring',     { scale: 1, opacity: 0.6, duration: 0.4, ease: 'power2.inOut' }, 0.8)
+      // Bloom swells in
+      .to('#loader-bloom',   { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
 
-      // Outer horns orbit 3× simultaneously (all start at t=0.4)
-      .to('#ha-main',  { rotation: orbits * 360,           duration: orbitDur, ease: orbitEase }, 0.4)
-      .to('#ha-t1',    { rotation: orbits * 360 - 18,      duration: orbitDur, ease: orbitEase }, 0.4)
-      .to('#ha-t2',    { rotation: orbits * 360 - 36,      duration: orbitDur, ease: orbitEase }, 0.4)
-      .to('#ha-t3',    { rotation: orbits * 360 - 58,      duration: orbitDur, ease: orbitEase }, 0.4)
+      // Logo materialises from center
+      .to('#loader-logo',    { opacity: 1, scale: 1, duration: 0.9, ease: 'expo.out',
+                               transformOrigin: '50% 50%' }, 0.3)
 
-      // Inner purple spark: 5 orbits (faster, opposite direction after 2)
-      .to('#ha-inner', { rotation: 5 * 360,                duration: orbitDur, ease: 'power2.inOut' }, 0.4)
+      // Tagline letter-spaces in
+      .to('#loader-tagline', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.8)
+      .to('#loader-pct',     { opacity: 1, duration: 0.4, ease: 'power2.out' }, 1.0)
 
-      // Tagline letter by letter (staggered opacity via single fade here)
-      .to('#loader-tagline', { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.6)
+      // Progress bar
+      .to('#loader-bar',     { width: '100%', duration: 2.2, ease: 'power1.inOut' }, 0.5)
 
-      // Progress bar fills as orbits happen
-      .to('#loader-bar', { width: '100%', duration: orbitDur - 0.1, ease: 'power1.inOut' }, 0.45)
+      // Bloom pulses brighter just before exit
+      .to('#loader-bloom',   { scale: 1.4, opacity: 0.7, duration: 0.35, ease: 'power2.in' }, 2.9)
 
-      // On finish: logo pulses, ring expands and fades, horns freeze
-      .to('#logo-ring', { scale: 2.2, opacity: 0, duration: 0.5, ease: 'power2.in' }, 2.7)
-      .to('#loader-logo', { scale: 1.06, filter: 'drop-shadow(0 0 60px rgba(212,168,83,0.9)) drop-shadow(0 0 25px rgba(124,58,237,0.6))', duration: 0.3, ease: 'power2.in' }, 2.7)
+      // Warp flash: radial burst, very brief
+      .to('#loader-warp',    { opacity: 1, duration: 0.12, ease: 'power3.in' }, 3.1)
+      .to('#loader-warp',    { opacity: 0, duration: 0.35, ease: 'power2.out' }, 3.22)
 
-      // Slide loader up
-      .to('#loader', { yPercent: -100, duration: 0.9, ease: 'expo.inOut' }, 3.0);
+      // Loader scales up and fades (warp-into-scene feeling) instead of plain slide
+      .to('#loader',         { opacity: 0, scale: 1.06, duration: 0.55, ease: 'power3.in' }, 3.12)
+      .to('#loader',         { yPercent: -105, duration: 0, ease: 'none' }, 3.67);
 
-    /* HERO ENTRANCE */
+    /* HERO ENTRANCE — staggered after warp */
     function heroIn() {
       const tl = gsap.timeline();
       tl
-        .to('.hero-eyebrow',           { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' })
-        .to('.hero-title',             { opacity: 1, duration: 0.01 }, '-=0.3')
-        .to('.hero-title .line-inner', { y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.15 }, '-=0.01')
-.to('.hero-btns',              { opacity: 1, y: 0, duration: 0.6,  ease: 'power3.out' }, '-=0.35')
-;
+        .from('#nav',                  { opacity: 0, y: -20, duration: 0.6, ease: 'power3.out' }, 0)
+        .to('.hero-eyebrow',           { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.15)
+        .to('.hero-title',             { opacity: 1, duration: 0.01 }, 0.3)
+        .to('.hero-title .line-inner', { y: 0, duration: 0.95, ease: 'power3.out', stagger: 0.14 }, 0.31)
+        .to('.hero-btns',              { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.7);
     }
 
     /* NAVBAR SCROLL STATE */
