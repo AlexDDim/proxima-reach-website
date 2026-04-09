@@ -54,7 +54,6 @@
       position: fixed; inset: 0;
       pointer-events: none;
       z-index: 99999;
-      mix-blend-mode: screen;
       opacity: 0;
       transition: opacity 0.4s ease;
     }
@@ -1671,8 +1670,9 @@
     wrap.id = 'neon-wrap';
     document.body.appendChild(wrap);
 
-    neonCursor({
+    const nc = neonCursor({
       el: wrap,
+      alpha: true,
       shaderPoints: 16,
       curvePoints: 80,
       curveLerp: 0.5,
@@ -1685,13 +1685,14 @@
       sleepTimeCoefY: 0
     });
 
-    // Forward window pointermove to wrap so the library tracks the mouse.
-    // Show the wrap on move, hide it when mouse is idle.
-    let hideTimer;
+    // Make background truly transparent — no blend mode needed
+    if (nc && nc.renderer) {
+      nc.renderer.setClearColor(0x000000, 0);
+    }
+
+    // Show on first move, stay visible (idle dot remains)
     window.addEventListener('pointermove', e => {
       wrap.style.opacity = '1';
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => { wrap.style.opacity = '0'; }, 800);
       wrap.dispatchEvent(new PointerEvent('pointermove', {
         clientX: e.clientX, clientY: e.clientY,
         bubbles: false, cancelable: false
