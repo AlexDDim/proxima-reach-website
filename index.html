@@ -1831,7 +1831,7 @@
             duration: dur,
             ease,
             delay,
-            overwrite: 'auto',
+            overwrite: true,
             onStart: () => { card.style.pointerEvents = t.pe; },
           });
 
@@ -1850,25 +1850,30 @@
         c.classList.add('shimmer-run');
       }
 
-      // Set initial state instantly
+      // Set initial state instantly — all cards start hidden, then entrance animates them in
       cards.forEach((card, i) => {
-        const t = getTarget(i);
+        const t = getTarget(i - 0); // active=0
         gsap.set(card, {
           xPercent: -50, yPercent: -50,
           x: t.x, rotateY: t.rotY,
-          scale: t.scale, opacity: t.opacity, zIndex: t.z,
+          scale: t.scale * 0.85,
+          opacity: 0,
+          zIndex: t.z,
         });
-        card.style.pointerEvents = t.pe;
+        card.style.pointerEvents = 'none';
         card.classList.toggle('is-active', i === 0);
       });
-      // Entrance animation
+      // Entrance: animate to final positions after one frame
       requestAnimationFrame(() => {
         cards.forEach((card, i) => {
-          const t = getTarget(i);
-          gsap.from(card, {
-            opacity: 0, scale: t.scale * 0.82,
-            duration: 0.9, ease: 'expo.out', delay: Math.abs(i - active) * 0.07,
-            overwrite: false,
+          const t = getTarget(i - 0); // active=0
+          gsap.to(card, {
+            x: t.x, rotateY: t.rotY,
+            scale: t.scale, opacity: t.opacity,
+            duration: 0.9, ease: 'expo.out',
+            delay: Math.abs(i) * 0.06,
+            overwrite: true,
+            onComplete: () => { if (i === 0) card.style.pointerEvents = 'auto'; },
           });
         });
       });
