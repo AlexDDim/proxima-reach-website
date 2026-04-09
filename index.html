@@ -50,11 +50,10 @@
     }
 
     /* ─── NEON CURSOR ───────────────────────────────────── */
-    #neon-wrap {
+    #neon-cvs {
       position: fixed; inset: 0;
-      pointer-events: none;
-      z-index: 99999;
-      mix-blend-mode: screen;
+      width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 99999;
     }
 
     /* ─── GRAIN ──────────────────────────────────────────── */
@@ -1660,37 +1659,84 @@
     });
   </script>
 
-  <script type="module">
-    import { neonCursor } from 'https://unpkg.com/threejs-toys@0.0.8/build/threejs-toys.module.cdn.min.js';
+  <script>
+  (function () {
+    const cvs = document.createElement('canvas');
+    cvs.id = 'neon-cvs';
+    document.body.appendChild(cvs);
+    const ctx = cvs.getContext('2d');
 
-    // Full-screen fixed wrap — pointer-events:none so site stays interactive
-    // mix-blend-mode:screen on wrap means its black background = transparent
-    const wrap = document.createElement('div');
-    wrap.id = 'neon-wrap';
-    document.body.appendChild(wrap);
+    const COLOR = '#b06aff'; // neon purple
+    const DOT_R = 4;
+    const TRAIL_LEN = 28;
+    const FADE_RATE = 0.04; // how fast trail points fade
 
-    neonCursor({
-      el: wrap,
-      shaderPoints: 16,
-      curvePoints: 80,
-      curveLerp: 0.5,
-      radius1: 2,
-      radius2: 4,
-      velocityTreshold: 10,
-      sleepRadiusX: 1,
-      sleepRadiusY: 1,
-      sleepTimeCoefX: 0,
-      sleepTimeCoefY: 0
-    });
+    let W, H;
+    function resize() {
+      W = cvs.width  = window.innerWidth;
+      H = cvs.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
 
-    // Library listens to 'pointermove' on el, but el has pointer-events:none.
-    // Solution: forward window pointermove → wrap so the library tracks the mouse.
-    window.addEventListener('pointermove', e => {
-      wrap.dispatchEvent(new PointerEvent('pointermove', {
-        clientX: e.clientX, clientY: e.clientY,
-        bubbles: false, cancelable: false
-      }));
-    });
+    const trail = []; // [{x, y, a}]
+    let mx = -999, my = -999;
+
+    window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Fade existing trail points
+      for (let i = trail.length - 1; i >= 0; i--) {
+        trail[i].a -= FADE_RATE;
+        if (trail[i].a <= 0) { trail.splice(i, 1); }
+      }
+
+      // Add current position
+      if (mx > 0) trail.push({ x: mx, y: my, a: 1 });
+      if (trail.length > TRAIL_LEN) trail.shift();
+
+      // Draw trail
+      for (let i = 1; i < trail.length; i++) {
+        const p = trail[i], pp = trail[i - 1];
+        const prog = i / trail.length;
+        const alpha = p.a * prog;
+        const r = DOT_R * prog;
+        ctx.beginPath();
+        ctx.moveTo(pp.x, pp.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = COLOR;
+        ctx.globalAlpha = alpha * 0.9;
+        ctx.lineWidth = r * 1.5;
+        ctx.shadowColor = COLOR;
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+      }
+
+      // Draw neon dot at cursor
+      if (mx > 0) {
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = COLOR;
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(mx, my, DOT_R * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = COLOR;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(mx, my, DOT_R * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  })();
   </script>
 
 </body>
