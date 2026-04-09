@@ -1667,9 +1667,10 @@
     const ctx = cvs.getContext('2d');
 
     const COLOR = '#b06aff'; // neon purple
-    const DOT_R = 4;
-    const TRAIL_LEN = 28;
-    const FADE_RATE = 0.04; // how fast trail points fade
+    const COLOR2 = '#e0aaff'; // lighter core
+    const DOT_R = 7;
+    const TRAIL_LEN = 40;
+    const FADE_RATE = 0.028;
 
     let W, H;
     function resize() {
@@ -1697,36 +1698,59 @@
       if (mx > 0) trail.push({ x: mx, y: my, a: 1 });
       if (trail.length > TRAIL_LEN) trail.shift();
 
-      // Draw trail
-      for (let i = 1; i < trail.length; i++) {
-        const p = trail[i], pp = trail[i - 1];
-        const prog = i / trail.length;
-        const alpha = p.a * prog;
-        const r = DOT_R * prog;
-        ctx.beginPath();
-        ctx.moveTo(pp.x, pp.y);
-        ctx.lineTo(p.x, p.y);
-        ctx.strokeStyle = COLOR;
-        ctx.globalAlpha = alpha * 0.9;
-        ctx.lineWidth = r * 1.5;
-        ctx.shadowColor = COLOR;
-        ctx.shadowBlur = 8;
-        ctx.stroke();
+      // Draw trail — two passes: soft outer glow then bright core
+      for (let pass = 0; pass < 2; pass++) {
+        for (let i = 1; i < trail.length; i++) {
+          const p = trail[i], pp = trail[i - 1];
+          const prog = i / trail.length;
+          const alpha = p.a * prog;
+          ctx.beginPath();
+          ctx.moveTo(pp.x, pp.y);
+          ctx.lineTo(p.x, p.y);
+          if (pass === 0) {
+            // Soft glow halo
+            ctx.globalAlpha = alpha * 0.35;
+            ctx.lineWidth = DOT_R * prog * 3.5;
+            ctx.strokeStyle = COLOR;
+            ctx.shadowColor = COLOR;
+            ctx.shadowBlur = 18;
+          } else {
+            // Bright core line
+            ctx.globalAlpha = alpha * 0.95;
+            ctx.lineWidth = DOT_R * prog * 1.1;
+            ctx.strokeStyle = COLOR2;
+            ctx.shadowColor = COLOR2;
+            ctx.shadowBlur = 6;
+          }
+          ctx.lineCap = 'round';
+          ctx.stroke();
+        }
       }
 
       // Draw neon dot at cursor
       if (mx > 0) {
-        ctx.globalAlpha = 1;
+        // Outer glow ring
+        ctx.globalAlpha = 0.3;
         ctx.shadowColor = COLOR;
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 24;
+        ctx.fillStyle = COLOR;
+        ctx.beginPath();
+        ctx.arc(mx, my, DOT_R * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        // Mid bloom
+        ctx.globalAlpha = 0.7;
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = COLOR;
+        ctx.beginPath();
+        ctx.arc(mx, my, DOT_R, 0, Math.PI * 2);
+        ctx.fill();
+        // Bright white core
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 8;
         ctx.fillStyle = '#fff';
         ctx.beginPath();
-        ctx.arc(mx, my, DOT_R * 0.6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = COLOR;
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(mx, my, DOT_R * 0.35, 0, Math.PI * 2);
+        ctx.arc(mx, my, DOT_R * 0.45, 0, Math.PI * 2);
         ctx.fill();
       }
 
