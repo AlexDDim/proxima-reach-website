@@ -576,24 +576,49 @@
       background: linear-gradient(90deg, var(--gold), transparent);
     }
 
-    /* ─── SERVICES SCROLL PROGRESS BAR ─────────────────── */
-    #srv-progress {
-      position: absolute; bottom: 0; left: 5rem; right: 5rem; height: 2px;
-      background: rgba(255,255,255,0.06); z-index: 10; border-radius: 2px;
-    }
-    #srv-progress-fill {
-      height: 100%; width: 0%; border-radius: 2px;
-      background: linear-gradient(90deg, var(--purple), var(--gold));
-      box-shadow: 0 0 12px rgba(212,168,83,0.6);
-      transition: width 0.1s linear;
+    /* ─── SERVICES ROULETTE ─────────────────────────────── */
+    #srv-roulette {
+      position: relative; z-index: 2;
+      height: 460px;
+      perspective: 1400px;
+      perspective-origin: 50% 50%;
     }
 
-    #srv-track {
-      position: relative; z-index: 2;
-      display: flex; gap: 1.75rem;
-      padding: 2rem 5rem 3rem;
-      width: max-content;
-      will-change: transform;
+    /* Nav dots */
+    #srv-dots {
+      display: flex; justify-content: center; gap: 0.6rem;
+      margin-top: 2rem; position: relative; z-index: 10;
+    }
+    .srv-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .srv-dot.active {
+      background: var(--gold);
+      transform: scale(1.4);
+      box-shadow: 0 0 10px rgba(212,168,83,0.7);
+    }
+
+    /* Arrow hints */
+    #srv-arrows {
+      position: absolute; bottom: -3.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 1rem; z-index: 10;
+    }
+    .srv-arrow {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--white-dim);
+      transition: border-color 0.3s, background 0.3s, color 0.3s, box-shadow 0.3s;
+      font-size: 0.85rem; user-select: none;
+    }
+    .srv-arrow:hover {
+      border-color: rgba(212,168,83,0.6);
+      color: var(--gold);
+      box-shadow: 0 0 16px rgba(212,168,83,0.3);
     }
 
     /* Shimmer sweep animation on card entrance */
@@ -616,26 +641,26 @@
     }
 
     .srv-card {
-      position: relative;
+      position: absolute;
+      left: 50%; top: 50%;
       width: 340px; min-height: 430px;
       padding: 2.5rem 2.25rem;
       background: linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(124,58,237,0.07) 100%);
       border: 1px solid rgba(255,255,255,0.09);
       border-radius: 20px;
-      flex-shrink: 0; overflow: hidden; cursor: default;
-      opacity: 0; transform: translateY(80px) scale(0.9);
+      overflow: hidden; cursor: default;
       will-change: transform, opacity;
       backdrop-filter: blur(6px);
-      transition: box-shadow 0.4s ease;
+      /* JS sets transform; CSS handles transition */
+      transition: transform 0.7s cubic-bezier(0.22,1,0.36,1),
+                  opacity 0.7s cubic-bezier(0.22,1,0.36,1),
+                  box-shadow 0.4s ease, border-color 0.4s ease;
     }
 
-    .srv-card.in-view {
-      animation: srv-pop 0.9s ease forwards;
-    }
-
-    /* Float only when fully in view and not hovered */
-    .srv-card.in-view.do-float {
-      animation: srv-float 4s ease-in-out infinite;
+    /* Active center card hover */
+    .srv-card.is-active:hover {
+      border-color: rgba(212,168,83,0.7);
+      box-shadow: 0 0 90px rgba(212,168,83,0.5), 0 0 35px rgba(212,168,83,0.35), 0 20px 50px rgba(0,0,0,0.4);
     }
 
     /* Border shimmer layer */
@@ -647,44 +672,41 @@
       content: '';
       position: absolute; top: 0; left: 0;
       width: 60px; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
       transform: translateX(-100%) skewX(-15deg);
     }
-    .srv-card.in-view .srv-card-shimmer::after {
-      animation: srv-shimmer 0.75s ease forwards;
+    .srv-card.shimmer-run .srv-card-shimmer::after {
+      animation: srv-shimmer 0.65s ease forwards;
     }
 
     /* Mouse-tracking spotlight glow */
     .srv-card-spotlight {
       position: absolute; border-radius: 50%;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 70%);
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(212,168,83,0.13) 0%, transparent 70%);
       pointer-events: none; z-index: 0;
       transform: translate(-50%, -50%);
-      transition: opacity 0.3s ease;
-      opacity: 0;
+      transition: opacity 0.3s ease; opacity: 0;
     }
-    .srv-card:hover .srv-card-spotlight { opacity: 1; }
+    .srv-card.is-active:hover .srv-card-spotlight { opacity: 1; }
 
-    /* Glowing border on hover */
+    /* Glowing border on hover (active only) */
     .srv-card::after {
       content: '';
       position: absolute; inset: -1px; border-radius: 20px;
       background: linear-gradient(135deg, rgba(212,168,83,0.6), rgba(124,58,237,0.5), rgba(212,168,83,0.6));
-      z-index: -1; opacity: 0;
-      transition: opacity 0.4s ease;
+      z-index: -1; opacity: 0; transition: opacity 0.4s ease;
     }
-    .srv-card:hover::after { opacity: 1; }
+    .srv-card.is-active:hover::after { opacity: 1; }
 
     /* Bottom sweep line */
     .srv-card-line {
       position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--purple), var(--gold), var(--purple));
       transform: scaleX(0); transform-origin: left; border-radius: 0 0 20px 20px;
-      transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
-      z-index: 2;
+      transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1); z-index: 2;
     }
-    .srv-card:hover .srv-card-line { transform: scaleX(1); }
+    .srv-card.is-active:hover .srv-card-line { transform: scaleX(1); }
 
     .srv-card-glow {
       position: absolute; top: -30%; right: -20%;
@@ -693,10 +715,7 @@
       pointer-events: none; z-index: 0;
       transition: transform 0.6s ease, opacity 0.4s ease;
     }
-    .srv-card:hover .srv-card-glow {
-      transform: scale(1.4);
-      opacity: 1.5;
-    }
+    .srv-card.is-active:hover .srv-card-glow { transform: scale(1.4); }
 
     .srv-icon {
       width: 56px; height: 56px;
@@ -1022,9 +1041,7 @@
       <div class="srv-hint">Scroll to explore all services</div>
     </div>
 
-    <div id="srv-progress"><div id="srv-progress-fill"></div></div>
-
-    <div id="srv-track">
+    <div id="srv-roulette">
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
@@ -1216,6 +1233,9 @@
       </div>
 
     </div>
+
+    <div id="srv-dots"></div>
+
   </section>
 
   <!-- ─── CONTACT ──────────────────────────────────────────── -->
@@ -1763,92 +1783,133 @@
       once: true
     });
 
-    /* ── SERVICES: HORIZONTAL SCROLL + CARD ANIMATIONS ── */
-    const track = document.getElementById('srv-track');
-    const progressFill = document.getElementById('srv-progress-fill');
-    const srvCards = track.querySelectorAll('.srv-card');
+    /* ── SERVICES: 3D ROULETTE CAROUSEL ── */
+    (function() {
+      const roulette  = document.getElementById('srv-roulette');
+      const dotsWrap  = document.getElementById('srv-dots');
+      const cards     = [...roulette.querySelectorAll('.srv-card')];
+      const N         = cards.length; // 7
+      let   active    = 0;
+      let   animating = false;
 
-    // Staggered entrance: each card pops in as it enters the viewport
-    function revealCards() {
-      srvCards.forEach((card, i) => {
-        const rect = card.getBoundingClientRect();
-        if (rect.left < window.innerWidth * 0.9 && rect.right > 0) {
-          if (!card.classList.contains('in-view')) {
-            setTimeout(() => {
-              card.style.opacity = '1';
-              card.style.transform = 'translateY(0) scale(1)';
-              card.style.transition = 'opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1)';
-              card.classList.add('in-view');
-              // Remove float class while shimmer runs, then add it
-              setTimeout(() => card.classList.add('do-float'), 1400);
-            }, i * 55);
+      // Build dots
+      cards.forEach((_, i) => {
+        const d = document.createElement('span');
+        d.className = 'srv-dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(d);
+      });
+
+      // Position map: offset from active (-2, -1, 0, 1, 2, hidden)
+      function getTransform(offset) {
+        const abs = Math.abs(offset);
+        if (abs > 1) {
+          // Hidden behind side cards
+          const dir = offset > 0 ? 1 : -1;
+          return { x: dir * 960, rotY: dir * -45, scale: 0.55, opacity: 0, z: -10, pe: 'none' };
+        }
+        if (offset === 0) return { x: 0,    rotY: 0,   scale: 1,    opacity: 1,    z: 100, pe: 'auto' };
+        if (offset === -1) return { x: -400, rotY: 22,  scale: 0.82, opacity: 0.55, z: 30,  pe: 'none' };
+        if (offset ===  1) return { x:  400, rotY: -22, scale: 0.82, opacity: 0.55, z: 30,  pe: 'none' };
+      }
+
+      function applyPositions(newActive, instant) {
+        const dots = dotsWrap.querySelectorAll('.srv-dot');
+        dots.forEach((d, i) => d.classList.toggle('active', i === newActive));
+
+        cards.forEach((card, i) => {
+          const offset = i - newActive;
+          const t = getTransform(offset);
+
+          if (instant) {
+            card.style.transition = 'none';
+          } else {
+            // Stagger timing: center card lands first, sides follow
+            const delay = Math.abs(offset) * 0.06;
+            card.style.transition = `transform 0.75s ${delay}s cubic-bezier(0.22,1,0.36,1), opacity 0.6s ${delay}s ease, box-shadow 0.4s ease, border-color 0.4s ease`;
+          }
+
+          card.style.transform   = `translate(-50%,-50%) translateX(${t.x}px) rotateY(${t.rotY}deg) scale(${t.scale})`;
+          card.style.opacity     = t.opacity;
+          card.style.zIndex      = t.z;
+          card.style.pointerEvents = t.pe;
+
+          // Mark center card
+          card.classList.toggle('is-active', offset === 0);
+        });
+      }
+
+      function goTo(idx, noAnim) {
+        if (animating && !noAnim) return;
+        const prev = active;
+        active = Math.max(0, Math.min(N - 1, idx));
+        applyPositions(active, noAnim);
+
+        // Shimmer the new center card
+        const centerCard = cards[active];
+        centerCard.classList.remove('shimmer-run');
+        void centerCard.offsetWidth;
+        centerCard.classList.add('shimmer-run');
+
+        animating = true;
+        setTimeout(() => { animating = false; }, 800);
+      }
+
+      // Initial placement (instant, no transition)
+      applyPositions(0, true);
+      // Then animate in after a tick
+      requestAnimationFrame(() => requestAnimationFrame(() => goTo(0)));
+
+      // Mouse tilt + spotlight (center card only)
+      cards.forEach(card => {
+        const spotlight = card.querySelector('.srv-card-spotlight');
+        card.addEventListener('mousemove', e => {
+          if (!card.classList.contains('is-active')) return;
+          const r   = card.getBoundingClientRect();
+          const cx  = e.clientX - r.left, cy = e.clientY - r.top;
+          const hw  = r.width / 2, hh = r.height / 2;
+          const rY  =  ((cx - hw) / hw) * 8;
+          const rX  = -((cy - hh) / hh) * 6;
+          card.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+          card.style.transform  = `translate(-50%,-50%) perspective(900px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.04)`;
+          if (spotlight) { spotlight.style.left = cx + 'px'; spotlight.style.top = cy + 'px'; }
+        });
+        card.addEventListener('mouseleave', () => {
+          if (!card.classList.contains('is-active')) return;
+          card.style.transition = 'transform 0.65s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease, border-color 0.4s ease';
+          card.style.transform  = `translate(-50%,-50%) translateX(0px) rotateY(0deg) scale(1)`;
+        });
+      });
+
+      // GSAP ScrollTrigger: snap one card per scroll unit
+      const scrollDist = window.innerHeight * (N - 1);
+
+      gsap.to({}, {
+        scrollTrigger: {
+          trigger: '#services',
+          start: 'top top',
+          end: () => '+=' + scrollDist,
+          pin: true,
+          scrub: false,
+          anticipatePin: 1,
+          snap: {
+            snapTo: (value) => Math.round(value * (N-1)) / (N-1),
+            duration: { min: 0.3, max: 0.6 },
+            ease: 'power2.inOut',
+            delay: 0.05,
+          },
+          onUpdate: self => {
+            const idx = Math.round(self.progress * (N - 1));
+            if (idx !== active) goTo(idx);
           }
         }
       });
-    }
 
-    gsap.to('#srv-track', {
-      x: () => -(track.scrollWidth - window.innerWidth),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '#services',
-        start: 'top top',
-        end: () => '+=' + (track.scrollWidth - window.innerWidth),
-        pin: true,
-        scrub: 0.65,
-        invalidateOnRefresh: true,
-        anticipatePin: 1,
-        onUpdate: self => {
-          progressFill.style.width = (self.progress * 100) + '%';
-          revealCards();
-        }
-      }
-    });
-
-    // Reveal first cards on load
-    setTimeout(revealCards, 400);
-
-    // Mouse-tracking 3D tilt + spotlight per card
-    srvCards.forEach(card => {
-      const spotlight = card.querySelector('.srv-card-spotlight');
-
-      card.addEventListener('mousemove', e => {
-        if (!card.classList.contains('in-view')) return;
-        card.classList.remove('do-float');
-
-        const r = card.getBoundingClientRect();
-        const cx = e.clientX - r.left;
-        const cy = e.clientY - r.top;
-        const hw = r.width / 2, hh = r.height / 2;
-        const rotY =  ((cx - hw) / hw) * 10;
-        const rotX = -((cy - hh) / hh) * 8;
-
-        card.style.transform    = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
-        card.style.transition   = 'box-shadow 0.4s ease, border-color 0.4s ease';
-        card.style.boxShadow    = `0 0 80px rgba(212,168,83,0.45), 0 0 30px rgba(212,168,83,0.3), ${-rotY*2}px ${-rotX*2}px 40px rgba(0,0,0,0.5)`;
-        card.style.borderColor  = 'rgba(212,168,83,0.75)';
-
-        if (spotlight) {
-          spotlight.style.left = cx + 'px';
-          spotlight.style.top  = cy + 'px';
-        }
+      gsap.from('.srv-header .s-label, .srv-header .s-title, .srv-hint', {
+        opacity: 0, y: 24, stagger: 0.12, duration: 0.75, ease: 'power3.out',
+        scrollTrigger: { trigger: '#services', start: 'top 80%' }
       });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform   = '';
-        card.style.transition  = 'transform 0.65s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease, border-color 0.4s ease';
-        card.style.boxShadow   = '';
-        card.style.borderColor = '';
-        setTimeout(() => {
-          if (!card.matches(':hover')) card.classList.add('do-float');
-        }, 700);
-      });
-    });
-
-    gsap.from('.srv-header .s-label, .srv-header .s-title, .srv-hint', {
-      opacity: 0, y: 24, stagger: 0.12, duration: 0.75, ease: 'power3.out',
-      scrollTrigger: { trigger: '#services', start: 'top 80%' }
-    });
+    })();
 
     /* CONTACT REVEAL */
     gsap.from('.ct-grid > div:first-child > *', {
