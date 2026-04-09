@@ -55,6 +55,8 @@
       pointer-events: none;
       z-index: 99999;
       mix-blend-mode: screen;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
 
     /* ─── GRAIN ──────────────────────────────────────────── */
@@ -1683,9 +1685,13 @@
       sleepTimeCoefY: 0
     });
 
-    // Library listens to 'pointermove' on el, but el has pointer-events:none.
-    // Solution: forward window pointermove → wrap so the library tracks the mouse.
+    // Forward window pointermove to wrap so the library tracks the mouse.
+    // Show the wrap on move, hide it when mouse is idle.
+    let hideTimer;
     window.addEventListener('pointermove', e => {
+      wrap.style.opacity = '1';
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => { wrap.style.opacity = '0'; }, 800);
       wrap.dispatchEvent(new PointerEvent('pointermove', {
         clientX: e.clientX, clientY: e.clientY,
         bubbles: false, cancelable: false
