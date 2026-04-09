@@ -54,8 +54,7 @@
       position: fixed; inset: 0;
       pointer-events: none;
       z-index: 99999;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      mix-blend-mode: screen;
     }
 
     /* ─── GRAIN ──────────────────────────────────────────── */
@@ -1670,14 +1669,13 @@
     wrap.id = 'neon-wrap';
     document.body.appendChild(wrap);
 
-    const nc = neonCursor({
+    neonCursor({
       el: wrap,
-      alpha: true,
       shaderPoints: 16,
       curvePoints: 80,
       curveLerp: 0.5,
-      radius1: 5,
-      radius2: 30,
+      radius1: 2,
+      radius2: 4,
       velocityTreshold: 10,
       sleepRadiusX: 1,
       sleepRadiusY: 1,
@@ -1685,14 +1683,9 @@
       sleepTimeCoefY: 0
     });
 
-    // Make background truly transparent — no blend mode needed
-    if (nc && nc.renderer) {
-      nc.renderer.setClearColor(0x000000, 0);
-    }
-
-    // Show on first move, stay visible (idle dot remains)
+    // Library listens to 'pointermove' on el, but el has pointer-events:none.
+    // Solution: forward window pointermove → wrap so the library tracks the mouse.
     window.addEventListener('pointermove', e => {
-      wrap.style.opacity = '1';
       wrap.dispatchEvent(new PointerEvent('pointermove', {
         clientX: e.clientX, clientY: e.clientY,
         bubbles: false, cancelable: false
