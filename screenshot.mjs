@@ -17,8 +17,9 @@ const filepath = join(dir, filename);
 
 const bravePath  = 'C:/Users/alexd/AppData/Local/BraveSoftware/Brave-Browser/Application/brave.exe';
 const chromePath = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe';
+const chromePath2 = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 import { existsSync } from 'fs';
-const executablePath = existsSync(bravePath) ? bravePath : chromePath;
+const executablePath = existsSync(bravePath) ? bravePath : existsSync(chromePath) ? chromePath : chromePath2;
 
 const browser = await puppeteer.launch({
   executablePath,

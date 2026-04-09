@@ -43,7 +43,6 @@
 
     body {
       cursor: none;
-      touch-action: none;
       background: var(--bg);
       color: var(--white);
       font-family: var(--ff-body);
@@ -1666,11 +1665,12 @@
     const canvas = document.getElementById('cursor-canvas');
 
     // ── WebGL fluid simulation cursor ────────────────────────
+    try {
     const params = { alpha: true, depth: false, stencil: false, antialias: false, preserveDrawingBuffer: false };
     let gl = canvas.getContext('webgl2', params);
     const isWebGL2 = !!gl;
     if (!gl) gl = canvas.getContext('webgl', params) || canvas.getContext('experimental-webgl', params);
-    if (!gl) return;
+    if (!gl) { document.body.style.cursor = 'auto'; return; }
 
     let supportLinearFiltering, halfFloat, halfFloatTexType;
     if (isWebGL2) {
@@ -1890,7 +1890,7 @@
       const [h,s,v] = PALETTE[paletteIdx % PALETTE.length];
       paletteIdx++;
       const c = HSVtoRGB(h + (Math.random()-0.5)*0.03, s, v);
-      c.r *= 0.18; c.g *= 0.18; c.b *= 0.18;
+      c.r *= 0.55; c.g *= 0.55; c.b *= 0.55;
       return c;
     }
 
@@ -2017,6 +2017,7 @@
     });
 
     window.addEventListener('resize', () => { resizeCanvas(); });
+    } catch(e) { console.warn('Fluid cursor failed:', e); document.body.style.cursor = 'auto'; }
   })();
   </script>
 
