@@ -50,14 +50,14 @@
     }
 
     /* ─── NEON CURSOR ───────────────────────────────────── */
+    #neon-cursor {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 99999;
+      mix-blend-mode: screen;
+    }
     #neon-cursor canvas {
-      position: fixed !important;
-      top: 0 !important; left: 0 !important;
-      width: 100vw !important; height: 100vh !important;
-      pointer-events: none !important;
-      z-index: 99999 !important;
-      mix-blend-mode: screen !important;
-      background: transparent !important;
+      display: block;
+      width: 100% !important; height: 100% !important;
     }
 
     /* ─── GRAIN ──────────────────────────────────────────── */
@@ -776,6 +776,7 @@
 </head>
 <body>
 
+  <div id="neon-cursor" aria-hidden="true"></div>
   <div id="grain" aria-hidden="true"></div>
 
   <!-- ─── LOADER ──────────────────────────────────────────── -->
@@ -1666,15 +1667,15 @@
   <script type="module">
     import { neonCursor } from 'https://unpkg.com/threejs-toys@0.0.8/build/threejs-toys.module.cdn.min.js';
     neonCursor({
-      el: document.body,
+      el: document.getElementById('neon-cursor'),
       shaderPoints: 16,
       curvePoints: 80,
       curveLerp: 0.5,
       radius1: 5,
       radius2: 30,
       velocityTreshold: 10,
-      sleepRadiusX: 0,
-      sleepRadiusY: 0,
+      sleepRadiusX: 1,
+      sleepRadiusY: 1,
       sleepTimeCoefX: 0,
       sleepTimeCoefY: 0
     });
