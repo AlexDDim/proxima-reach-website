@@ -1892,7 +1892,26 @@
       });
 
       // GSAP ScrollTrigger: pin section, snap one card per scroll step
-      const scrollDist = window.innerHeight * (N - 1) * 0.6; // slightly tighter scroll distance
+      // Buffer zones at start/end give a slight dwell before unpinning.
+      const stepDist   = window.innerHeight * 0.55;  // scroll distance per card step
+      const bufferDist = window.innerHeight * 0.5;   // dead-zone at first and last card
+      const scrollDist = bufferDist * 2 + stepDist * (N - 1);
+
+      // Convert raw progress (0–1) → card index, accounting for buffer zones
+      function progressToIdx(v) {
+        const bf = bufferDist / scrollDist;
+        const inner = Math.max(0, Math.min(1, (v - bf) / (1 - 2 * bf)));
+        return Math.round(inner * (N - 1));
+      }
+
+      // Snap points in progress space: card 0 anchors at 0, card N-1 at 1,
+      // interior cards distributed in the middle band
+      const snapPoints = Array.from({ length: N }, (_, i) => {
+        if (i === 0)     return 0;
+        if (i === N - 1) return 1;
+        const bf = bufferDist / scrollDist;
+        return bf + (i / (N - 1)) * (1 - 2 * bf);
+      });
 
       let lastIdx = 0;
       gsap.to({}, {
@@ -1901,17 +1920,17 @@
           start: 'top top',
           end: () => '+=' + scrollDist,
           pin: true,
-          scrub: 1,          // scrub=1 gives a 1s lag → feels weighty, not snappy
+          scrub: 0.35,       // low scrub → responsive to fast scrolling
           anticipatePin: 1,
           snap: {
-            snapTo: v => Math.round(v * (N - 1)) / (N - 1),
-            duration: { min: 0.4, max: 0.8 },
+            snapTo: v => snapPoints.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a),
+            duration: { min: 0.2, max: 0.5 },
             ease: 'expo.inOut',
-            delay: 0.08,
+            delay: 0.04,
             inertia: false,
           },
           onUpdate: self => {
-            const idx = Math.round(self.progress * (N - 1));
+            const idx = progressToIdx(self.progress);
             if (idx !== lastIdx) { lastIdx = idx; goTo(idx); }
           },
         }
