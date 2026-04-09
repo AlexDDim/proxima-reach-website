@@ -576,85 +576,146 @@
       background: linear-gradient(90deg, var(--gold), transparent);
     }
 
+    /* ─── SERVICES SCROLL PROGRESS BAR ─────────────────── */
+    #srv-progress {
+      position: absolute; bottom: 0; left: 5rem; right: 5rem; height: 2px;
+      background: rgba(255,255,255,0.06); z-index: 10; border-radius: 2px;
+    }
+    #srv-progress-fill {
+      height: 100%; width: 0%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--gold));
+      box-shadow: 0 0 12px rgba(212,168,83,0.6);
+      transition: width 0.1s linear;
+    }
+
     #srv-track {
       position: relative; z-index: 2;
-      display: flex; gap: 1.5rem;
-      padding: 2rem 5rem 2.5rem;
+      display: flex; gap: 1.75rem;
+      padding: 2rem 5rem 3rem;
       width: max-content;
       will-change: transform;
-      perspective: 1200px;
+    }
+
+    /* Shimmer sweep animation on card entrance */
+    @keyframes srv-shimmer {
+      0%   { transform: translateX(-100%) skewX(-15deg); }
+      100% { transform: translateX(400%) skewX(-15deg); }
+    }
+
+    /* Idle float */
+    @keyframes srv-float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-7px); }
+    }
+
+    /* Flash pop on entrance */
+    @keyframes srv-pop {
+      0%   { box-shadow: 0 0 0 0 rgba(212,168,83,0); }
+      30%  { box-shadow: 0 0 60px 20px rgba(212,168,83,0.35); }
+      100% { box-shadow: 0 0 20px 0 rgba(212,168,83,0); }
     }
 
     .srv-card {
       position: relative;
-      width: 340px; min-height: 420px;
+      width: 340px; min-height: 430px;
       padding: 2.5rem 2.25rem;
-      background: linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(124,58,237,0.06) 100%);
+      background: linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(124,58,237,0.07) 100%);
       border: 1px solid rgba(255,255,255,0.09);
       border-radius: 20px;
       flex-shrink: 0; overflow: hidden; cursor: default;
-      opacity: 0; transform: translateY(60px) rotateX(12deg) scale(0.94);
-      transition: border-color 0.4s ease, box-shadow 0.4s ease;
-      transform-style: preserve-3d;
-      backdrop-filter: blur(4px);
+      opacity: 0; transform: translateY(80px) scale(0.9);
+      will-change: transform, opacity;
+      backdrop-filter: blur(6px);
+      transition: box-shadow 0.4s ease;
     }
 
     .srv-card.in-view {
-      opacity: 1; transform: translateY(0) rotateX(0deg) scale(1);
-      transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1),
-                  transform 0.7s cubic-bezier(0.22,1,0.36,1),
-                  border-color 0.4s ease, box-shadow 0.4s ease;
+      animation: srv-pop 0.9s ease forwards;
     }
 
-    .srv-card.in-view:hover {
-      border-color: rgba(212,168,83,0.7);
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 0 90px rgba(212,168,83,0.5), 0 0 35px rgba(212,168,83,0.35), 0 20px 50px rgba(0,0,0,0.4);
+    /* Float only when fully in view and not hovered */
+    .srv-card.in-view.do-float {
+      animation: srv-float 4s ease-in-out infinite;
     }
 
-    .srv-card::before {
-      content: '';
+    /* Border shimmer layer */
+    .srv-card-shimmer {
       position: absolute; inset: 0; border-radius: 20px;
-      background: linear-gradient(135deg, rgba(212,168,83,0.04) 0%, transparent 50%, rgba(124,58,237,0.04) 100%);
-      opacity: 0; transition: opacity 0.4s ease;
+      overflow: hidden; pointer-events: none; z-index: 1;
     }
-    .srv-card.in-view:hover::before { opacity: 1; }
+    .srv-card-shimmer::after {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 60px; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: translateX(-100%) skewX(-15deg);
+    }
+    .srv-card.in-view .srv-card-shimmer::after {
+      animation: srv-shimmer 0.75s ease forwards;
+    }
 
+    /* Mouse-tracking spotlight glow */
+    .srv-card-spotlight {
+      position: absolute; border-radius: 50%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+    .srv-card:hover .srv-card-spotlight { opacity: 1; }
+
+    /* Glowing border on hover */
     .srv-card::after {
       content: '';
+      position: absolute; inset: -1px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(212,168,83,0.6), rgba(124,58,237,0.5), rgba(212,168,83,0.6));
+      z-index: -1; opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .srv-card:hover::after { opacity: 1; }
+
+    /* Bottom sweep line */
+    .srv-card-line {
       position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--purple), var(--gold), var(--purple));
-      transform: scaleX(0); transform-origin: left;
-      transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
-      border-radius: 0 0 20px 20px;
+      transform: scaleX(0); transform-origin: left; border-radius: 0 0 20px 20px;
+      transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 2;
     }
-    .srv-card.in-view:hover::after { transform: scaleX(1); }
+    .srv-card:hover .srv-card-line { transform: scaleX(1); }
 
     .srv-card-glow {
       position: absolute; top: -30%; right: -20%;
-      width: 220px; height: 220px;
-      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
-      pointer-events: none; transition: opacity 0.4s ease;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+      transition: transform 0.6s ease, opacity 0.4s ease;
     }
-    .srv-card.in-view:hover .srv-card-glow { opacity: 2; }
+    .srv-card:hover .srv-card-glow {
+      transform: scale(1.4);
+      opacity: 1.5;
+    }
 
     .srv-icon {
       width: 56px; height: 56px;
-      margin-bottom: 1.75rem; position: relative;
+      margin-bottom: 1.75rem; position: relative; z-index: 2;
     }
 
     .srv-icon svg { width: 100%; height: 100%; }
 
     .srv-icon-ring {
-      position: absolute; inset: -8px;
-      border-radius: 50%;
+      position: absolute; inset: -8px; border-radius: 50%;
       background: radial-gradient(circle, rgba(212,168,83,0.18) 0%, transparent 70%);
-      transition: opacity 0.4s ease;
+      transition: background 0.4s ease, transform 0.4s ease;
     }
-    .srv-card.in-view:hover .srv-icon-ring {
-      opacity: 1.5;
-      background: radial-gradient(circle, rgba(212,168,83,0.35) 0%, transparent 70%);
+    .srv-card:hover .srv-icon-ring {
+      background: radial-gradient(circle, rgba(212,168,83,0.45) 0%, transparent 70%);
+      transform: scale(1.3);
     }
+
+    .srv-tag, .srv-name, .srv-desc, .srv-features { position: relative; z-index: 2; }
 
     .srv-tag {
       font-family: var(--ff-ui);
@@ -667,6 +728,10 @@
       font-family: var(--ff-display);
       font-size: 1.75rem; letter-spacing: 0.04em;
       color: var(--white); margin-bottom: 0.9rem;
+      transition: text-shadow 0.4s ease;
+    }
+    .srv-card:hover .srv-name {
+      text-shadow: 0 0 30px rgba(212,168,83,0.4);
     }
 
     .srv-desc {
@@ -957,10 +1022,15 @@
       <div class="srv-hint">Scroll to explore all services</div>
     </div>
 
+    <div id="srv-progress"><div id="srv-progress-fill"></div></div>
+
     <div id="srv-track">
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -986,6 +1056,9 @@
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1010,6 +1083,9 @@
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1032,6 +1108,9 @@
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1055,6 +1134,9 @@
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1077,6 +1159,9 @@
 
       <div class="srv-card">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1098,6 +1183,9 @@
 
       <div class="srv-card" style="border-color: rgba(212,168,83,0.14); background: linear-gradient(150deg, rgba(212,168,83,0.05) 0%, rgba(124,58,237,0.06) 100%);">
         <div class="srv-card-glow"></div>
+        <div class="srv-card-shimmer"></div>
+        <div class="srv-card-spotlight"></div>
+        <div class="srv-card-line"></div>
         <div class="srv-icon">
           <div class="srv-icon-ring"></div>
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1675,8 +1763,29 @@
       once: true
     });
 
-    /* SERVICES HORIZONTAL SCROLL */
+    /* ── SERVICES: HORIZONTAL SCROLL + CARD ANIMATIONS ── */
     const track = document.getElementById('srv-track');
+    const progressFill = document.getElementById('srv-progress-fill');
+    const srvCards = track.querySelectorAll('.srv-card');
+
+    // Staggered entrance: each card pops in as it enters the viewport
+    function revealCards() {
+      srvCards.forEach((card, i) => {
+        const rect = card.getBoundingClientRect();
+        if (rect.left < window.innerWidth * 0.9 && rect.right > 0) {
+          if (!card.classList.contains('in-view')) {
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0) scale(1)';
+              card.style.transition = 'opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1)';
+              card.classList.add('in-view');
+              // Remove float class while shimmer runs, then add it
+              setTimeout(() => card.classList.add('do-float'), 1400);
+            }, i * 55);
+          }
+        }
+      });
+    }
 
     gsap.to('#srv-track', {
       x: () => -(track.scrollWidth - window.innerWidth),
@@ -1686,33 +1795,55 @@
         start: 'top top',
         end: () => '+=' + (track.scrollWidth - window.innerWidth),
         pin: true,
-        scrub: 0.8,
+        scrub: 0.65,
         invalidateOnRefresh: true,
         anticipatePin: 1,
         onUpdate: self => {
-          // As cards scroll into view, add in-view class with staggered delay
-          const cards = track.querySelectorAll('.srv-card');
-          cards.forEach((card, i) => {
-            const rect = card.getBoundingClientRect();
-            if (rect.left < window.innerWidth * 0.88 && rect.right > 0) {
-              if (!card.classList.contains('in-view')) {
-                setTimeout(() => card.classList.add('in-view'), i * 60);
-              }
-            }
-          });
+          progressFill.style.width = (self.progress * 100) + '%';
+          revealCards();
         }
       }
     });
 
-    // Trigger first visible cards immediately on load
-    setTimeout(() => {
-      track.querySelectorAll('.srv-card').forEach((card, i) => {
-        const rect = card.getBoundingClientRect();
-        if (rect.left < window.innerWidth * 0.88) {
-          setTimeout(() => card.classList.add('in-view'), i * 120);
+    // Reveal first cards on load
+    setTimeout(revealCards, 400);
+
+    // Mouse-tracking 3D tilt + spotlight per card
+    srvCards.forEach(card => {
+      const spotlight = card.querySelector('.srv-card-spotlight');
+
+      card.addEventListener('mousemove', e => {
+        if (!card.classList.contains('in-view')) return;
+        card.classList.remove('do-float');
+
+        const r = card.getBoundingClientRect();
+        const cx = e.clientX - r.left;
+        const cy = e.clientY - r.top;
+        const hw = r.width / 2, hh = r.height / 2;
+        const rotY =  ((cx - hw) / hw) * 10;
+        const rotX = -((cy - hh) / hh) * 8;
+
+        card.style.transform    = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+        card.style.transition   = 'box-shadow 0.4s ease, border-color 0.4s ease';
+        card.style.boxShadow    = `0 0 80px rgba(212,168,83,0.45), 0 0 30px rgba(212,168,83,0.3), ${-rotY*2}px ${-rotX*2}px 40px rgba(0,0,0,0.5)`;
+        card.style.borderColor  = 'rgba(212,168,83,0.75)';
+
+        if (spotlight) {
+          spotlight.style.left = cx + 'px';
+          spotlight.style.top  = cy + 'px';
         }
       });
-    }, 300);
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform   = '';
+        card.style.transition  = 'transform 0.65s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease, border-color 0.4s ease';
+        card.style.boxShadow   = '';
+        card.style.borderColor = '';
+        setTimeout(() => {
+          if (!card.matches(':hover')) card.classList.add('do-float');
+        }, 700);
+      });
+    });
 
     gsap.from('.srv-header .s-label, .srv-header .s-title, .srv-hint', {
       opacity: 0, y: 24, stagger: 0.12, duration: 0.75, ease: 'power3.out',
