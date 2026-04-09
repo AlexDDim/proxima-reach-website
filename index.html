@@ -254,12 +254,17 @@
     }
 
     #nav.stuck .nav-logo-img {
-      height: 56px;
-      filter: brightness(2) contrast(1.4) drop-shadow(0 0 8px rgba(212,168,83,0.4));
+      height: 88px;
+      /* clip-path cuts the grey PNG border: at 88px height / 59px width,
+         inset values = rendered border thickness in px */
+      mask-image: none; -webkit-mask-image: none;
+      clip-path: inset(8px 12px 20px 12px);
+      filter: brightness(1.7) contrast(1.45) saturate(1.3) drop-shadow(0 0 10px rgba(212,168,83,0.45));
+      transition: height 0.4s ease, filter 0.4s ease, clip-path 0.4s ease;
     }
 
     #nav.stuck .nav-logo-img:hover {
-      filter: brightness(2.5) contrast(1.5)
+      filter: brightness(2) contrast(1.5) saturate(1.4)
               drop-shadow(0 0 16px rgba(212,168,83,0.8))
               drop-shadow(0 0 30px rgba(212,168,83,0.5))
               drop-shadow(0 0 16px rgba(124,58,237,0.6));
@@ -867,10 +872,12 @@
     }
 
     .footer-logo {
-      height: 38px; width: auto;
-      mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 38%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 38%, transparent 100%);
-      opacity: 0.75;
+      height: 96px; width: auto;
+      mask-image: none; -webkit-mask-image: none;
+      /* inset at 96px height / 64px width */
+      clip-path: inset(9px 13px 22px 13px);
+      filter: brightness(1.6) contrast(1.4) saturate(1.2);
+      opacity: 0.9;
     }
 
     .footer-copy {
