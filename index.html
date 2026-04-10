@@ -6,7 +6,7 @@
   <title>Proxima Reach — Your Business Within Reach</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script type="importmap">
@@ -34,9 +34,9 @@
       --white:       #f0ecff;
       --white-dim:   rgba(240, 236, 255, 0.55);
       --white-faint: rgba(240, 236, 255, 0.18);
-      --ff-display:  'Bebas Neue', sans-serif;
-      --ff-ui:       'Barlow Condensed', sans-serif;
-      --ff-body:     'DM Sans', sans-serif;
+      --ff-display:  'Oswald', sans-serif;
+      --ff-ui:       'Exo 2', sans-serif;
+      --ff-body:     'Nunito Sans', sans-serif;
     }
 
     html { scroll-behavior: smooth; }
@@ -391,6 +391,39 @@
 
     .nav-cta:hover { transform: translateY(-2px); opacity: 0.9; box-shadow: 0 0 30px rgba(212,168,83,0.6), 0 0 60px rgba(212,168,83,0.3), 0 8px 24px rgba(212,168,83,0.4); }
 
+    /* ─── LANGUAGE TOGGLE ───────────────────────────────── */
+    #lang-toggle {
+      display: flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 24px;
+      padding: 4px 5px;
+      cursor: pointer; flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(212,168,83,0.15), 0 2px 12px rgba(0,0,0,0.6);
+    }
+    .lang-opt {
+      display: flex; align-items: center; justify-content: center;
+      padding: 3px 6px;
+      border-radius: 18px;
+      font-size: 1.35rem; line-height: 1;
+      opacity: 0.45;
+      transition: opacity 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+      user-select: none;
+    }
+    .lang-opt img.emoji { width: 24px !important; height: 24px !important; display: block; }
+    .lang-opt:hover { opacity: 0.75; transform: scale(1.1); }
+    .lang-opt.active {
+      background: rgba(212,168,83,0.18);
+      opacity: 1;
+      box-shadow: 0 0 8px rgba(212,168,83,0.35), inset 0 0 0 1px rgba(212,168,83,0.25);
+      transform: scale(1.08);
+    }
+    .lang-sep {
+      width: 1px; height: 14px;
+      background: rgba(255,255,255,0.12);
+      flex-shrink: 0;
+    }
+
     /* ─── HERO ───────────────────────────────────────────── */
     #hero {
       position: relative;
@@ -446,8 +479,9 @@
 
     .hero-title {
       font-family: var(--ff-display);
-      font-size: clamp(4rem, 9vw, 8rem);
-      line-height: 0.92; letter-spacing: 0.03em;
+      font-weight: 700;
+      font-size: clamp(3.6rem, 8vw, 7.2rem);
+      line-height: 0.92; letter-spacing: 0.02em;
       color: var(--white);
       opacity: 0;
     }
@@ -514,8 +548,9 @@
 
     .s-title {
       font-family: var(--ff-display);
-      font-size: clamp(2.8rem, 5.5vw, 5rem);
-      line-height: 0.96; letter-spacing: 0.03em;
+      font-weight: 700;
+      font-size: clamp(2.6rem, 5vw, 4.6rem);
+      line-height: 0.96; letter-spacing: 0.02em;
       color: var(--white);
     }
 
@@ -575,7 +610,8 @@
 
     .sol-num {
       font-family: var(--ff-display);
-      font-size: 4rem; line-height: 1;
+      font-weight: 700;
+      font-size: 3.6rem; line-height: 1;
       color: rgba(212,168,83,0.1);
       margin-bottom: 0.75rem;
       transition: color 0.4s ease;
@@ -821,7 +857,8 @@
 
     .srv-name {
       font-family: var(--ff-display);
-      font-size: 1.75rem; letter-spacing: 0.04em;
+      font-weight: 700;
+      font-size: 1.6rem; letter-spacing: 0.02em;
       color: var(--white); margin-bottom: 0.9rem;
       transition: text-shadow 0.4s ease;
     }
@@ -879,7 +916,8 @@
 
     .ct-title {
       font-family: var(--ff-display);
-      font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+      font-weight: 700;
+      font-size: clamp(2.5rem, 4vw, 3.8rem);
       line-height: 0.96; margin-bottom: 1.25rem;
     }
     .ct-title span { color: var(--gold); }
@@ -1079,7 +1117,7 @@
       #contact { padding: 6rem 1.5rem 0; }
       .ct-grid { grid-template-columns: 1fr; gap: 3rem; }
       #footer { flex-direction: column; gap: 1rem; margin-top: 3rem; padding: 2rem 1.5rem; }
-      .hero-title { font-size: clamp(3rem, 13vw, 5.5rem); }
+      .hero-title { font-size: clamp(2.8rem, 12vw, 5rem); }
     }
   </style>
 </head>
@@ -1146,12 +1184,21 @@
       <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" class="nav-logo-img">
     </a>
     <div class="nav-right">
+      <div id="lang-toggle" role="group" aria-label="Language">
+        <span class="lang-opt active" data-lang="en" title="English">
+          <img class="emoji" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1ec-1f1e7.svg" alt="🇬🇧" draggable="false">
+        </span>
+        <span class="lang-sep"></span>
+        <span class="lang-opt" data-lang="bg" title="Български">
+          <img class="emoji" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1e7-1f1ec.svg" alt="🇧🇬" draggable="false">
+        </span>
+      </div>
       <ul class="nav-links">
-        <li><a href="#solutions">Solutions</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#solutions" data-i18n="nav-solutions">Solutions</a></li>
+        <li><a href="#services"  data-i18n="nav-services">Services</a></li>
+        <li><a href="#contact"   data-i18n="nav-contact">Contact</a></li>
       </ul>
-      <a href="#contact" class="nav-cta">Get in Touch</a>
+      <a href="#contact" class="nav-cta" data-i18n="nav-cta">Get in Touch</a>
     </div>
   </nav>
 
@@ -1160,16 +1207,16 @@
     <div class="webgl" aria-hidden="true"></div>
 
     <div class="hero-content">
-      <p class="hero-eyebrow">SMM &middot; Content &middot; Growth &middot; Branding</p>
+      <p class="hero-eyebrow" data-i18n="hero-eyebrow">SMM &middot; Content &middot; Growth &middot; Branding</p>
 
       <h1 class="hero-title">
-        <span class="line"><span class="line-inner">YOUR BUSINESS</span></span>
-        <span class="line"><span class="line-inner"><span class="accent">WITHIN</span> REACH</span></span>
+        <span class="line"><span class="line-inner" data-i18n="hero-line1">YOUR BUSINESS</span></span>
+        <span class="line"><span class="line-inner" data-i18n="hero-line2"><span class="accent">WITHIN</span> REACH</span></span>
       </h1>
 
 <div class="hero-btns">
-        <a href="#services" class="btn-gold">Our Services</a>
-        <a href="#contact"  class="btn-ghost">Let&#8217;s Talk</a>
+        <a href="#services" class="btn-gold" data-i18n="hero-btn1">Our Services</a>
+        <a href="#contact"  class="btn-ghost" data-i18n="hero-btn2">Let&#8217;s Talk</a>
       </div>
     </div>
 
@@ -1178,57 +1225,57 @@
   <!-- ─── SOLUTIONS ────────────────────────────────────────── -->
   <section id="solutions">
     <div class="sol-header">
-      <p class="s-label">The Problem Space</p>
-      <h2 class="s-title">CHALLENGES<br>WE ELIMINATE</h2>
+      <p class="s-label" data-i18n="sol-label">The Problem Space</p>
+      <h2 class="s-title" data-i18n="sol-title">CHALLENGES<br>WE ELIMINATE</h2>
     </div>
 
     <div class="sol-grid">
 
       <div class="sol-card">
         <div class="sol-num">01</div>
-        <h3 class="sol-problem">Invisible Online Presence</h3>
-        <div class="sol-divider">Our solution</div>
-        <p class="sol-answer">Your brand exists — but no one sees it. We build a commanding multi-platform presence engineered to be found, followed, and remembered.</p>
+        <h3 class="sol-problem" data-i18n="sol-01-problem">Invisible Online Presence</h3>
+        <div class="sol-divider" data-i18n="sol-divider">Our solution</div>
+        <p class="sol-answer" data-i18n="sol-01-answer">Your brand exists — but no one sees it. We build a commanding multi-platform presence engineered to be found, followed, and remembered.</p>
         <div class="sol-line"></div>
       </div>
 
       <div class="sol-card">
         <div class="sol-num">02</div>
-        <h3 class="sol-problem">Dead Engagement</h3>
-        <div class="sol-divider">Our solution</div>
-        <p class="sol-answer">Posting into the void with zero reaction. Our content strategies are designed to spark conversation and grow loyal communities around your brand.</p>
+        <h3 class="sol-problem" data-i18n="sol-02-problem">Dead Engagement</h3>
+        <div class="sol-divider" data-i18n="sol-divider">Our solution</div>
+        <p class="sol-answer" data-i18n="sol-02-answer">Posting into the void with zero reaction. Our content strategies are designed to spark conversation and grow loyal communities around your brand.</p>
         <div class="sol-line"></div>
       </div>
 
       <div class="sol-card">
         <div class="sol-num">03</div>
-        <h3 class="sol-problem">Wasted Ad Spend</h3>
-        <div class="sol-divider">Our solution</div>
-        <p class="sol-answer">Running paid campaigns with no clear ROI. We architect data-driven ads that convert — every pound and dollar working at peak efficiency.</p>
+        <h3 class="sol-problem" data-i18n="sol-03-problem">Wasted Ad Spend</h3>
+        <div class="sol-divider" data-i18n="sol-divider">Our solution</div>
+        <p class="sol-answer" data-i18n="sol-03-answer">Running paid campaigns with no clear ROI. We architect data-driven ads that convert — every pound and dollar working at peak efficiency.</p>
         <div class="sol-line"></div>
       </div>
 
       <div class="sol-card">
         <div class="sol-num">04</div>
-        <h3 class="sol-problem">Inconsistent Identity</h3>
-        <div class="sol-divider">Our solution</div>
-        <p class="sol-answer">Scattered visuals and messaging erode trust. We craft a cohesive brand identity that commands instant recognition across every touchpoint.</p>
+        <h3 class="sol-problem" data-i18n="sol-04-problem">Inconsistent Identity</h3>
+        <div class="sol-divider" data-i18n="sol-divider">Our solution</div>
+        <p class="sol-answer" data-i18n="sol-04-answer">Scattered visuals and messaging erode trust. We craft a cohesive brand identity that commands instant recognition across every touchpoint.</p>
         <div class="sol-line"></div>
       </div>
 
       <div class="sol-card">
         <div class="sol-num">05</div>
-        <h3 class="sol-problem">No Search Visibility</h3>
-        <div class="sol-divider">Our solution</div>
-        <p class="sol-answer">Your competitors rank. You don't. Our SEO strategies place you at the top of searches that actually drive qualified, high-intent traffic.</p>
+        <h3 class="sol-problem" data-i18n="sol-05-problem">No Search Visibility</h3>
+        <div class="sol-divider" data-i18n="sol-divider">Our solution</div>
+        <p class="sol-answer" data-i18n="sol-05-answer">Your competitors rank. You don't. Our SEO strategies place you at the top of searches that actually drive qualified, high-intent traffic.</p>
         <div class="sol-line"></div>
       </div>
 
       <div class="sol-card">
         <div class="sol-num">06</div>
-        <h3 class="sol-problem">Flying Blind on Data</h3>
-        <div class="sol-divider">Our solution</div>
-        <p class="sol-answer">Making decisions without insight is guesswork. We implement analytics frameworks that show exactly what's working, what isn't, and why.</p>
+        <h3 class="sol-problem" data-i18n="sol-06-problem">Flying Blind on Data</h3>
+        <div class="sol-divider" data-i18n="sol-divider">Our solution</div>
+        <p class="sol-answer" data-i18n="sol-06-answer">Making decisions without insight is guesswork. We implement analytics frameworks that show exactly what's working, what isn't, and why.</p>
         <div class="sol-line"></div>
       </div>
 
@@ -1239,10 +1286,10 @@
   <section id="services">
     <div class="srv-header">
       <div>
-        <p class="s-label">What We Do</p>
-        <h2 class="s-title">OUR SERVICES</h2>
+        <p class="s-label" data-i18n="srv-label">What We Do</p>
+        <h2 class="s-title" data-i18n="srv-title">OUR SERVICES</h2>
       </div>
-      <div class="srv-hint">Scroll to explore all services</div>
+      <div class="srv-hint" data-i18n="srv-hint">Scroll to explore all services</div>
     </div>
 
     <div id="srv-roulette">
@@ -1264,14 +1311,14 @@
             <circle cx="8"  cy="18" r="3" fill="#7c3aed" opacity="0.8"/>
           </svg>
         </div>
-        <div class="srv-tag">Platform Growth</div>
-        <h3 class="srv-name">SOCIAL MEDIA<br>MANAGEMENT</h3>
-        <p class="srv-desc">Full-spectrum management of your social channels — strategy, scheduling, community, and growth handled with precision.</p>
+        <div class="srv-tag" data-i18n="srv-01-tag">Platform Growth</div>
+        <h3 class="srv-name" data-i18n="srv-01-name">SOCIAL MEDIA<br>MANAGEMENT</h3>
+        <p class="srv-desc" data-i18n="srv-01-desc">Full-spectrum management of your social channels — strategy, scheduling, community, and growth handled with precision.</p>
         <ul class="srv-features">
-          <li>Platform Strategy</li>
-          <li>Community Management</li>
-          <li>Growth Campaigns</li>
-          <li>Monthly Reporting</li>
+          <li data-i18n="srv-01-f1">Platform Strategy</li>
+          <li data-i18n="srv-01-f2">Community Management</li>
+          <li data-i18n="srv-01-f3">Growth Campaigns</li>
+          <li data-i18n="srv-01-f4">Monthly Reporting</li>
         </ul>
       </div>
 
@@ -1291,14 +1338,14 @@
             <line x1="37" y1="10" x2="37" y2="14" stroke="#d4a853" stroke-width="1.4" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="srv-tag">Creative Studio</div>
-        <h3 class="srv-name">CONTENT<br>CREATION</h3>
-        <p class="srv-desc">Scroll-stopping visuals and sharp copy that tell your brand story. Every piece engineered to perform across every format.</p>
+        <div class="srv-tag" data-i18n="srv-02-tag">Creative Studio</div>
+        <h3 class="srv-name" data-i18n="srv-02-name">CONTENT<br>CREATION</h3>
+        <p class="srv-desc" data-i18n="srv-02-desc">Scroll-stopping visuals and sharp copy that tell your brand story. Every piece engineered to perform across every format.</p>
         <ul class="srv-features">
-          <li>Visual Design</li>
-          <li>Video &amp; Reels</li>
-          <li>Copywriting</li>
-          <li>Content Calendars</li>
+          <li data-i18n="srv-02-f1">Visual Design</li>
+          <li data-i18n="srv-02-f2">Video &amp; Reels</li>
+          <li data-i18n="srv-02-f3">Copywriting</li>
+          <li data-i18n="srv-02-f4">Content Calendars</li>
         </ul>
       </div>
 
@@ -1316,14 +1363,14 @@
             <polyline points="36,10 44,10 44,18" stroke="rgba(212,168,83,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="srv-tag">Paid Performance</div>
-        <h3 class="srv-name">ADS<br>OPTIMISATION</h3>
-        <p class="srv-desc">Paid campaigns engineered for maximum ROI. Precise targeting, relentless testing, and fearless scaling of what converts.</p>
+        <div class="srv-tag" data-i18n="srv-03-tag">Paid Performance</div>
+        <h3 class="srv-name" data-i18n="srv-03-name">ADS<br>OPTIMISATION</h3>
+        <p class="srv-desc" data-i18n="srv-03-desc">Paid campaigns engineered for maximum ROI. Precise targeting, relentless testing, and fearless scaling of what converts.</p>
         <ul class="srv-features">
-          <li>Meta &amp; Google Ads</li>
-          <li>Audience Targeting</li>
-          <li>A/B Testing</li>
-          <li>ROI Tracking</li>
+          <li data-i18n="srv-03-f1">Meta &amp; Google Ads</li>
+          <li data-i18n="srv-03-f2">Audience Targeting</li>
+          <li data-i18n="srv-03-f3">A/B Testing</li>
+          <li data-i18n="srv-03-f4">ROI Tracking</li>
         </ul>
       </div>
 
@@ -1342,14 +1389,14 @@
             <line x1="12" y1="31" x2="36" y2="31" stroke="rgba(212,168,83,0.5)" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="srv-tag">Organic Discovery</div>
-        <h3 class="srv-name">SEARCH ENGINE<br>OPTIMISATION</h3>
-        <p class="srv-desc">Dominate organic rankings that deliver sustained, high-intent traffic. Technical, on-page, and off-page — the full stack.</p>
+        <div class="srv-tag" data-i18n="srv-04-tag">Organic Discovery</div>
+        <h3 class="srv-name" data-i18n="srv-04-name">SEARCH ENGINE<br>OPTIMISATION</h3>
+        <p class="srv-desc" data-i18n="srv-04-desc">Dominate organic rankings that deliver sustained, high-intent traffic. Technical, on-page, and off-page — the full stack.</p>
         <ul class="srv-features">
-          <li>Technical SEO Audit</li>
-          <li>Keyword Strategy</li>
-          <li>On-Page Optimisation</li>
-          <li>Link Building</li>
+          <li data-i18n="srv-04-f1">Technical SEO Audit</li>
+          <li data-i18n="srv-04-f2">Keyword Strategy</li>
+          <li data-i18n="srv-04-f3">On-Page Optimisation</li>
+          <li data-i18n="srv-04-f4">Link Building</li>
         </ul>
       </div>
 
@@ -1367,14 +1414,14 @@
             <polyline points="8,22 14,14 22,20 32,10" stroke="#d4a853" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="srv-tag">Data Intelligence</div>
-        <h3 class="srv-name">ANALYTICS &amp;<br>REPORTING</h3>
-        <p class="srv-desc">Transform raw numbers into strategic decisions. Custom dashboards and deep-dive reports revealing where every click comes from.</p>
+        <div class="srv-tag" data-i18n="srv-05-tag">Data Intelligence</div>
+        <h3 class="srv-name" data-i18n="srv-05-name">ANALYTICS &amp;<br>REPORTING</h3>
+        <p class="srv-desc" data-i18n="srv-05-desc">Transform raw numbers into strategic decisions. Custom dashboards and deep-dive reports revealing where every click comes from.</p>
         <ul class="srv-features">
-          <li>Custom Dashboards</li>
-          <li>Competitor Analysis</li>
-          <li>Monthly Deep Dives</li>
-          <li>Growth Forecasting</li>
+          <li data-i18n="srv-05-f1">Custom Dashboards</li>
+          <li data-i18n="srv-05-f2">Competitor Analysis</li>
+          <li data-i18n="srv-05-f3">Monthly Deep Dives</li>
+          <li data-i18n="srv-05-f4">Growth Forecasting</li>
         </ul>
       </div>
 
@@ -1391,14 +1438,14 @@
             <circle cx="24" cy="24" r="3.5" fill="#d4a853"/>
           </svg>
         </div>
-        <div class="srv-tag">Identity Design</div>
-        <h3 class="srv-name">BRAND<br>DEVELOPMENT</h3>
-        <p class="srv-desc">Your brand is far more than a logo. We architect complete visual identities that make you unmistakable — from mark to messaging.</p>
+        <div class="srv-tag" data-i18n="srv-06-tag">Identity Design</div>
+        <h3 class="srv-name" data-i18n="srv-06-name">BRAND<br>DEVELOPMENT</h3>
+        <p class="srv-desc" data-i18n="srv-06-desc">Your brand is far more than a logo. We architect complete visual identities that make you unmistakable — from mark to messaging.</p>
         <ul class="srv-features">
-          <li>Logo &amp; Visual Identity</li>
-          <li>Brand Guidelines</li>
-          <li>Tone of Voice</li>
-          <li>Brand Strategy</li>
+          <li data-i18n="srv-06-f1">Logo &amp; Visual Identity</li>
+          <li data-i18n="srv-06-f2">Brand Guidelines</li>
+          <li data-i18n="srv-06-f3">Tone of Voice</li>
+          <li data-i18n="srv-06-f4">Brand Strategy</li>
         </ul>
       </div>
 
@@ -1425,14 +1472,14 @@
             <line x1="14" y1="19" x2="18" y2="22" stroke="rgba(212,168,83,0.4)" stroke-width="1.2"/>
           </svg>
         </div>
-        <div class="srv-tag">And More</div>
-        <h3 class="srv-name">CUSTOM<br>SOLUTIONS</h3>
-        <p class="srv-desc">Every business is different. If your challenge goes beyond a standard category, we build a tailored strategy from the ground up.</p>
+        <div class="srv-tag" data-i18n="srv-07-tag">And More</div>
+        <h3 class="srv-name" data-i18n="srv-07-name">CUSTOM<br>SOLUTIONS</h3>
+        <p class="srv-desc" data-i18n="srv-07-desc">Every business is different. If your challenge goes beyond a standard category, we build a tailored strategy from the ground up.</p>
         <ul class="srv-features">
-          <li>Influencer Outreach</li>
-          <li>Email Marketing</li>
-          <li>PR &amp; Media</li>
-          <li>Strategic Consultation</li>
+          <li data-i18n="srv-07-f1">Influencer Outreach</li>
+          <li data-i18n="srv-07-f2">Email Marketing</li>
+          <li data-i18n="srv-07-f3">PR &amp; Media</li>
+          <li data-i18n="srv-07-f4">Strategic Consultation</li>
         </ul>
       </div>
 
@@ -1447,9 +1494,9 @@
     <div class="ct-grid">
 
       <div>
-        <p class="s-label">Let&#8217;s Connect</p>
-        <h2 class="ct-title">READY TO<br><span>ELEVATE?</span></h2>
-        <p class="ct-desc">Your next level of growth starts with a single conversation. Reach out — let&#8217;s build something remarkable together.</p>
+        <p class="s-label" data-i18n="ct-label">Let&#8217;s Connect</p>
+        <h2 class="ct-title" data-i18n="ct-title">READY TO<br><span>ELEVATE?</span></h2>
+        <p class="ct-desc" data-i18n="ct-desc">Your next level of growth starts with a single conversation. Reach out — let&#8217;s build something remarkable together.</p>
         <div class="ct-links">
           <a href="tel:+00000000000" class="ct-link">
             <svg viewBox="0 0 20 20" fill="currentColor">
@@ -1468,7 +1515,7 @@
       </div>
 
       <div class="ct-right">
-        <p class="social-label">Follow the journey</p>
+        <p class="social-label" data-i18n="ct-social-label">Follow the journey</p>
         <div class="socials">
           <a href="#" class="soc-link" aria-label="Facebook">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -1488,8 +1535,8 @@
             </svg>
           </a>
         </div>
-        <p class="ct-callout">We partner with brands ready to dominate their digital space. If that&#8217;s you — let&#8217;s make it happen.</p>
-        <a href="mailto:hello@proximareach.com" class="btn-gold" style="display:inline-block;">Start the Conversation &#8594;</a>
+        <p class="ct-callout" data-i18n="ct-callout">We partner with brands ready to dominate their digital space. If that&#8217;s you — let&#8217;s make it happen.</p>
+        <a href="mailto:hello@proximareach.com" class="btn-gold" style="display:inline-block;" data-i18n="ct-cta">Start the Conversation &#8594;</a>
       </div>
 
     </div>
@@ -1506,16 +1553,16 @@
           <img src="brand_assets/Proxima Reach Logo.png" alt="Proxima Reach" class="footer-logo">
         </div>
 
-        <p class="footer-tagline">Your Business Within Reach</p>
+        <p class="footer-tagline" data-i18n="footer-tagline">Your Business Within Reach</p>
 
         <ul class="footer-nav">
-          <li><a href="#solutions">Solutions</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#solutions" data-i18n="nav-solutions">Solutions</a></li>
+          <li><a href="#services" data-i18n="nav-services">Services</a></li>
+          <li><a href="#contact" data-i18n="nav-contact">Contact</a></li>
         </ul>
 
 <div class="footer-bar">
-          <p class="footer-copy">&#169; 2026 Proxima Reach<span>&#9670;</span>All rights reserved</p>
+          <p class="footer-copy" data-i18n="footer-copy">&#169; 2026 Proxima Reach<span>&#9670;</span>All rights reserved</p>
         </div>
 
       </div>
@@ -2372,6 +2419,237 @@
     }
 
     draw();
+  })();
+  </script>
+
+  <!-- ─── BILINGUAL ENGINE ──────────────────────────────────── -->
+  <script>
+  (function() {
+    const T = {
+      en: {
+        /* ── Nav ─────────────────────────────────────────────── */
+        'nav-solutions': 'Solutions',
+        'nav-services':  'Services',
+        'nav-contact':   'Contact',
+        'nav-cta':       'Get in Touch',
+
+        /* ── Hero ────────────────────────────────────────────── */
+        'hero-eyebrow': 'SMM &middot; Content &middot; Growth &middot; Branding',
+        'hero-line1':   'YOUR BUSINESS',
+        'hero-line2':   '<span class="accent">WITHIN</span> REACH',
+        'hero-btn1':    'Our Services',
+        'hero-btn2':    'Let\u2019s Talk',
+
+        /* ── Solutions ───────────────────────────────────────── */
+        'sol-label':  'The Problem Space',
+        'sol-title':  'CHALLENGES<br>WE ELIMINATE',
+        'sol-divider':'Our solution',
+        'sol-01-problem': 'Invisible Online Presence',
+        'sol-01-answer':  'Your brand exists — but no one sees it. We build a commanding multi-platform presence engineered to be found, followed, and remembered.',
+        'sol-02-problem': 'Dead Engagement',
+        'sol-02-answer':  'Posting into the void with zero reaction. Our content strategies are designed to spark conversation and grow loyal communities around your brand.',
+        'sol-03-problem': 'Wasted Ad Spend',
+        'sol-03-answer':  'Running paid campaigns with no clear ROI. We architect data-driven ads that convert — every pound and dollar working at peak efficiency.',
+        'sol-04-problem': 'Inconsistent Identity',
+        'sol-04-answer':  'Scattered visuals and messaging erode trust. We craft a cohesive brand identity that commands instant recognition across every touchpoint.',
+        'sol-05-problem': 'No Search Visibility',
+        'sol-05-answer':  'Your competitors rank. You don\'t. Our SEO strategies place you at the top of searches that actually drive qualified, high-intent traffic.',
+        'sol-06-problem': 'Flying Blind on Data',
+        'sol-06-answer':  'Making decisions without insight is guesswork. We implement analytics frameworks that show exactly what\'s working, what isn\'t, and why.',
+
+        /* ── Services ────────────────────────────────────────── */
+        'srv-label': 'What We Do',
+        'srv-title': 'OUR SERVICES',
+        'srv-hint':  'Scroll to explore all services',
+
+        'srv-01-tag':  'Platform Growth',
+        'srv-01-name': 'SOCIAL MEDIA<br>MANAGEMENT',
+        'srv-01-desc': 'Full-spectrum management of your social channels — strategy, scheduling, community, and growth handled with precision.',
+        'srv-01-f1': 'Platform Strategy',    'srv-01-f2': 'Community Management',
+        'srv-01-f3': 'Growth Campaigns',     'srv-01-f4': 'Monthly Reporting',
+
+        'srv-02-tag':  'Creative Studio',
+        'srv-02-name': 'CONTENT<br>CREATION',
+        'srv-02-desc': 'Scroll-stopping visuals and sharp copy that tell your brand story. Every piece engineered to perform across every format.',
+        'srv-02-f1': 'Visual Design',        'srv-02-f2': 'Video &amp; Reels',
+        'srv-02-f3': 'Copywriting',          'srv-02-f4': 'Content Calendars',
+
+        'srv-03-tag':  'Paid Performance',
+        'srv-03-name': 'ADS<br>OPTIMISATION',
+        'srv-03-desc': 'Paid campaigns engineered for maximum ROI. Precise targeting, relentless testing, and fearless scaling of what converts.',
+        'srv-03-f1': 'Meta &amp; Google Ads', 'srv-03-f2': 'Audience Targeting',
+        'srv-03-f3': 'A/B Testing',           'srv-03-f4': 'ROI Tracking',
+
+        'srv-04-tag':  'Organic Discovery',
+        'srv-04-name': 'SEARCH ENGINE<br>OPTIMISATION',
+        'srv-04-desc': 'Dominate organic rankings that deliver sustained, high-intent traffic. Technical, on-page, and off-page — the full stack.',
+        'srv-04-f1': 'Technical SEO Audit',   'srv-04-f2': 'Keyword Strategy',
+        'srv-04-f3': 'On-Page Optimisation',  'srv-04-f4': 'Link Building',
+
+        'srv-05-tag':  'Data Intelligence',
+        'srv-05-name': 'ANALYTICS &amp;<br>REPORTING',
+        'srv-05-desc': 'Transform raw numbers into strategic decisions. Custom dashboards and deep-dive reports revealing where every click comes from.',
+        'srv-05-f1': 'Custom Dashboards',    'srv-05-f2': 'Competitor Analysis',
+        'srv-05-f3': 'Monthly Deep Dives',   'srv-05-f4': 'Growth Forecasting',
+
+        'srv-06-tag':  'Identity Design',
+        'srv-06-name': 'BRAND<br>DEVELOPMENT',
+        'srv-06-desc': 'Your brand is far more than a logo. We architect complete visual identities that make you unmistakable — from mark to messaging.',
+        'srv-06-f1': 'Logo &amp; Visual Identity', 'srv-06-f2': 'Brand Guidelines',
+        'srv-06-f3': 'Tone of Voice',              'srv-06-f4': 'Brand Strategy',
+
+        'srv-07-tag':  'And More',
+        'srv-07-name': 'CUSTOM<br>SOLUTIONS',
+        'srv-07-desc': 'Every business is different. If your challenge goes beyond a standard category, we build a tailored strategy from the ground up.',
+        'srv-07-f1': 'Influencer Outreach',  'srv-07-f2': 'Email Marketing',
+        'srv-07-f3': 'PR &amp; Media',       'srv-07-f4': 'Strategic Consultation',
+
+        /* ── Contact ─────────────────────────────────────────── */
+        'ct-label':        'Let\u2019s Connect',
+        'ct-title':        'READY TO<br><span>ELEVATE?</span>',
+        'ct-desc':         'Your next level of growth starts with a single conversation. Reach out \u2014 let\u2019s build something remarkable together.',
+        'ct-social-label': 'Follow the journey',
+        'ct-callout':      'We partner with brands ready to dominate their digital space. If that\u2019s you \u2014 let\u2019s make it happen.',
+        'ct-cta':          'Start the Conversation \u2192',
+
+        /* ── Footer ──────────────────────────────────────────── */
+        'footer-tagline': 'Your Business Within Reach',
+        'footer-copy':    '&#169; 2026 Proxima Reach<span>&#9670;</span>All rights reserved',
+      },
+
+      bg: {
+        /* ── Nav ─────────────────────────────────────────────── */
+        'nav-solutions': 'Решения',
+        'nav-services':  'Услуги',
+        'nav-contact':   'Контакт',
+        'nav-cta':       'Свържете се',
+
+        /* ── Hero ────────────────────────────────────────────── */
+        'hero-eyebrow': 'SMM &middot; Съдържание &middot; Растеж &middot; Брандинг',
+        'hero-line1':   'ВАШИЯТ БИЗНЕС',
+        'hero-line2':   '<span class="accent">НА НОВО</span> НИВО',
+        'hero-btn1':    'Нашите услуги',
+        'hero-btn2':    'Свържете се',
+
+        /* ── Solutions ───────────────────────────────────────── */
+        'sol-label':  'Областта на проблемите',
+        'sol-title':  'ПРЕДИЗВИКАТЕЛСТВА,<br>КОИТО РЕШАВАМЕ',
+        'sol-divider':'Нашият подход',
+        'sol-01-problem': 'Незабележимо онлайн присъствие',
+        'sol-01-answer':  'Марката ви съществува — но остава невидима. Изграждаме авторитетно присъствие на всички платформи, проектирано да бъде открито, следвано и запомнено.',
+        'sol-02-problem': 'Липса на ангажираност',
+        'sol-02-answer':  'Публикувате редовно, но без резултат. Нашите стратегии за съдържание са създадени да провокират диалог и да изградят лоялна общност около вашата марка.',
+        'sol-03-problem': 'Неефективен рекламен бюджет',
+        'sol-03-answer':  'Инвестирате в платена реклама без измерима възвращаемост. Изграждаме кампании, водени от данни, при които всеки вложен лев носи реален резултат.',
+        'sol-04-problem': 'Разпокъсана бранд идентичност',
+        'sol-04-answer':  'Непоследователните визуали и послания подкопават доверието. Изграждаме единна бранд идентичност, която се разпознава веднага на всяка точка на контакт.',
+        'sol-05-problem': 'Невидимост в търсачките',
+        'sol-05-answer':  'Конкурентите ви са на първа страница — вие не сте. Нашите SEO стратегии ви извеждат на върха при търсенията, които привличат квалифицирани клиенти.',
+        'sol-06-problem': 'Решения без аналитична основа',
+        'sol-06-answer':  'Бизнес решенията без данни са чисто предположение. Внедряваме аналитични системи, които разкриват точно какво работи, какво не и защо.',
+
+        /* ── Services ────────────────────────────────────────── */
+        'srv-label': 'Какво предлагаме',
+        'srv-title': 'НАШИТЕ УСЛУГИ',
+        'srv-hint':  'Превъртете, за да разгледате всички услуги',
+
+        'srv-01-tag':  'Платформен растеж',
+        'srv-01-name': 'УПРАВЛЕНИЕ НА<br>СОЦИАЛНИ МРЕЖИ',
+        'srv-01-desc': 'Цялостно управление на социалните ви канали — стратегия, планиране, изграждане на общност и устойчив растеж, реализирани с прецизност.',
+        'srv-01-f1': 'Платформена стратегия', 'srv-01-f2': 'Управление на общност',
+        'srv-01-f3': 'Кампании за растеж',   'srv-01-f4': 'Месечни отчети',
+
+        'srv-02-tag':  'Творческо студио',
+        'srv-02-name': 'СЪЗДАВАНЕ НА<br>СЪДЪРЖАНИЕ',
+        'srv-02-desc': 'Спиращи вниманието визуали и остър текст за марката ви. Всяко парче — оптимизирано за резултат.',
+        'srv-02-f1': 'Визуален дизайн',   'srv-02-f2': 'Видео и Reels',
+        'srv-02-f3': 'Копирайтинг',       'srv-02-f4': 'Контент календари',
+
+        'srv-03-tag':  'Платена реклама',
+        'srv-03-name': 'ОПТИМИЗАЦИЯ<br>НА РЕКЛАМИ',
+        'srv-03-desc': 'Платени кампании за максимален ROI. Прецизно таргетиране и мащабиране на това, което конвертира.',
+        'srv-03-f1': 'Meta и Google Ads', 'srv-03-f2': 'Прецизно таргетиране',
+        'srv-03-f3': 'A/B тестване',      'srv-03-f4': 'ROI проследяване',
+
+        'srv-04-tag':  'Органично търсене',
+        'srv-04-name': 'ОПТИМИЗАЦИЯ ЗА<br>ТЪРСАЧКИ',
+        'srv-04-desc': 'Доминирайте в класациите с устойчив трафик. Технически, on-page и off-page — пълният стек.',
+        'srv-04-f1': 'Технически SEO одит', 'srv-04-f2': 'Стратегия с ключови думи',
+        'srv-04-f3': 'On-Page оптимизация', 'srv-04-f4': 'Изграждане на линкове',
+
+        'srv-05-tag':  'Анализ на данни',
+        'srv-05-name': 'АНАЛИЗИ И<br>ОТЧЕТИ',
+        'srv-05-desc': 'Превърнете данните в стратегически решения. Персонализирани табла и задълбочени отчети, разкриващи произхода на всяко кликване.',
+        'srv-05-f1': 'Персонализирани табла', 'srv-05-f2': 'Конкурентен анализ',
+        'srv-05-f3': 'Задълбочени прегледи',  'srv-05-f4': 'Прогнози за растеж',
+
+        'srv-06-tag':  'Бранд идентичност',
+        'srv-06-name': 'ИЗГРАЖДАНЕ НА<br>МАРКАТА',
+        'srv-06-desc': 'Марката ви е много повече от лого. Изграждаме визуална идентичност, която ви прави незаменими — от символа до посланието.',
+        'srv-06-f1': 'Лого и идентичност', 'srv-06-f2': 'Бранд наръчник',
+        'srv-06-f3': 'Тон на гласа',       'srv-06-f4': 'Бранд стратегия',
+
+        'srv-07-tag':  'И още',
+        'srv-07-name': 'ПЕРСОНАЛИЗИРАНИ<br>РЕШЕНИЯ',
+        'srv-07-desc': 'Всеки бизнес е различен. Ако нуждите ви надхвърлят стандартното — изграждаме стратегия от нулата.',
+        'srv-07-f1': 'Инфлуенсър маркетинг', 'srv-07-f2': 'Имейл маркетинг',
+        'srv-07-f3': 'PR и медии',            'srv-07-f4': 'Стратегически консултации',
+
+        /* ── Contact ─────────────────────────────────────────── */
+        'ct-label':        'Работим заедно',
+        'ct-title':        'ГОТОВИ ЛИ СТЕ<br><span>ЗА СЛЕДВАЩОТО НИВО?</span>',
+        'ct-desc':         'Пробивът на вашия бизнес започва с един разговор. Свържете се с нас — нека изградим нещо забележително заедно.',
+        'ct-social-label': 'Последвайте ни',
+        'ct-callout':      'Работим с марки, амбицирани да доминират в дигиталното пространство. Ако това сте вие — нека го превърнем в реалност.',
+        'ct-cta':          'Започнете разговора \u2192',
+
+        /* ── Footer ──────────────────────────────────────────── */
+        'footer-tagline': 'Вашият бизнес — в нашия обхват',
+        'footer-copy':    '&#169; 2026 Proxima Reach<span>&#9670;</span>Всички права запазени',
+      }
+    };
+
+    // Keys that contain HTML (child elements must be preserved via innerHTML)
+    const HTML_KEYS = new Set([
+      'hero-eyebrow','hero-line2','sol-title','ct-title','footer-copy',
+      'srv-01-name','srv-02-name','srv-03-name','srv-04-name',
+      'srv-05-name','srv-06-name','srv-07-name'
+    ]);
+
+    let currentLang = localStorage.getItem('pr-lang') || 'en';
+
+    function applyLang(lang) {
+      const dict = T[lang];
+      if (!dict) return;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (!(key in dict)) return;
+        if (HTML_KEYS.has(key)) {
+          el.innerHTML = dict[key];
+        } else {
+          el.textContent = dict[key];
+        }
+      });
+      // Update toggle UI
+      document.querySelectorAll('.lang-opt').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.lang === lang);
+      });
+      document.documentElement.lang = lang;
+      currentLang = lang;
+      localStorage.setItem('pr-lang', lang);
+    }
+
+    // Wire up toggle
+    document.getElementById('lang-toggle').addEventListener('click', function(e) {
+      const opt = e.target.closest('.lang-opt');
+      if (!opt) return;
+      const lang = opt.dataset.lang;
+      if (lang && lang !== currentLang) applyLang(lang);
+    });
+
+    // Apply on load
+    applyLang(currentLang);
+
   })();
   </script>
 
