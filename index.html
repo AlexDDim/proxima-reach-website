@@ -2451,15 +2451,17 @@
       .to('#bh-event', { scale: 1, duration: 1.0, ease: 'expo.in' }, 3.3)
 
       // ⑧ SINGULARITY CONTRACTS → HERO SPHERE (t = 4.05)
-      // The black hole collapses inward — becoming the sphere at the hero's centre
-      .to('#bh-event', { scale: 0.055, duration: 1.05, ease: 'expo.inOut' }, 4.05)
-      // Loader content fades out during contraction, revealing the Three.js sphere underneath
-      .to('#loader', { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 4.2)
-      .to('#loader', { yPercent: -105, duration: 0 }, 5.2);
+      // Black hole collapses inward — its final size matches the Three.js nucleus sphere
+      // (sphere r=20, camera z=150, FOV 55° → projected diameter ≈ 230px on 900px viewport)
+      // #bh-event is 2800px wide → scale 0.082 ≈ 230px
+      .to('#bh-event', { scale: 0.082, duration: 1.1, ease: 'expo.inOut' }, 4.05)
+      // Loader fades while black dot is still visible — sphere underneath takes over seamlessly
+      .to('#loader', { opacity: 0, duration: 1.0, ease: 'power2.inOut' }, 4.6)
+      .to('#loader', { yPercent: -105, duration: 0 }, 5.7);
 
-    /* HERO ENTRANCE — staggered after warp */
+    /* HERO ENTRANCE — 2s pause lets sphere breathe before elements arrive */
     function heroIn() {
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({ delay: 2 });
       tl
         .from('#nav',                  { opacity: 0, y: -20, duration: 0.6, ease: 'power3.out' }, 0)
         .to('.hero-eyebrow',           { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.15)
