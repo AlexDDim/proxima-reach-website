@@ -39,7 +39,7 @@
       --ff-body:     'Nunito Sans', sans-serif;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
 
     body {
       cursor: none;
@@ -289,8 +289,58 @@
     /* Warp-speed flash overlay for exit */
     #loader-warp {
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(212,168,83,0.5) 30%, transparent 70%);
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(212,168,83,0.6) 25%, rgba(124,58,237,0.4) 55%, transparent 75%);
       opacity: 0; pointer-events: none; z-index: 5;
+    }
+
+    /* ── GRAVITATIONAL INFALL CANVAS ── */
+    #loader-nova {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 6;
+    }
+
+    /* ── EVENT HORIZON (black circle, grows to fill screen then contracts to sphere) ── */
+    #bh-event {
+      position: absolute; top: 50%; left: 50%;
+      width: 2800px; height: 2800px;
+      margin-left: -1400px; margin-top: -1400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #000000 55%, #06000f 80%, #000000 100%);
+      box-shadow:
+        inset 0 0 120px 60px rgba(20,0,40,0.95),
+        0 0 80px 40px rgba(0,0,0,0.8);
+      opacity: 0; pointer-events: none; z-index: 8;
+    }
+
+    /* ── ACCRETION DISK (hot compressed matter ring, tilted in perspective) ── */
+    #bh-disk {
+      position: absolute; top: 50%; left: 50%;
+      width: 300px; height: 300px;
+      margin-left: -150px; margin-top: -150px;
+      border-radius: 50%;
+      border: 20px solid rgba(255,140,20,0.9);
+      box-shadow:
+        0 0 28px 12px rgba(255,120,15,0.7),
+        0 0 70px 30px rgba(255,60,5,0.35),
+        0 0 120px 50px rgba(200,30,0,0.15),
+        inset 0 0 16px 6px rgba(255,210,80,0.55);
+      filter: blur(3.5px);
+      opacity: 0; pointer-events: none; z-index: 5;
+    }
+
+    /* ── PHOTON SPHERE (thin bright ring at Schwarzschild radius) ── */
+    #bh-photon {
+      position: absolute; top: 50%; left: 50%;
+      width: 76px; height: 76px;
+      margin-left: -38px; margin-top: -38px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,230,160,1);
+      box-shadow:
+        0 0 12px 5px rgba(255,210,100,0.95),
+        0 0 32px 12px rgba(255,140,30,0.65),
+        0 0 65px 24px rgba(255,60,10,0.3);
+      opacity: 0; pointer-events: none; z-index: 9;
     }
 
     /* ─── NAVBAR ─────────────────────────────────────────── */
@@ -1107,17 +1157,207 @@
     }
 
     @media (max-width: 768px) {
-      #nav { padding: 1.25rem 1.5rem; }
-      #nav.stuck { padding: 0.9rem 1.5rem; }
+
+      /* ── NAV ─────────────────────────────────────────────── */
+      /* Nav collapses to 0 height so logo overlays the hero without pushing content */
+      #nav {
+        padding: 0; height: 0; overflow: visible;
+        align-items: flex-start;
+        background: none !important;
+        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+        border-bottom-color: transparent !important;
+      }
+      #nav > a { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+      /* Pulsating glow — animate opacity only (GPU composited), static filter on img */
+      @keyframes hero-logo-pulse {
+        0%, 100% { opacity: 0.1; transform: translate(-50%, -50%) scale(0.9); }
+        50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+      }
+      /* Glow layer behind logo via anchor ::after */
+      #nav:not(.stuck) > a {
+        position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      }
+      #nav:not(.stuck) > a::after {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(212,168,83,0.55) 0%, rgba(124,58,237,0.25) 45%, transparent 70%);
+        pointer-events: none;
+        will-change: opacity, transform;
+        animation: hero-logo-pulse 2.8s ease-in-out infinite;
+      }
+      .nav-right {
+        position: absolute; top: 0.85rem; right: 0.75rem;
+        gap: 0.6rem; padding-top: 0; flex-shrink: 0; align-items: center;
+      }
+      /* Stuck: compact bar */
+      #nav.stuck {
+        height: auto; overflow: hidden; padding: 0.45rem 1rem;
+        align-items: center;
+        background: rgba(6,6,13,0.92) !important;
+        backdrop-filter: blur(24px) !important; -webkit-backdrop-filter: blur(24px) !important;
+        border-bottom-color: rgba(212,168,83,0.08) !important;
+      }
+      #nav.stuck > a { position: static; transform: none; }
+      #nav.stuck .nav-right { position: static; padding-top: 0; }
+      /* Compact logo in stuck state on mobile */
+      #nav.stuck .nav-logo-img {
+        height: 72px !important;
+        mask-image: none !important; -webkit-mask-image: none !important;
+        clip-path: inset(7px 8px 12px 8px) !important;
+        filter: brightness(1.9) contrast(1.45) saturate(1.3) drop-shadow(0 0 8px rgba(212,168,83,0.5)) !important;
+      }
       .nav-links { display: none; }
-      #solutions { padding: 6rem 1.5rem; }
-      .sol-grid { grid-template-columns: 1fr; }
-      .srv-header { padding: 0 1.5rem; }
-      #srv-track { padding: 0.5rem 1.5rem 1rem; }
-      #contact { padding: 6rem 1.5rem 0; }
-      .ct-grid { grid-template-columns: 1fr; gap: 3rem; }
-      #footer { flex-direction: column; gap: 1rem; margin-top: 3rem; padding: 2rem 1.5rem; }
-      .hero-title { font-size: clamp(2.8rem, 12vw, 5rem); }
+      .nav-cta { display: none; }
+      #lang-toggle { padding: 3px 4px; gap: 2px; }
+      .lang-opt { padding: 2px 3px; }
+      .lang-opt img.emoji { width: 18px !important; height: 18px !important; }
+
+      /* ── HERO ────────────────────────────────────────────── */
+      /* Disable pointer interaction on webgl canvas — allow scroll-through */
+      .webgl { pointer-events: none !important; }
+      /* Promote logo to own GPU layer so glow doesn't cause repaints */
+      #nav:not(.stuck) .nav-logo-img { will-change: transform; transform: translateZ(0); }
+      /* Push hero content to bottom half so full logo doesn't overlap it */
+      #hero { justify-content: flex-end; padding-bottom: 11vh; }
+      /* Hide in-scene logo on mobile (nav logo serves this purpose) */
+      .hero-logo-wrap { display: none; }
+      .hero-title { font-size: clamp(2.6rem, 11vw, 4.2rem); line-height: 0.95; }
+      .hero-eyebrow { font-size: 0.58rem; letter-spacing: 0.22em; }
+      .hero-btns { flex-direction: column; align-items: center; gap: 0.65rem; width: 100%; }
+      .btn-gold, .btn-ghost { width: 100%; max-width: 280px; text-align: center; padding: 0.9rem 1.5rem; font-size: 0.72rem; }
+
+      /* ── SOLUTIONS ───────────────────────────────────────── */
+      #solutions { padding: 5rem 1.25rem 4rem; }
+      .sol-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .sol-card { padding: 1.75rem 1.5rem; }
+      .sol-num { font-size: 2.8rem; margin-bottom: 0.5rem; }
+      .sol-problem { font-size: 1rem; }
+      .sol-answer { font-size: 0.82rem; line-height: 1.7; }
+      .s-title { font-size: clamp(2rem, 9vw, 3rem); }
+      .s-label { font-size: 0.6rem; letter-spacing: 0.28em; }
+
+      /* ── SERVICES — horizontal swipe carousel ────────────── */
+      #services {
+        height: auto;
+        min-height: unset;
+        overflow: hidden;
+        padding: 4rem 0 2rem;
+      }
+      #services::before { display: none; }
+      .srv-header { padding: 0 1.25rem; margin-bottom: 1.5rem; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .srv-hint { font-size: 0.6rem; }
+
+      #srv-roulette {
+        position: relative !important;
+        height: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        overflow-x: scroll !important;
+        overflow-y: hidden !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        perspective: none !important;
+      }
+      #srv-roulette::-webkit-scrollbar { display: none !important; }
+      .srv-card {
+        position: relative !important;
+        left: auto !important; top: auto !important;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        flex: 0 0 100vw !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-height: unset !important;
+        padding: 1.75rem 1.5rem !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        backdrop-filter: none !important;
+        scroll-snap-align: start !important;
+      }
+      .srv-card-spotlight { display: none; }
+      .srv-card-glow { display: block; }
+      .srv-card-shimmer { display: block; }
+      /* Trigger all desktop hover effects via mob-visible class on swipe */
+      .srv-card { transition: border-color 0.4s ease 0.25s, box-shadow 0.5s ease 0.25s !important; }
+      .srv-card.mob-visible {
+        border-color: rgba(212,168,83,0.7) !important;
+        box-shadow: 0 0 90px rgba(212,168,83,0.4), 0 0 35px rgba(212,168,83,0.25), 0 20px 50px rgba(0,0,0,0.4) !important;
+      }
+      .srv-card.mob-visible .srv-card-line { transform: scaleX(1); transition-delay: 0.3s; }
+      .srv-card.mob-visible .srv-card-glow { transform: scale(1.4); transition: transform 0.6s ease 0.2s; }
+      .srv-card.mob-visible::after { opacity: 1; transition: opacity 0.4s ease 0.2s; }
+      #srv-dots { display: flex; margin-top: 1.25rem; }
+      .srv-name { font-size: 1.3rem; line-height: 1.1; }
+      .srv-desc { font-size: 0.8rem; margin-bottom: 1rem; }
+      .srv-tag { font-size: 0.58rem; }
+      .srv-features li { font-size: 0.65rem; }
+      .srv-icon { width: 48px; height: 48px; margin-bottom: 1rem; }
+
+      /* ── LOADER ──────────────────────────────────────────── */
+      /* Keep default justify-content: center — centers entire stage (orbit + text) */
+      /* Scale the entire orbit stage to fit mobile viewport */
+      .loader-orbit-wrap {
+        width: min(82vw, 380px);
+        height: min(82vw, 380px);
+      }
+      /* Scale rings proportionally (desktop = 480/360/240 inside 520px wrap) */
+      .l-ring-1 { width: min(75.6vw, 350px); height: min(75.6vw, 350px); }
+      .l-ring-2 { width: min(56.7vw, 262px); height: min(56.7vw, 262px); }
+      .l-ring-3 { width: min(37.8vw, 175px); height: min(37.8vw, 175px); }
+      /* Orbit dot radii scaled (240→130, 180→98, 120→65 at 380/520 ratio) */
+      @keyframes l-orbit-gold-mob   { to { transform: rotate(360deg)  translateX(min(33.3vw, 130px)) rotate(-360deg); } }
+      @keyframes l-orbit-purple-mob { to { transform: rotate(-360deg) translateX(min(25.1vw,  98px)) rotate(360deg);  } }
+      @keyframes l-orbit-white-mob  { to { transform: rotate(360deg)  translateX(min(16.7vw,  65px)) rotate(-360deg); } }
+      .l-dot-gold   { animation-name: l-orbit-gold-mob; }
+      .l-dot-purple { animation-name: l-orbit-purple-mob; }
+      .l-dot-white  { animation-name: l-orbit-white-mob; }
+      /* Arc SVG — match orbit wrap size */
+      #loader-arc-svg { width: min(82vw, 380px); height: min(82vw, 380px); }
+      /* Logo: scale width; use percentage clip so centering is always accurate */
+      #loader-logo {
+        width: min(43.6vw, 170px);
+        clip-path: inset(6.2% 12.7% 14.9% 12.7%);
+      }
+      /* Bloom scaled */
+      .loader-bloom { width: min(70vw, 280px); height: min(70vw, 280px); }
+
+      /* ── CONTACT ─────────────────────────────────────────── */
+      #contact { padding: 5rem 1.25rem 0; overflow: hidden; }
+      #contact::after { display: none; }
+      .ct-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .ct-title { font-size: clamp(2.2rem, 9vw, 3rem); }
+      .ct-desc { font-size: 0.85rem; margin-bottom: 1.75rem; max-width: 100%; }
+      .ct-link { font-size: 0.75rem; }
+      .ct-callout { font-size: 0.82rem; margin-bottom: 1.5rem; }
+      .ct-right { padding-top: 0; }
+      .socials { margin-bottom: 2rem; }
+      .btn-gold[href^="mailto"] { display: block; text-align: center; }
+      /* Force contact content visible — GSAP scroll triggers may not fire at small heights */
+      .ct-grid > div > *, .ct-right > * { opacity: 1 !important; transform: none !important; }
+
+      /* ── FOOTER ──────────────────────────────────────────── */
+      #footer { margin-top: 3rem; padding: 0 1.25rem; }
+      .footer-logo { height: 360px !important; clip-path: inset(28px 32px 50px 32px) !important; }
+      .footer-body { padding: 2rem 0 0; }
+      .footer-nav { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+      .footer-tagline { font-size: 0.58rem; letter-spacing: 0.22em; margin-bottom: 1.5rem; }
+      .footer-bar { padding: 1rem 0 1.5rem; }
+      .footer-copy { font-size: 0.56rem; text-align: center; }
+    }
+
+    /* ── Extra small (iPhone SE etc.) ────────────────────── */
+    @media (max-width: 390px) {
+      .hero-title { font-size: clamp(2.2rem, 10vw, 3.2rem); }
+      .ct-title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+      .s-title { font-size: clamp(1.8rem, 9vw, 2.6rem); }
     }
   </style>
 </head>
@@ -1175,6 +1415,14 @@
       </div>
     </div>
 
+    <!-- Gravitational infall canvas (stars spiraling into singularity) -->
+    <canvas id="loader-nova"></canvas>
+    <!-- Accretion disk (hot compressed matter ring) -->
+    <div id="bh-disk"></div>
+    <!-- Event horizon (black circle that grows then contracts) -->
+    <div id="bh-event"></div>
+    <!-- Photon sphere (bright ring at Schwarzschild radius) -->
+    <div id="bh-photon"></div>
     <div id="loader-warp"></div>
   </div>
 
@@ -1662,6 +1910,10 @@
       this.controls.minDistance = 150;
       this.controls.enablePan = false;
       this.controls.enableZoom = false;
+      // On mobile: keep auto-rotate but disable touch interaction
+      if (window.innerWidth <= 768) {
+        this.controls.enableRotate = false;
+      }
     }
 
     textureLoader() {
@@ -2044,6 +2296,7 @@
     })();
 
     /* ── LOADER TIMELINE ── */
+
     const loaderTl = gsap.timeline({
       onComplete() {
         window._stopLoaderCanvas?.();
@@ -2052,20 +2305,17 @@
       }
     });
 
-    // Arc progress — circumference ≈ 1489, drive stroke-dashoffset from 1489→0
+    // Arc progress — circumference ≈ 1489
     const arcFill = document.getElementById('loader-arc-fill');
     const CIRC = 1489;
     const arcProxy = { p: 0 };
 
-    // Constellation stars: light up at 20%, 40%, 60%, 80%, 100%
-    const STAR_COUNT_ROW = 5;
     const STAR_THRESHOLDS = [0.18, 0.38, 0.58, 0.78, 0.96];
     let starsLit = 0;
     const statusLabels = ['INITIALISING', 'CALIBRATING', 'ALIGNING', 'LAUNCHING', 'READY'];
 
     function updateArc(pct) {
       arcFill.style.strokeDashoffset = CIRC * (1 - pct);
-      // Light up stars
       const shouldLit = STAR_THRESHOLDS.filter(t => pct >= t).length;
       while (starsLit < shouldLit) {
         document.getElementById(`lst-${starsLit}`)?.classList.add('lit');
@@ -2076,34 +2326,136 @@
       }
     }
 
+    /* ── Gravitational infall — stars spiral into the singularity ── */
+    function activateBlackHole(cx, cy) {
+      const canvas = document.getElementById('loader-nova');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const maxR = Math.sqrt(cx * cx + cy * cy) * 1.5;
+      // Seed particles all over the screen, orbiting then falling in
+      const particles = Array.from({ length: 240 }, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const r = 55 + Math.random() * maxR;
+        const dir = Math.random() < 0.65 ? 1 : -1; // mostly clockwise
+        return {
+          r, startR: r,
+          angle,
+          dir,
+          omega0: (0.018 + Math.random() * 0.038) * dir,
+          fallSpeed: 0.005 + Math.random() * 0.011,
+          size: 0.5 + Math.random() * 2.2,
+        };
+      });
+
+      let running = true;
+      function draw() {
+        if (!running) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let anyAlive = false;
+        for (const p of particles) {
+          if (p.r < 8) continue;
+          anyAlive = true;
+          // Angular velocity increases as r shrinks (conservation of momentum)
+          const boost = Math.pow(p.startR / Math.max(p.r, 12), 1.3);
+          p.angle += p.omega0 * boost;
+          // Infall accelerates with gravity (1/r²)
+          const gravBoost = Math.pow(p.startR / Math.max(p.r, 12), 0.9);
+          p.r -= p.fallSpeed * gravBoost * p.r * 0.009;
+
+          const x = cx + p.r * Math.cos(p.angle);
+          const y = cy + p.r * Math.sin(p.angle);
+
+          // Color shifts from cool white → hot orange-red as it falls in
+          const heat = 1 - Math.min(1, p.r / p.startR);
+          const rr = 255;
+          const gg = Math.floor(255 * (1 - heat * 0.48));
+          const bb = Math.floor(255 * Math.max(0, 1 - heat * 1.7));
+
+          const alpha = Math.min(1, p.r / 70) * 0.88;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = `rgb(${rr},${gg},${bb})`;
+          ctx.shadowColor = `rgb(${rr},${gg},${bb})`;
+          ctx.shadowBlur = p.size * 7;
+          ctx.beginPath();
+          ctx.arc(x, y, p.size * Math.min(1, p.r / 35), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        if (anyAlive) requestAnimationFrame(draw);
+        else { ctx.clearRect(0, 0, canvas.width, canvas.height); running = false; }
+      }
+      requestAnimationFrame(draw);
+      return () => { running = false; };
+    }
+
+    // Flat disk perspective set before timeline starts
+    gsap.set('#bh-disk', { scaleY: 0.18 });
+
     loaderTl
-      // Bloom swells in
-      .to('#loader-bloom',   { opacity: 1, scale: 1, duration: 1.4, ease: 'power2.out' }, 0)
+      // ① STELLAR SYSTEM — bloom + logo materialise
+      .to('#loader-bloom',   { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
+      .to('#loader-logo',    { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)', transformOrigin: '50% 50%' }, 0.2)
 
-      // Logo materialises from center
-      .to('#loader-logo',    { opacity: 1, scale: 1, duration: 1.0, ease: 'expo.out',
-                               transformOrigin: '50% 50%' }, 0.25)
+      // ② Ring pulse on logo arrival
+      .to('.l-ring',         { opacity: 0.55, duration: 0.15, ease: 'power3.in' }, 0.5)
+      .to('.l-ring',         { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.65)
 
-      // Tagline fades in
-      .to('#loader-tagline', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.7)
-      .to('#loader-pct',     { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.9)
+      // ③ Tagline + progress labels
+      .to('#loader-tagline', { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.6)
+      .to('#loader-pct',     { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.8)
 
-      // Arc sweeps from 0→100% over 2.4s, calling updateArc on each tick
-      .to(arcProxy, {
-        p: 1, duration: 2.4, ease: 'power1.inOut',
-        onUpdate() { updateArc(arcProxy.p); }
-      }, 0.5)
+      // ④ Arc sweeps 0 → 100%
+      .to(arcProxy, { p: 1, duration: 2.2, ease: 'power1.inOut', onUpdate() { updateArc(arcProxy.p); } }, 0.4)
 
-      // Bloom pulses brighter just before exit
-      .to('#loader-bloom',   { scale: 1.5, opacity: 0.85, duration: 0.4, ease: 'power2.in' }, 3.1)
+      // ⑤ GRAVITATIONAL ANOMALY (t = 2.6) — a dark point materialises at centre
+      // The singularity is born — tiny black dot appears
+      .to('#bh-event', { opacity: 1, scale: 0.006, duration: 0.4, ease: 'power2.out' }, 2.6)
+      // Orbit rings subtly slow / freeze (gravity warping spacetime)
+      .add(() => {
+        document.querySelectorAll('.l-ring').forEach(r => r.style.animationPlayState = 'paused');
+      }, 2.65)
+      // Infall particles begin their death spiral
+      .add(() => {
+        const el = document.getElementById('loader');
+        activateBlackHole(el.offsetWidth / 2, el.offsetHeight / 2);
+      }, 2.68)
+      // Accretion disk flares into existence (hot matter compressed at event horizon)
+      .to('#bh-disk', { opacity: 0.95, duration: 0.55, ease: 'power2.out' }, 2.75)
+      // Logo tidal flare — star brightens as it's torn apart
+      .to('#loader-logo', { scale: 1.15, duration: 0.28, ease: 'power2.in' }, 2.72)
 
-      // Warp flash
-      .to('#loader-warp',    { opacity: 1, duration: 0.12, ease: 'power3.in' }, 3.3)
-      .to('#loader-warp',    { opacity: 0, duration: 0.38, ease: 'power2.out' }, 3.42)
+      // ⑥ SPAGHETTIFICATION (t = 3.0) — everything stretched and devoured
+      // Logo stretches vertically (tidal force) then vanishes past the event horizon
+      .to('#loader-logo', {
+        scaleX: 0.06, scaleY: 4, opacity: 0,
+        duration: 0.42, ease: 'power4.in', transformOrigin: '50% 50%'
+      }, 3.0)
+      // Rings, dots, arc, text all fall inward
+      .to('.l-ring',       { opacity: 0, duration: 0.32, ease: 'power3.in' }, 3.0)
+      .to('.l-dot',        { opacity: 0, duration: 0.28, ease: 'power3.in' }, 3.02)
+      .to('#loader-arc-svg',  { opacity: 0, scale: 0.08, duration: 0.38, ease: 'power4.in' }, 3.0)
+      .to('#loader-tagline',  { opacity: 0, y: 8, duration: 0.28, ease: 'power3.in' }, 3.0)
+      .to('#loader-pct',      { opacity: 0, y: 6, duration: 0.25, ease: 'power3.in' }, 3.02)
+      .to('#loader-bloom',    { opacity: 0, scale: 0.02, duration: 0.38, ease: 'power4.in' }, 3.0)
 
-      // Loader fades + scales out (warp-into-scene)
-      .to('#loader',         { opacity: 0, scale: 1.08, duration: 0.6, ease: 'power3.in' }, 3.32)
-      .to('#loader',         { yPercent: -105, duration: 0, ease: 'none' }, 3.92);
+      // ⑦ EVENT HORIZON EXPANDS (t = 3.3) — black hole consumes everything
+      // Disk gets swallowed first
+      .to('#bh-disk', { opacity: 0, scale: 0.4, scaleY: 0.05, duration: 0.35, ease: 'power3.in' }, 3.3)
+      // Photon ring flares briefly at the edge (last light before darkness)
+      .to('#bh-photon', { opacity: 1, duration: 0.2, ease: 'power2.out' }, 3.35)
+      .to('#bh-photon', { opacity: 0, duration: 0.35, ease: 'power2.in' }, 3.55)
+      // Event horizon floods the screen
+      .to('#bh-event', { scale: 1, duration: 1.0, ease: 'expo.in' }, 3.3)
+
+      // ⑧ SINGULARITY CONTRACTS → HERO SPHERE (t = 4.05)
+      // The black hole collapses inward — becoming the sphere at the hero's centre
+      .to('#bh-event', { scale: 0.055, duration: 1.05, ease: 'expo.inOut' }, 4.05)
+      // Loader content fades out during contraction, revealing the Three.js sphere underneath
+      .to('#loader', { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 4.2)
+      .to('#loader', { yPercent: -105, duration: 0 }, 5.2);
 
     /* HERO ENTRANCE — staggered after warp */
     function heroIn() {
@@ -2146,6 +2498,57 @@
       const cards    = [...roulette.querySelectorAll('.srv-card')];
       const N        = cards.length;
       let   active   = 0;
+
+      // On mobile: horizontal swipe carousel with scroll-snap
+      if (window.innerWidth <= 768) {
+        // Reset GSAP transforms so CSS scroll-snap takes over
+        cards.forEach(card => {
+          gsap.set(card, { clearProps: 'all' });
+          card.style.pointerEvents = 'auto';
+        });
+
+        // Build and show dots
+        cards.forEach((_, i) => {
+          const d = document.createElement('span');
+          d.className = 'srv-dot' + (i === 0 ? ' active' : '');
+          d.addEventListener('click', () => {
+            roulette.scrollTo({ left: i * window.innerWidth, behavior: 'smooth' });
+          });
+          dotsWrap.appendChild(d);
+        });
+        dotsWrap.style.display = 'flex';
+
+        // Sync dot highlight to scroll position
+        roulette.addEventListener('scroll', () => {
+          const idx = Math.round(roulette.scrollLeft / window.innerWidth);
+          dotsWrap.querySelectorAll('.srv-dot').forEach((d, i) =>
+            d.classList.toggle('active', i === idx)
+          );
+        }, { passive: true });
+
+        // Fire shimmer + gold border when card scrolls into view (with slight delay)
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            const card = entry.target;
+            if (entry.isIntersecting) {
+              card.classList.add('mob-visible', 'is-active');
+              setTimeout(() => {
+                if (card.classList.contains('mob-visible')) {
+                  card.classList.remove('shimmer-run');
+                  void card.offsetWidth;
+                  card.classList.add('shimmer-run');
+                }
+              }, 260);
+            } else {
+              card.classList.remove('mob-visible', 'is-active', 'shimmer-run');
+            }
+          });
+        }, { root: roulette, threshold: 0.6 });
+
+        cards.forEach(card => observer.observe(card));
+
+        return;
+      }
 
       // Build dots
       cards.forEach((_, i) => {
@@ -2320,6 +2723,8 @@
 
   <script>
   (function () {
+    // Neon cursor is desktop-only — skip entirely on touch/mobile
+    if (window.innerWidth <= 768 || ('ontouchstart' in window)) return;
     const cvs = document.createElement('canvas');
     cvs.id = 'neon-cvs';
     document.body.appendChild(cvs);
@@ -2471,13 +2876,13 @@
         'srv-02-tag':  'Creative Studio',
         'srv-02-name': 'CONTENT<br>CREATION',
         'srv-02-desc': 'Scroll-stopping visuals and sharp copy that tell your brand story. Every piece engineered to perform across every format.',
-        'srv-02-f1': 'Visual Design',        'srv-02-f2': 'Video &amp; Reels',
+        'srv-02-f1': 'Visual Design',        'srv-02-f2': 'Video & Reels',
         'srv-02-f3': 'Copywriting',          'srv-02-f4': 'Content Calendars',
 
         'srv-03-tag':  'Paid Performance',
         'srv-03-name': 'ADS<br>OPTIMISATION',
         'srv-03-desc': 'Paid campaigns engineered for maximum ROI. Precise targeting, relentless testing, and fearless scaling of what converts.',
-        'srv-03-f1': 'Meta &amp; Google Ads', 'srv-03-f2': 'Audience Targeting',
+        'srv-03-f1': 'Meta & Google Ads', 'srv-03-f2': 'Audience Targeting',
         'srv-03-f3': 'A/B Testing',           'srv-03-f4': 'ROI Tracking',
 
         'srv-04-tag':  'Organic Discovery',
@@ -2495,14 +2900,14 @@
         'srv-06-tag':  'Identity Design',
         'srv-06-name': 'BRAND<br>DEVELOPMENT',
         'srv-06-desc': 'Your brand is far more than a logo. We architect complete visual identities that make you unmistakable — from mark to messaging.',
-        'srv-06-f1': 'Logo &amp; Visual Identity', 'srv-06-f2': 'Brand Guidelines',
+        'srv-06-f1': 'Logo & Visual Identity', 'srv-06-f2': 'Brand Guidelines',
         'srv-06-f3': 'Tone of Voice',              'srv-06-f4': 'Brand Strategy',
 
         'srv-07-tag':  'And More',
         'srv-07-name': 'CUSTOM<br>SOLUTIONS',
         'srv-07-desc': 'Every business is different. If your challenge goes beyond a standard category, we build a tailored strategy from the ground up.',
         'srv-07-f1': 'Influencer Outreach',  'srv-07-f2': 'Email Marketing',
-        'srv-07-f3': 'PR &amp; Media',       'srv-07-f4': 'Strategic Consultation',
+        'srv-07-f3': 'PR & Media',       'srv-07-f4': 'Strategic Consultation',
 
         /* ── Contact ─────────────────────────────────────────── */
         'ct-label':        'Let\u2019s Connect',
