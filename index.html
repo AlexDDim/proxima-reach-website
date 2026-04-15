@@ -2948,118 +2948,125 @@
       );
     });
 
-    /* ── UNIVERSE TRAVEL: galaxy zoom + planet fly-through ──
-       As user scrolls the galaxy expands (FOV narrows) and the
-       camera pans toward each orbiting planet sequentially,
-       using them as visual anchors for each page section.
+    /* ── PLANET ZOOM JOURNEY ─────────────────────────────────
+       Each section zooms into its assigned planet: the planet
+       fills the foreground and stays static while the section
+       is in view. Scrolling transitions smoothly to the next.
+
+       Architecture:
+       • A proxy object C holds camera/planet state.
+       • gsap.ticker syncs C → Three.js every frame.
+       • Per-section timelines (zoom-in → hold → zoom-out)
+         are scrubbed by ScrollTrigger — fully reversible.
     ─────────────────────────────────────────────────────── */
     (function() {
-      function tryUniverseTravel() {
+      function trySetup() {
         const app = window._heroThree;
         if (!app || !app.controls || !app.planet1) {
-          requestAnimationFrame(tryUniverseTravel);
+          requestAnimationFrame(trySetup);
           return;
         }
 
-        const ctrl     = app.controls;
-        const cam      = app.camera;
-        const nucleus  = app.nucleus;
-        const sphereBg = app.sphereBg;
+        const ctrl = app.controls;
+        const cam  = app.camera;
 
-        // Read actual planet positions from Three.js geometry buffers
-        function planetXY(p) {
-          const a = p.geometry.attributes.position.array;
-          return { x: a[0], y: a[1] };
+        // ── Read planet 3-D positions from geometry buffers ──
+        function pPos(planet) {
+          const a = planet.geometry.attributes.position.array;
+          return { x: a[0], y: a[1], z: a[2] };
         }
-        const p1 = planetXY(app.planet1);
-        const p2 = planetXY(app.planet2);
-        const p3 = planetXY(app.planet3);
+        const P1 = pPos(app.planet1);
+        const P2 = pPos(app.planet2);
+        const P3 = pPos(app.planet3);
 
-        // Scale: planet positions are 40–60 units out; we aim the camera
-        // at 45% of that offset so the planet drifts into frame but the
-        // hero sphere stays partially visible.
-        const S = 0.45;
-
-        /* Keyframes: [progress, targetX, targetY, fov, sphereScale]
-           FOV 55 = wide (hero default)
-           FOV 32 = zoomed-in deep (galaxy fully expanded) */
-        const KF = [
-          [0.00,         0,          0,     55,   1.00],  // hero — default
-          [0.16,  p1.x*0.2,   p1.y*0.2,   50,   1.04],  // approaching planet 1
-          [0.30,  p1.x*S,     p1.y*S,     40,   1.10],  // PLANET 1 FOCUS (solutions peak)
-          [0.44,  p1.x*0.25,  p1.y*0.25,  44,   1.06],  // leaving p1 / warp to p2
-          [0.56,  p2.x*S,     p2.y*S,     34,   1.02],  // PLANET 2 FOCUS (services peak)
-          [0.68,  p2.x*0.2,   p2.y*0.2,   38,   0.98],  // leaving p2 / drift to p3
-          [0.80,  p3.x*S,     p3.y*S,     32,   0.94],  // PLANET 3 FOCUS (contact peak)
-          [1.00,         0,          0,    44,   0.90],  // pull-back — bottom of page
-        ];
-
-        // Planet material sizes at rest vs focus (grow as camera zooms in)
-        const BASE_SIZES  = [app.planet1.material.size, app.planet2.material.size, app.planet3.material.size];
-        const FOCUS_SIZES = [BASE_SIZES[0] * 2.8, BASE_SIZES[1] * 2.8, BASE_SIZES[2] * 2.8];
-        // Near-star field base size
+        // ── Baseline material values ──
+        const B1 = app.planet1.material.size;
+        const B2 = app.planet2.material.size;
+        const B3 = app.planet3.material.size;
         const STAR2_BASE = app.pointStars2.material.size;
 
-        function lerp(a, b, t) { return a + (b - a) * t; }
-        function smoothstep(t)  { return t * t * (3 - 2 * t); }
+        // ── Proxy object — GSAP animates these, ticker applies them ──
+        const C = {
+          tx: 0, ty: 0, tz: 0,      // controls.target
+          fov: 55,                   // camera FOV
+          p1sz: B1, p2sz: B2, p3sz: B3,
+          star2sz: STAR2_BASE,
+        };
 
-        // Planet highlight weights: how "focused" we are on each planet (0–1)
-        function planetWeight(progress, peakProgress) {
-          const d = Math.abs(progress - peakProgress);
-          return Math.max(0, 1 - d / 0.18);   // bell curve ±18% around peak
+        // ── Sync proxy → Three.js on every GSAP tick ──
+        gsap.ticker.add(() => {
+          ctrl.target.set(C.tx, C.ty, C.tz);
+          cam.fov = C.fov;
+          cam.updateProjectionMatrix();
+          app.planet1.material.size = C.p1sz;
+          app.planet2.material.size = C.p2sz;
+          app.planet3.material.size = C.p3sz;
+          app.planet1.material.needsUpdate = true;
+          app.planet2.material.needsUpdate = true;
+          app.planet3.material.needsUpdate = true;
+          app.pointStars2.material.size = C.star2sz;
+          app.pointStars2.material.needsUpdate = true;
+        });
+
+        // ── Constants ──
+        const FOCUS_FOV  = 14;           // zoomed-in FOV at planet focus
+        const EXIT_FOV   = 50;           // wider FOV while transitioning
+        const FOCUS_SZ   = 90;           // planet point size at focus
+        const STAR2_ZOOM = STAR2_BASE * 2.6;
+        const ease       = 'power2.inOut';
+
+        // ── Factory: zoom-in → hold → zoom-out for one planet ──
+        // The pan target reaches 80% of the planet's position so
+        // the planet is centered; z only partially to avoid clipping.
+        function makePlanetTl(pos, pSzProp, baseSz) {
+          return gsap.timeline()
+            // ZOOM IN (30% of scroll distance)
+            .to(C, { tx: pos.x*0.8, ty: pos.y*0.8, tz: pos.z*0.2,
+                     fov: FOCUS_FOV, star2sz: STAR2_ZOOM,
+                     duration: 0.3, ease })
+            .to(C, { [pSzProp]: FOCUS_SZ, duration: 0.3, ease }, '<')
+
+            // HOLD — planet stays prominent (40% of scroll distance)
+            .to({}, { duration: 0.4 })
+
+            // ZOOM OUT (30% of scroll distance)
+            .to(C, { tx: 0, ty: 0, tz: 0,
+                     fov: EXIT_FOV, star2sz: STAR2_BASE,
+                     duration: 0.3, ease })
+            .to(C, { [pSzProp]: baseSz, duration: 0.3, ease }, '<');
         }
 
-        ScrollTrigger.create({
-          start: 'top top',
-          end:   'bottom bottom',
-          scrub: 2,
-          onUpdate(self) {
-            const p = self.progress;
-
-            // Interpolate keyframe path
-            let from = KF[0], to = KF[KF.length - 1];
-            for (let i = 0; i < KF.length - 1; i++) {
-              if (p >= KF[i][0] && p <= KF[i + 1][0]) {
-                from = KF[i]; to = KF[i + 1]; break;
-              }
-            }
-            const span = to[0] - from[0];
-            const t = span < 0.001 ? 1 : smoothstep((p - from[0]) / span);
-
-            // Camera target pan (makes planets drift into frame)
-            ctrl.target.x = lerp(from[1], to[1], t);
-            ctrl.target.y = lerp(from[2], to[2], t);
-
-            // FOV zoom — galaxy expands as FOV narrows
-            cam.fov = lerp(from[3], to[3], t);
-            cam.updateProjectionMatrix();
-
-            // Hero sphere scale
-            const sc = lerp(from[4], to[4], t);
-            if (nucleus)  nucleus.scale.set(sc, sc, sc);
-            if (sphereBg) sphereBg.scale.set(sc, sc, sc);
-
-            // Planet focus weights
-            const w1 = planetWeight(p, 0.30);
-            const w2 = planetWeight(p, 0.56);
-            const w3 = planetWeight(p, 0.80);
-
-            // Grow planet point sizes as we zoom toward each
-            app.planet1.material.size = lerp(BASE_SIZES[0], FOCUS_SIZES[0], w1);
-            app.planet2.material.size = lerp(BASE_SIZES[1], FOCUS_SIZES[1], w2);
-            app.planet3.material.size = lerp(BASE_SIZES[2], FOCUS_SIZES[2], w3);
-            app.planet1.material.needsUpdate = true;
-            app.planet2.material.needsUpdate = true;
-            app.planet3.material.needsUpdate = true;
-
-            // Near-star field also grows slightly as FOV narrows (enhances zoom feel)
-            const fovFactor = (55 - cam.fov) / (55 - 32); // 0 at hero, 1 at max zoom
-            app.pointStars2.material.size = STAR2_BASE + fovFactor * STAR2_BASE * 1.8;
-            app.pointStars2.material.needsUpdate = true;
+        // ── Planet 1 — Solutions ──
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: '#solutions',
+            start: 'top 60%',
+            end:   'bottom 40%',
+            scrub: 1.8,
           }
-        });
+        }).add(makePlanetTl(P1, 'p1sz', B1));
+
+        // ── Planet 2 — Services ──
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: '#services',
+            start: 'top 60%',
+            end:   'bottom 40%',
+            scrub: 1.8,
+          }
+        }).add(makePlanetTl(P2, 'p2sz', B2));
+
+        // ── Planet 3 — Contact ──
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: '#contact',
+            start: 'top 60%',
+            end:   'bottom 40%',
+            scrub: 1.8,
+          }
+        }).add(makePlanetTl(P3, 'p3sz', B3));
       }
-      tryUniverseTravel();
+      trySetup();
     })();
   </script>
 
