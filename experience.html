@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Orbit — Proxima Reach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold:    #D4A853;
+      --gold-l:  #F2CC72;
+      --gold-d:  rgba(212,168,83,0.28);
+      --purple:  #7C3AED;
+      --bg:      #000008;
+      --white:   #F8F6EF;
+      --dim:     rgba(248,246,239,0.42);
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Barlow Condensed', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ─────────────────────────────────────────── */
+    #cur {
+      position: fixed; z-index: 9999;
+      width: 10px; height: 10px;
+      border-radius: 50%; background: var(--gold);
+      pointer-events: none;
+      transform: translate(-50%,-50%);
+      box-shadow: 0 0 12px 5px rgba(212,168,83,0.7);
+      transition: width .2s, height .2s;
+    }
+    #cur-ring {
+      position: fixed; z-index: 9998;
+      width: 34px; height: 34px;
+      border-radius: 50%; border: 1px solid rgba(212,168,83,0.35);
+      pointer-events: none;
+      transform: translate(-50%,-50%);
+    }
+    body:hover #cur { opacity: 1; }
+
+    /* ── FIXED LAYERS ───────────────────────────────────── */
+    #star-cv  { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    #gl-wrap  { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+    #flash    { position: fixed; inset: 0; z-index: 200; background: #fff; opacity: 0; pointer-events: none; }
+
+    /* ── NAV ────────────────────────────────────────────── */
+    #enav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 50; padding: 1.6rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      opacity: 0;
+    }
+    .enav-logo {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 0.6rem; letter-spacing: 0.45em;
+      color: var(--gold); text-decoration: none;
+    }
+    .enav-back {
+      font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--dim); text-decoration: none;
+      transition: color .3s; cursor: none;
+    }
+    .enav-back:hover { color: var(--white); }
+
+    /* ── SCENE DOTS ─────────────────────────────────────── */
+    #sdots {
+      position: fixed; right: 2.2rem; top: 50%;
+      transform: translateY(-50%);
+      z-index: 50; display: flex; flex-direction: column; gap: 0.65rem;
+      opacity: 0;
+    }
+    .sdot {
+      width: 5px; height: 5px; border-radius: 50%;
+      border: 1px solid rgba(212,168,83,0.3);
+      transition: all .4s ease; cursor: none;
+    }
+    .sdot.on {
+      background: var(--gold); border-color: var(--gold);
+      box-shadow: 0 0 8px 3px rgba(212,168,83,0.55);
+    }
+
+    /* ── SCROLL ROOT ────────────────────────────────────── */
+    #sr { position: relative; z-index: 2; }
+
+    /* Wrapper sets scroll distance; scene is sticky inside */
+    .sw { position: relative; }
+    .sc {
+      position: sticky; top: 0;
+      height: 100vh; width: 100%;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── SCENE 1 ─ THE VOID ─────────────────────────────── */
+    .s1-dot {
+      position: absolute; top: 50%; left: 50%;
+      width: 8px; height: 8px; margin: -4px 0 0 -4px;
+      border-radius: 50%; background: var(--gold);
+      box-shadow:
+        0 0 22px 10px rgba(212,168,83,0.85),
+        0 0 70px 30px rgba(212,168,83,0.35),
+        0 0 140px 60px rgba(124,58,237,0.18);
+      animation: dot-pulse 2.6s ease-in-out infinite;
+      z-index: 3;
+    }
+    @keyframes dot-pulse {
+      0%,100% { box-shadow: 0 0 22px 10px rgba(212,168,83,0.85), 0 0 70px 30px rgba(212,168,83,0.35); }
+      50%      { box-shadow: 0 0 36px 15px rgba(212,168,83,1),    0 0 110px 50px rgba(212,168,83,0.55), 0 0 200px 80px rgba(124,58,237,0.3); }
+    }
+
+    .s1-center {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center; z-index: 4;
+      pointer-events: none;
+    }
+    .s1-eye {
+      font-size: 0.6rem; letter-spacing: 0.6em; text-transform: uppercase;
+      color: var(--gold-d); margin-bottom: 2rem; opacity: 0;
+    }
+    .s1-hed {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(3rem, 7.5vw, 6.5rem); font-weight: 700;
+      letter-spacing: 0.07em; line-height: 0.95;
+      opacity: 0;
+    }
+    .s1-sub {
+      font-size: 0.62rem; letter-spacing: 0.45em; text-transform: uppercase;
+      color: var(--dim); margin-top: 2.5rem; opacity: 0;
+    }
+
+    .s1-hint {
+      position: absolute; bottom: 2.8rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+      opacity: 0; z-index: 3;
+    }
+    .hint-txt { font-size: 0.52rem; letter-spacing: 0.5em; color: var(--dim); text-transform: uppercase; }
+    .hint-line {
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: drip 1.9s ease-in-out infinite;
+    }
+    @keyframes drip {
+      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+      49%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      50%  { transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; opacity: 0.1; }
+    }
+
+    /* Equatorial line accent */
+    .eq-line {
+      position: absolute; left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(212,168,83,0.04) 20%, rgba(212,168,83,0.14) 50%, rgba(212,168,83,0.04) 80%, transparent);
+      pointer-events: none;
+    }
+
+    /* ── SCENE 2 ─ THE ORBIT ────────────────────────────── */
+    .s2-labels { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+    .s2-lbl {
+      position: absolute;
+      font-size: 0.58rem; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--gold); opacity: 0; white-space: nowrap;
+      display: flex; align-items: center; gap: 0.55rem;
+    }
+    .s2-lbl::before {
+      content: ''; display: block;
+      width: 20px; height: 1px;
+      background: rgba(212,168,83,0.45);
+      flex-shrink: 0;
+    }
+    .s2-lbl.r { flex-direction: row-reverse; }
+
+    .s2-foot {
+      position: absolute; bottom: 9vh; left: 50%;
+      transform: translateX(-50%);
+      text-align: center; z-index: 5; pointer-events: none;
+      width: 100%;
+    }
+    .s2-hed {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(2.8rem, 7.5vw, 7rem); font-weight: 700;
+      letter-spacing: 0.025em; line-height: 0.9;
+      opacity: 0; transform: translateY(80px);
+    }
+    .s2-hed .gld { color: var(--gold); }
+    .s2-sub {
+      font-size: 0.62rem; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--dim); margin-top: 1.8rem; opacity: 0;
+    }
+
+    /* ── SCENE 3 ─ THE PULL ─────────────────────────────── */
+    .s3-bh {
+      position: absolute; top: 50%; left: 50%;
+      width: 32px; height: 32px; margin: -16px 0 0 -16px;
+      border-radius: 50%; background: #000;
+      box-shadow:
+        0 0 50px 25px rgba(0,0,0,0.95),
+        0 0 120px 60px rgba(0,0,0,0.7);
+      transform: scale(0);
+      z-index: 4; pointer-events: none;
+    }
+    .s3-disk {
+      position: absolute; top: 50%; left: 50%;
+      width: 220px; height: 220px; margin: -110px 0 0 -110px;
+      border-radius: 50%;
+      border: 16px solid rgba(255,115,8,0.82);
+      box-shadow:
+        0 0 25px 10px rgba(255,95,5,0.6),
+        0 0 65px 28px rgba(255,40,0,0.25),
+        inset 0 0 20px rgba(255,200,60,0.4);
+      filter: blur(3.5px);
+      transform: scaleY(0.14) scale(0); opacity: 0;
+      z-index: 3; pointer-events: none;
+    }
+
+    .s3-cap {
+      position: absolute; top: 10vh; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Syncopate', sans-serif;
+      font-size: 0.62rem; letter-spacing: 0.65em; text-transform: uppercase;
+      color: var(--gold); opacity: 0; white-space: nowrap; z-index: 6;
+    }
+
+    .stats {
+      position: absolute; z-index: 6;
+      display: flex; align-items: center;
+      gap: clamp(2.5rem, 7vw, 7rem);
+    }
+    .stat { text-align: center; opacity: 0; transform: translateY(28px); }
+    .stat-n {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 700;
+      color: var(--gold); display: block; line-height: 1;
+    }
+    .stat-l {
+      font-size: 0.56rem; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--dim); display: block; margin-top: 0.75rem;
+    }
+
+    /* Gravitational lensing ring (photon sphere) */
+    .s3-photon {
+      position: absolute; top: 50%; left: 50%;
+      width: 80px; height: 80px; margin: -40px 0 0 -40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,200,80,0.9);
+      box-shadow:
+        0 0 14px 5px rgba(255,180,40,0.85),
+        0 0 40px 14px rgba(255,100,10,0.4);
+      transform: scale(0); opacity: 0;
+      z-index: 5; pointer-events: none;
+    }
+
+    /* ── SCENE 4 ─ THE REACH ────────────────────────────── */
+    .s4-inner {
+      position: relative; z-index: 3;
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .s4-eye {
+      font-size: 0.6rem; letter-spacing: 0.58em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 2.2rem; opacity: 0;
+    }
+    .s4-hed {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 6rem); font-weight: 700;
+      letter-spacing: 0.05em; line-height: 0.95;
+      opacity: 0; transform: translateY(50px);
+      margin-bottom: 4rem;
+    }
+
+    /* Orbiting CTA */
+    .orb-wrap {
+      position: relative; display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 230px; height: 230px;
+      opacity: 0;
+    }
+    .orb-ring {
+      position: absolute; border-radius: 50%;
+    }
+    .orb-r1 {
+      width: 220px; height: 220px;
+      border: 1px solid rgba(212,168,83,0.14);
+      animation: orb-cw 11s linear infinite;
+    }
+    .orb-r2 {
+      width: 170px; height: 170px;
+      border: 1px solid rgba(124,58,237,0.2);
+      animation: orb-ccw 8s linear infinite;
+    }
+    .orb-r3 {
+      width: 128px; height: 128px;
+      border: 1px solid rgba(212,168,83,0.1);
+      animation: orb-cw 6s linear infinite;
+    }
+    @keyframes orb-cw  { to { transform: rotate(360deg);  } }
+    @keyframes orb-ccw { to { transform: rotate(-360deg); } }
+
+    .orb-dot {
+      position: absolute; border-radius: 50%;
+      top: -3.5px; left: 50%; margin-left: -3.5px;
+      width: 7px; height: 7px;
+      background: var(--gold);
+      box-shadow: 0 0 12px 4px rgba(212,168,83,0.75);
+    }
+    .orb-dot-p {
+      background: #c084fc;
+      box-shadow: 0 0 10px 3px rgba(192,132,252,0.75);
+      top: auto; bottom: -3px;
+    }
+    .orb-dot-w {
+      width: 5px; height: 5px;
+      background: #fff;
+      box-shadow: 0 0 6px 2px rgba(255,255,255,0.7);
+      top: -2.5px; margin-left: -2.5px;
+    }
+
+    .btn-reach {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; gap: 0.7rem;
+      padding: 1.1rem 2.6rem;
+      border: 1px solid var(--gold);
+      color: var(--gold); background: transparent;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; letter-spacing: 0.4em; text-transform: uppercase;
+      text-decoration: none; cursor: none;
+      transition: background .35s, color .35s, box-shadow .35s;
+    }
+    .btn-reach:hover {
+      background: var(--gold); color: var(--bg);
+      box-shadow: 0 0 50px rgba(212,168,83,0.5), 0 0 100px rgba(212,168,83,0.2);
+    }
+
+    .s4-foot {
+      position: absolute; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem; letter-spacing: 0.38em; text-transform: uppercase;
+      color: var(--dim); z-index: 4; opacity: 0; white-space: nowrap;
+    }
+    .s4-foot a { color: inherit; text-decoration: none; transition: color .3s; cursor: none; }
+    .s4-foot a:hover { color: var(--white); }
+
+    /* Subtle corner accents */
+    .corner {
+      position: absolute; width: 40px; height: 40px;
+      pointer-events: none; z-index: 4; opacity: 0;
+    }
+    .corner::before, .corner::after {
+      content: ''; position: absolute;
+      background: rgba(212,168,83,0.35);
+    }
+    .corner::before { width: 100%; height: 1px; top: 0; left: 0; }
+    .corner::after  { width: 1px; height: 100%; top: 0; left: 0; }
+    .corner.tr { top: 2rem; right: 3rem; transform: rotate(90deg); }
+    .corner.bl { bottom: 2rem; left: 3rem; transform: rotate(270deg); }
+    .corner.tl { top: 2rem; left: 3rem; }
+    .corner.br { bottom: 2rem; right: 3rem; transform: rotate(180deg); }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cur"></div>
+  <div id="cur-ring"></div>
+
+  <!-- Fixed canvases -->
+  <canvas id="star-cv"></canvas>
+  <div id="gl-wrap"></div>
+
+  <!-- Flash overlay -->
+  <div id="flash"></div>
+
+  <!-- Nav -->
+  <nav id="enav">
+    <a class="enav-logo" href="index.html">Proxima Reach</a>
+    <a class="enav-back" href="index.html">← Back to site</a>
+  </nav>
+
+  <!-- Scene progress dots -->
+  <div id="sdots">
+    <div class="sdot on"></div>
+    <div class="sdot"></div>
+    <div class="sdot"></div>
+    <div class="sdot"></div>
+  </div>
+
+  <!-- SCROLL CONTENT -->
+  <div id="sr">
+
+    <!-- ── SCENE 1: THE VOID ── 220vh ── -->
+    <div class="sw" id="w1" style="height: 220vh">
+      <div class="sc" id="sc1">
+        <div class="eq-line"></div>
+        <div class="corner tl" id="c-tl"></div>
+        <div class="corner tr" id="c-tr"></div>
+        <div class="corner bl" id="c-bl"></div>
+        <div class="corner br" id="c-br"></div>
+        <div class="s1-dot" id="s1dot"></div>
+        <div class="s1-center" id="s1ctr">
+          <p class="s1-eye">A Proxima Reach Journey</p>
+          <h1 class="s1-hed">THE<br>ORBIT</h1>
+          <p class="s1-sub">An interactive experience</p>
+        </div>
+        <div class="s1-hint" id="s1hint">
+          <span class="hint-txt">Scroll to enter</span>
+          <div class="hint-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCENE 2: THE ORBIT ── 380vh ── -->
+    <div class="sw" id="w2" style="height: 380vh">
+      <div class="sc" id="sc2">
+        <div class="s2-labels">
+          <div class="s2-lbl" id="l1" style="top:22%; left:6%">Social Media</div>
+          <div class="s2-lbl" id="l2" style="top:44%; left:5%">Content Creation</div>
+          <div class="s2-lbl" id="l3" style="top:66%; left:7%">Growth Strategy</div>
+          <div class="s2-lbl r" id="l4" style="top:27%; right:6%">Paid Ads</div>
+          <div class="s2-lbl r" id="l5" style="top:50%; right:5%">Brand Identity</div>
+          <div class="s2-lbl r" id="l6" style="top:72%; right:7%">PR & Media</div>
+        </div>
+        <div class="s2-foot" id="s2foot">
+          <h2 class="s2-hed" id="s2hed">YOUR BUSINESS<br><span class="gld">WITHIN REACH</span></h2>
+          <p class="s2-sub" id="s2sub">Full-spectrum digital growth — strategy to execution</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCENE 3: THE PULL ── 340vh ── -->
+    <div class="sw" id="w3" style="height: 340vh">
+      <div class="sc" id="sc3">
+        <div class="s3-disk" id="s3disk"></div>
+        <div class="s3-photon" id="s3ph"></div>
+        <div class="s3-bh" id="s3bh"></div>
+        <p class="s3-cap" id="s3cap">Impact at scale</p>
+        <div class="stats" id="stats">
+          <div class="stat" id="st1">
+            <span class="stat-n">50+</span>
+            <span class="stat-l">Brands scaled</span>
+          </div>
+          <div class="stat" id="st2">
+            <span class="stat-n">3×</span>
+            <span class="stat-l">Average growth</span>
+          </div>
+          <div class="stat" id="st3">
+            <span class="stat-n">95%</span>
+            <span class="stat-l">Client retention</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCENE 4: THE REACH ── 280vh ── -->
+    <div class="sw" id="w4" style="height: 280vh">
+      <div class="sc" id="sc4">
+        <div class="s4-inner" id="s4in">
+          <p class="s4-eye" id="s4eye">Ready to launch?</p>
+          <h2 class="s4-hed" id="s4hed">ENTER<br>THE ORBIT</h2>
+          <div class="orb-wrap" id="obw">
+            <div class="orb-ring orb-r1"><div class="orb-dot"></div></div>
+            <div class="orb-ring orb-r2"><div class="orb-dot orb-dot-p"></div></div>
+            <div class="orb-ring orb-r3"><div class="orb-dot orb-dot-w"></div></div>
+            <a href="index.html#contact" class="btn-reach">Get In Touch</a>
+          </div>
+        </div>
+        <div class="s4-foot" id="s4foot">
+          <a href="index.html">← Return to main site</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="vendor/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ── CURSOR ──────────────────────────────────────────── */
+    const cur = document.getElementById('cur');
+    const curR = document.getElementById('cur-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    window.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      gsap.set(cur, { x: mx, y: my });
+    });
+    (function tick() {
+      rx += (mx - rx) * 0.1;
+      ry += (my - ry) * 0.1;
+      gsap.set(curR, { x: rx, y: ry });
+      requestAnimationFrame(tick);
+    })();
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => gsap.to([cur, curR], { scale: 2.2, duration: 0.3 }));
+      el.addEventListener('mouseleave', () => gsap.to([cur, curR], { scale: 1, duration: 0.3 }));
+    });
+
+    /* ── STAR FIELD ──────────────────────────────────────── */
+    (() => {
+      const cv = document.getElementById('star-cv');
+      const ctx = cv.getContext('2d');
+      const resize = () => { cv.width = innerWidth; cv.height = innerHeight; };
+      resize(); window.addEventListener('resize', resize);
+
+      const stars = Array.from({ length: 350 }, () => ({
+        x: Math.random(), y: Math.random(),
+        r: 0.2 + Math.random() * 1.4,
+        a: 0.15 + Math.random() * 0.85,
+        sp: 0.3 + Math.random() * 1,
+        ph: Math.random() * Math.PI * 2,
+        d: 0.2 + Math.random() * 0.8,  // parallax depth
+      }));
+
+      let t = 0, pmx = 0, pmy = 0;
+      window.addEventListener('mousemove', e => {
+        pmx = (e.clientX / innerWidth  - 0.5);
+        pmy = (e.clientY / innerHeight - 0.5);
+      });
+
+      (function draw() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        t += 0.007;
+        for (const s of stars) {
+          const px = ((s.x + pmx * s.d * 0.028 + 1) % 1) * cv.width;
+          const py = ((s.y + pmy * s.d * 0.028 + 1) % 1) * cv.height;
+          const tw = 0.35 + 0.65 * Math.sin(t * s.sp + s.ph);
+          ctx.save();
+          ctx.globalAlpha = s.a * tw;
+          ctx.fillStyle = '#fff';
+          ctx.shadowColor = '#fff';
+          ctx.shadowBlur = s.r * 4;
+          ctx.beginPath();
+          ctx.arc(px, py, s.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        requestAnimationFrame(draw);
+      })();
+    })();
+
+    /* ── THREE.JS SPHERE ─────────────────────────────────── */
+    const S = (() => {
+      const wrap = document.getElementById('gl-wrap');
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setClearColor(0x000000, 0);
+      wrap.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.01, 1000);
+      camera.position.set(0, 0, 150);
+
+      // Lighting
+      const dirL = new THREE.DirectionalLight('#ffffff', 3);
+      dirL.position.set(0, 50, -20); scene.add(dirL);
+      scene.add(new THREE.AmbientLight('#ffffff', 1));
+      const goldPt = new THREE.PointLight('#D4A853', 2.5, 220);
+      goldPt.position.set(50, 0, 70); scene.add(goldPt);
+      const purpPt = new THREE.PointLight('#7C3AED', 2, 220);
+      purpPt.position.set(-50, 30, -70); scene.add(purpPt);
+
+      // Nucleus
+      const geo = new THREE.IcosahedronGeometry(20, 22);
+      const origPos = new Float32Array(geo.attributes.position.array);
+      const mat = new THREE.MeshPhongMaterial({
+        color:    new THREE.Color('#080220'),
+        emissive: new THREE.Color('#0d0630'),
+        shininess: 90,
+        specular:  new THREE.Color('#D4A853'),
+      });
+      const nucleus = new THREE.Mesh(geo, mat);
+      scene.add(nucleus);
+
+      // Orbit rings (TorusGeometry)
+      function mkRing(r, tube, col, op, rx, ry, rz) {
+        const m = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op });
+        const mesh = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 16, 120), m);
+        mesh.rotation.set(rx, ry, rz);
+        scene.add(mesh);
+        return mesh;
+      }
+      const ring1 = mkRing(36, 0.14, '#D4A853', 0, Math.PI/2.2, 0,       0);
+      const ring2 = mkRing(26, 0.14, '#7C3AED', 0, Math.PI/3,   0,       Math.PI/4);
+      const ring3 = mkRing(46, 0.12, '#D4A853', 0, Math.PI/5,   Math.PI/3, 0);
+
+      // Orbiting dots
+      function mkDot(radius, col) {
+        const m = new THREE.MeshBasicMaterial({ color: col });
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 12), m);
+        scene.add(mesh); return { mesh, radius };
+      }
+      const dot1 = mkDot(36, '#D4A853');
+      const dot2 = mkDot(26, '#c084fc');
+      const dot3 = mkDot(46, '#ffffff');
+
+      // State (driven by scroll via onUpdate)
+      const state = {
+        scale:       0,
+        noiseAmp:    2,
+        ringOp:      0,
+        wrapOp:      0,
+        dotOp:       0,
+      };
+
+      let pmx = 0, pmy = 0;
+      window.addEventListener('mousemove', e => {
+        pmx = (e.clientX / innerWidth  - 0.5) * 2;
+        pmy = (e.clientY / innerHeight - 0.5) * 2;
+      });
+      window.addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+
+      const clock = new THREE.Clock();
+      (function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        // Sphere scale
+        nucleus.scale.setScalar(state.scale);
+
+        // Organic vertex deformation (sine-wave based, no noise lib needed)
+        const pos = geo.attributes.position;
+        const amp = state.noiseAmp;
+        for (let i = 0; i < pos.count; i++) {
+          const ox = origPos[i*3], oy = origPos[i*3+1], oz = origPos[i*3+2];
+          const n = (
+            Math.sin(ox * 0.16 + t * 0.55) * Math.cos(oz * 0.11 + t * 0.38) +
+            Math.cos(oy * 0.14 - t * 0.42) * Math.sin(ox * 0.09 + t * 0.6)
+          ) * amp;
+          const len = Math.sqrt(ox*ox + oy*oy + oz*oz);
+          const sc  = (len + n) / len;
+          pos.setXYZ(i, ox*sc, oy*sc, oz*sc);
+        }
+        pos.needsUpdate = true;
+        geo.computeVertexNormals();
+
+        // Ring opacity + rotation
+        const ro = state.ringOp;
+        ring1.material.opacity = ro * 0.18;
+        ring2.material.opacity = ro * 0.22;
+        ring3.material.opacity = ro * 0.12;
+        ring1.rotation.y += 0.005  * ro;
+        ring2.rotation.z += 0.008  * ro;
+        ring3.rotation.x += 0.0035 * ro;
+
+        // Orbiting dots
+        const do_ = state.dotOp;
+        dot1.mesh.visible = do_ > 0.01;
+        dot2.mesh.visible = do_ > 0.01;
+        dot3.mesh.visible = do_ > 0.01;
+        if (do_ > 0.01) {
+          dot1.mesh.position.set(
+            Math.cos(t * 0.55) * dot1.radius,
+            Math.sin(t * 0.55) * dot1.radius * 0.42,
+            Math.sin(t * 0.55) * dot1.radius * 0.3
+          );
+          dot2.mesh.position.set(
+            Math.cos(-t * 0.82 + 1.2) * dot2.radius * 0.7,
+            Math.sin(-t * 0.82 + 1.2) * dot2.radius,
+            Math.cos(-t * 0.82 + 1.2) * dot2.radius * 0.5
+          );
+          dot3.mesh.position.set(
+            Math.cos(t * 0.38 + 2.5) * dot3.radius * 0.8,
+            Math.cos(t * 0.38 + 2.5) * dot3.radius * 0.35,
+            Math.sin(t * 0.38 + 2.5) * dot3.radius
+          );
+        }
+
+        // Light color shift based on scene
+        goldPt.position.x = Math.sin(t * 0.3) * 60;
+        goldPt.position.z = Math.cos(t * 0.3) * 60;
+
+        // Camera mouse parallax
+        camera.position.x += (pmx * 8  - camera.position.x) * 0.038;
+        camera.position.y += (-pmy * 6 - camera.position.y) * 0.038;
+        camera.lookAt(0, 0, 0);
+
+        // Sync wrapper opacity
+        wrap.style.opacity = state.wrapOp;
+
+        renderer.render(scene, camera);
+      })();
+
+      return state;
+    })();
+
+    /* ── HELPERS ─────────────────────────────────────────── */
+    const dots = document.querySelectorAll('.sdot');
+    function setDot(i) { dots.forEach((d,j) => d.classList.toggle('on', j===i)); }
+    function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+    function map(v, a, b, c, d) { return c + (d-c) * clamp((v-a)/(b-a), 0, 1); }
+
+    /* ── SCENE 1 ENTRANCE ────────────────────────────────── */
+    gsap.timeline({ delay: 0.4 })
+      .to('#enav',   { opacity: 1, duration: 0.9, ease: 'power2.out' },   0)
+      .to('#sdots',  { opacity: 1, duration: 0.9, ease: 'power2.out' },   0.1)
+      .to(['.corner'], { opacity: 1, duration: 0.8, ease: 'power2.out', stagger: 0.08 }, 0.2)
+      .to('.s1-eye', { opacity: 1, duration: 0.9, ease: 'power3.out' },   0.4)
+      .to('.s1-hed', { opacity: 1, duration: 1.1, ease: 'power3.out' },   0.6)
+      .to('.s1-sub', { opacity: 1, duration: 0.8, ease: 'power2.out' },   1.0)
+      .to('#s1hint', { opacity: 1, duration: 0.7, ease: 'power2.out' },   1.3);
+
+    /* ── SCROLL: SCENE 1 (THE VOID → SPHERE BIRTH) ───────── */
+    ScrollTrigger.create({
+      trigger: '#w1', start: 'top top', end: 'bottom bottom',
+      scrub: 1.4,
+      onUpdate(self) {
+        const p = self.progress;
+
+        // Singularity dot expands and fades as sphere materialises
+        gsap.set('#s1dot', {
+          scale:   1 + p * 22,
+          opacity: clamp(1 - p * 2.2, 0, 1),
+        });
+        // Title + sub drift upward and fade
+        gsap.set('#s1ctr', { opacity: clamp(1 - p * 2.5, 0, 1), y: -p * 70 });
+        gsap.set('#s1hint', { opacity: clamp(1 - p * 5, 0, 1) });
+        gsap.set('.corner', { opacity: clamp(1 - p * 3, 0, 1) });
+
+        // Sphere rises from the dot
+        S.scale    = map(p, 0.25, 0.8,  0, 1);
+        S.wrapOp   = map(p, 0.2,  0.7,  0, 1);
+        S.noiseAmp = map(p, 0.3,  0.85, 0, 2.5);
+        S.ringOp   = map(p, 0.5,  0.95, 0, 1);
+        S.dotOp    = map(p, 0.6,  0.95, 0, 1);
+      },
+      onLeave: () => setDot(1),
+    });
+
+    /* ── SCROLL: SCENE 2 (THE ORBIT) ────────────────────── */
+    ScrollTrigger.create({
+      trigger: '#w2', start: 'top top', end: 'bottom bottom',
+      scrub: 1.4,
+      onEnter:     () => setDot(1),
+      onEnterBack: () => setDot(1),
+      onUpdate(self) {
+        const p = self.progress;
+
+        // Sphere stays present
+        S.scale    = 1;
+        S.ringOp   = 1;
+        S.dotOp    = 1;
+        S.noiseAmp = 2.5;
+        S.wrapOp   = 1;
+
+        // Capability labels stagger in from 0–50% progress
+        const lbls = ['#l1','#l2','#l3','#l4','#l5','#l6'];
+        lbls.forEach((id, i) => {
+          const isRight = i >= 3;
+          const t = map(p, i * 0.065, i * 0.065 + 0.18, 0, 1);
+          const el = document.querySelector(id);
+          gsap.set(id, {
+            opacity: t,
+            x: isRight ? (1-t)*35 : -(1-t)*35,
+          });
+        });
+
+        // Headline rises at ~45% progress
+        const ht = map(p, 0.42, 0.68, 0, 1);
+        gsap.set('#s2hed', { opacity: ht, y: (1-ht)*80 });
+        gsap.set('#s2sub', { opacity: map(p, 0.55, 0.75, 0, 1) });
+
+        // GRAVITY PULL — last 20%: labels pulled toward centre, sphere compresses
+        if (p > 0.78) {
+          const pull = map(p, 0.78, 1, 0, 1);
+          lbls.forEach((id, i) => {
+            const isRight = i >= 3;
+            gsap.set(id, {
+              opacity: clamp(1 - pull * 2, 0, 1),
+              x:  isRight ? (1-pull)*0  :  -(1-pull)*0,
+              scale: 1 - pull * 0.5,
+            });
+          });
+          gsap.set('#s2hed', { opacity: clamp(1 - pull * 2,   0, 1) });
+          gsap.set('#s2sub', { opacity: clamp(1 - pull * 2.5, 0, 1) });
+
+          // Sphere compresses (gravity)
+          S.scale    = map(pull, 0, 1, 1, 0.45);
+          S.noiseAmp = map(pull, 0, 1, 2.5, 0.5);
+          S.ringOp   = map(pull, 0, 1, 1, 0.1);
+          S.dotOp    = map(pull, 0, 1, 1, 0);
+        }
+      },
+      onLeave: () => setDot(2),
+    });
+
+    /* ── SCROLL: SCENE 3 (THE PULL / BLACK HOLE) ────────── */
+    ScrollTrigger.create({
+      trigger: '#w3', start: 'top top', end: 'bottom bottom',
+      scrub: 1.4,
+      onEnter:     () => setDot(2),
+      onEnterBack: () => setDot(2),
+      onUpdate(self) {
+        const p = self.progress;
+
+        // Sphere continues collapsing into nothing
+        S.scale    = map(p, 0, 0.5, 0.45, 0);
+        S.ringOp   = map(p, 0, 0.4, 0.1, 0);
+        S.noiseAmp = map(p, 0, 0.5, 0.5, 0);
+        S.wrapOp   = map(p, 0, 0.45, 1, 0);
+        S.dotOp    = 0;
+
+        // Accretion disk materialises
+        const diskP = map(p, 0.05, 0.45, 0, 1);
+        gsap.set('#s3disk', {
+          opacity:  diskP * 0.9,
+          scale:    0.4 + diskP * 0.6,
+        });
+
+        // Photon ring flares briefly
+        const phP = map(p, 0.15, 0.5, 0, 1) * (1 - map(p, 0.5, 0.7, 0, 1));
+        gsap.set('#s3ph', { opacity: phP, scale: 0.5 + phP * 0.5 });
+
+        // Black hole grows
+        const bhP = map(p, 0.1, 0.65, 0, 1);
+        gsap.set('#s3bh', { scale: bhP * 55, opacity: bhP });
+
+        // Disk gets swallowed mid-way
+        if (p > 0.55) {
+          gsap.set('#s3disk', { opacity: map(p, 0.55, 0.72, 0.9, 0) });
+        }
+
+        // Section label
+        gsap.set('#s3cap', { opacity: map(p, 0.08, 0.3, 0, 1), y: map(p, 0.08, 0.3, 20, 0) });
+
+        // Stats emerge from the event horizon
+        gsap.set('#st1', { opacity: map(p, 0.38, 0.56, 0, 1), y: map(p, 0.38, 0.56, 28, 0) });
+        gsap.set('#st2', { opacity: map(p, 0.48, 0.66, 0, 1), y: map(p, 0.48, 0.66, 28, 0) });
+        gsap.set('#st3', { opacity: map(p, 0.58, 0.76, 0, 1), y: map(p, 0.58, 0.76, 28, 0) });
+
+        // Stats get pulled back in at the end
+        if (p > 0.82) {
+          const fade = map(p, 0.82, 0.97, 0, 1);
+          gsap.set(['#st1','#st2','#st3'], { opacity: 1 - fade });
+          gsap.set('#s3cap', { opacity: 1 - fade });
+        }
+
+        // Flash transition to scene 4
+        gsap.set('#flash', { opacity: map(p, 0.93, 1, 0, 1) });
+      },
+      onLeave: () => {
+        setDot(3);
+        // Start scene 4 entrance after the flash
+        gsap.to('#flash', { opacity: 0, duration: 1.2, ease: 'power2.out', delay: 0.1 });
+        gsap.to(S, { wrapOp: 0.25, scale: 0.35, ringOp: 0.4, noiseAmp: 1, dotOp: 0,
+                     duration: 1.6, ease: 'power2.inOut', delay: 0.3 });
+      },
+    });
+
+    /* ── SCROLL: SCENE 4 (THE REACH) ────────────────────── */
+    ScrollTrigger.create({
+      trigger: '#w4', start: 'top top', end: 'bottom bottom',
+      scrub: 1.4,
+      onEnter:     () => setDot(3),
+      onEnterBack: () => setDot(3),
+      onUpdate(self) {
+        const p = self.progress;
+        gsap.set('#s4eye', { opacity: map(p, 0,    0.25, 0, 1) });
+        gsap.set('#s4hed', { opacity: map(p, 0.05, 0.32, 0, 1), y: map(p, 0.05, 0.32, 50, 0) });
+        gsap.set('#obw',   { opacity: map(p, 0.2,  0.55, 0, 1) });
+        gsap.set('#s4foot',{ opacity: map(p, 0.55, 0.8,  0, 1) });
+      },
+    });
+
+  </script>
+</body>
+</html>
