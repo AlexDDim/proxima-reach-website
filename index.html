@@ -693,7 +693,7 @@
     #solutions {
       position: relative;
       padding: 9rem 5rem;
-      background: linear-gradient(160deg, rgba(11,9,24,0.78) 0%, rgba(6,6,13,0.82) 100%);
+      background: linear-gradient(160deg, rgba(11,9,24,0.68) 0%, rgba(6,6,13,0.72) 100%);
       overflow: hidden;
       z-index: 1;
     }
@@ -794,7 +794,7 @@
       overflow: hidden;
       display: flex; flex-direction: column;
       justify-content: center;
-      background: rgba(6,6,13,0.68);
+      background: rgba(6,6,13,0.58);
       z-index: 1;
     }
 
@@ -1030,7 +1030,7 @@
     #contact {
       position: relative;
       padding: 9rem 5rem 0;
-      background: linear-gradient(160deg, rgba(11,9,24,0.78) 0%, rgba(6,6,13,0.82) 100%);
+      background: linear-gradient(160deg, rgba(11,9,24,0.68) 0%, rgba(6,6,13,0.72) 100%);
       overflow: hidden;
       z-index: 1;
     }
@@ -2948,123 +2948,74 @@
       );
     });
 
-    /* ── PLANET ZOOM JOURNEY ─────────────────────────────────
-       Each section zooms into its assigned planet: the planet
-       fills the foreground and stays static while the section
-       is in view. Scrolling transitions smoothly to the next.
+    /* ── PLANETS PULLED TO FOREGROUND BESIDE SECTION CARDS ──
+       Each section pulls its assigned planet from its distant
+       orbit to a foreground position adjacent to the content.
+       The planet holds there while the section is in view,
+       then returns to orbit on scroll exit. Fully reversible.
 
-       Architecture:
-       • A proxy object C holds camera/planet state.
-       • gsap.ticker syncs C → Three.js every frame.
-       • Per-section timelines (zoom-in → hold → zoom-out)
-         are scrubbed by ScrollTrigger — fully reversible.
+       Camera stays fixed — the planets come TO the viewer.
+       Positions computed for 1440×900 viewport, camera z=150.
+       focal ≈ 866 → screen_x(px) = world_x * 866/(150-world_z)
     ─────────────────────────────────────────────────────── */
     (function() {
       function trySetup() {
         const app = window._heroThree;
-        if (!app || !app.controls || !app.planet1) {
-          requestAnimationFrame(trySetup);
-          return;
-        }
+        if (!app || !app.planet1) { requestAnimationFrame(trySetup); return; }
 
-        const ctrl = app.controls;
-        const cam  = app.camera;
+        // Capture base material sizes before any animation
+        const B = [
+          app.planet1.material.size,
+          app.planet2.material.size,
+          app.planet3.material.size,
+        ];
 
-        // ── Read planet 3-D positions from geometry buffers ──
-        function pPos(planet) {
-          const a = planet.geometry.attributes.position.array;
-          return { x: a[0], y: a[1], z: a[2] };
-        }
-        const P1 = pPos(app.planet1);
-        const P2 = pPos(app.planet2);
-        const P3 = pPos(app.planet3);
+        // Foreground anchor positions (world space):
+        //   At world_z = 55 → distance 95 from camera
+        //   screen_x(px) = world_x * 866 / 95
+        //   Planet 1: x=42 → 383px right of center  (right col of solutions grid)
+        //   Planet 2: x=-42 → 383px left             (left of services carousel)
+        //   Planet 3: x=38 → 347px right, y=-12 lower (lower-right of contact)
+        const FG = [
+          { x:  42, y:  10, z: 55 },  // planet 1 — solutions, right
+          { x: -42, y:   2, z: 55 },  // planet 2 — services,  left
+          { x:  38, y: -12, z: 55 },  // planet 3 — contact,   right-low
+        ];
 
-        // ── Baseline material values ──
-        const B1 = app.planet1.material.size;
-        const B2 = app.planet2.material.size;
-        const B3 = app.planet3.material.size;
-        const STAR2_BASE = app.pointStars2.material.size;
+        // Shrinking Object3D scale tightens the orbit radius so the planet
+        // hovers nearly stationary at its anchor (orbit radius ≈ 4 units).
+        const TIGHT  = 0.08;
+        const SZ     = 30;           // material size at focus (~270px diameter on screen)
+        const EASE   = 'power2.inOut';
 
-        // ── Proxy object — GSAP animates these, ticker applies them ──
-        const C = {
-          tx: 0, ty: 0, tz: 0,      // controls.target
-          fov: 55,                   // camera FOV
-          p1sz: B1, p2sz: B2, p3sz: B3,
-          star2sz: STAR2_BASE,
-        };
-
-        // ── Sync proxy → Three.js on every GSAP tick ──
-        gsap.ticker.add(() => {
-          ctrl.target.set(C.tx, C.ty, C.tz);
-          cam.fov = C.fov;
-          cam.updateProjectionMatrix();
-          app.planet1.material.size = C.p1sz;
-          app.planet2.material.size = C.p2sz;
-          app.planet3.material.size = C.p3sz;
-          app.planet1.material.needsUpdate = true;
-          app.planet2.material.needsUpdate = true;
-          app.planet3.material.needsUpdate = true;
-          app.pointStars2.material.size = C.star2sz;
-          app.pointStars2.material.needsUpdate = true;
-        });
-
-        // ── Constants ──
-        const FOCUS_FOV  = 14;           // zoomed-in FOV at planet focus
-        const EXIT_FOV   = 50;           // wider FOV while transitioning
-        const FOCUS_SZ   = 90;           // planet point size at focus
-        const STAR2_ZOOM = STAR2_BASE * 2.6;
-        const ease       = 'power2.inOut';
-
-        // ── Factory: zoom-in → hold → zoom-out for one planet ──
-        // The pan target reaches 80% of the planet's position so
-        // the planet is centered; z only partially to avoid clipping.
-        function makePlanetTl(pos, pSzProp, baseSz) {
+        function makeTl(planet, fg, baseSz) {
           return gsap.timeline()
-            // ZOOM IN (30% of scroll distance)
-            .to(C, { tx: pos.x*0.8, ty: pos.y*0.8, tz: pos.z*0.2,
-                     fov: FOCUS_FOV, star2sz: STAR2_ZOOM,
-                     duration: 0.3, ease })
-            .to(C, { [pSzProp]: FOCUS_SZ, duration: 0.3, ease }, '<')
-
-            // HOLD — planet stays prominent (40% of scroll distance)
-            .to({}, { duration: 0.4 })
-
-            // ZOOM OUT (30% of scroll distance)
-            .to(C, { tx: 0, ty: 0, tz: 0,
-                     fov: EXIT_FOV, star2sz: STAR2_BASE,
-                     duration: 0.3, ease })
-            .to(C, { [pSzProp]: baseSz, duration: 0.3, ease }, '<');
+            // PULL FORWARD — planet flies from orbit to beside the cards (25%)
+            .to(planet.position, { x: fg.x, y: fg.y, z: fg.z, duration: 0.25, ease: EASE })
+            .to(planet.scale,    { x: TIGHT, y: TIGHT, z: TIGHT, duration: 0.25, ease: EASE }, '<')
+            .to(planet.material, { size: SZ, duration: 0.25, ease: EASE }, '<')
+            // HOLD — planet stays beside the content area (50%)
+            .to({}, { duration: 0.5 })
+            // RETURN — planet retreats back to orbit (25%)
+            .to(planet.position, { x: 0, y: 0, z: 0, duration: 0.25, ease: EASE })
+            .to(planet.scale,    { x: 1, y: 1, z: 1, duration: 0.25, ease: EASE }, '<')
+            .to(planet.material, { size: baseSz, duration: 0.25, ease: EASE }, '<');
         }
 
-        // ── Planet 1 — Solutions ──
+        // Planet 1 — Solutions
         gsap.timeline({
-          scrollTrigger: {
-            trigger: '#solutions',
-            start: 'top 60%',
-            end:   'bottom 40%',
-            scrub: 1.8,
-          }
-        }).add(makePlanetTl(P1, 'p1sz', B1));
+          scrollTrigger: { trigger: '#solutions', start: 'top 65%', end: 'bottom 35%', scrub: 2 }
+        }).add(makeTl(app.planet1, FG[0], B[0]));
 
-        // ── Planet 2 — Services ──
+        // Planet 2 — Services
         gsap.timeline({
-          scrollTrigger: {
-            trigger: '#services',
-            start: 'top 60%',
-            end:   'bottom 40%',
-            scrub: 1.8,
-          }
-        }).add(makePlanetTl(P2, 'p2sz', B2));
+          scrollTrigger: { trigger: '#services', start: 'top 65%', end: 'bottom 35%', scrub: 2 }
+        }).add(makeTl(app.planet2, FG[1], B[1]));
 
-        // ── Planet 3 — Contact ──
+        // Planet 3 — Contact
         gsap.timeline({
-          scrollTrigger: {
-            trigger: '#contact',
-            start: 'top 60%',
-            end:   'bottom 40%',
-            scrub: 1.8,
-          }
-        }).add(makePlanetTl(P3, 'p3sz', B3));
+          scrollTrigger: { trigger: '#contact', start: 'top 65%', end: 'bottom 35%', scrub: 2 }
+        }).add(makeTl(app.planet3, FG[2], B[2]));
       }
       trySetup();
     })();
