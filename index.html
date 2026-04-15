@@ -548,13 +548,15 @@
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       overflow: hidden;
+      z-index: 1;
     }
 
     .webgl {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
+      position: fixed; inset: 0;
+      width: 100vw; height: 100vh;
       z-index: 0;
       opacity: 0; /* revealed by heroIn — never flashes in before its cue */
+      pointer-events: none;
     }
     .webgl canvas {
       display: block;
@@ -656,6 +658,16 @@
     }
 
 
+    /* ─── SECTION GLASS EDGE ──────────────────────────────── */
+    /* Thin gold glow at top of each section to look like a glass panel rim */
+    #solutions::after,
+    #services::after {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212,168,83,0.25) 30%, rgba(212,168,83,0.55) 50%, rgba(212,168,83,0.25) 70%, transparent);
+      pointer-events: none; z-index: 3;
+    }
+
     /* ─── SECTION SHARED ─────────────────────────────────── */
     .s-label {
       font-family: var(--ff-ui);
@@ -681,8 +693,9 @@
     #solutions {
       position: relative;
       padding: 9rem 5rem;
-      background: var(--bg2);
+      background: linear-gradient(160deg, rgba(11,9,24,0.78) 0%, rgba(6,6,13,0.82) 100%);
       overflow: hidden;
+      z-index: 1;
     }
 
     #solutions::before {
@@ -705,10 +718,12 @@
 
     .sol-card {
       position: relative; padding: 2.25rem 2rem;
-      background: rgba(255,255,255,0.022);
+      background: rgba(8,7,20,0.72);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 14px;
       overflow: hidden;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
     }
 
@@ -779,7 +794,8 @@
       overflow: hidden;
       display: flex; flex-direction: column;
       justify-content: center;
-      background: var(--bg);
+      background: rgba(6,6,13,0.68);
+      z-index: 1;
     }
 
     #services::before {
@@ -1014,8 +1030,9 @@
     #contact {
       position: relative;
       padding: 9rem 5rem 0;
-      background: var(--bg2);
+      background: linear-gradient(160deg, rgba(11,9,24,0.78) 0%, rgba(6,6,13,0.82) 100%);
       overflow: hidden;
+      z-index: 1;
     }
 
     #contact::after {
@@ -1951,7 +1968,7 @@
 
     async init() {
       this.threeInit();
-      window._heroThree = { camera: this.camera };
+      window._heroThree = this; /* expose full app: .camera, .controls, .nucleus, .scene */
       this.texturePromise = this.textureLoader();
       this.createElements();
       this.createMovingStars();
@@ -2930,6 +2947,67 @@
         }
       );
     });
+
+    /* ── UNIVERSE TRAVEL: scroll-driven camera drift ────────
+       Shifts the OrbitControls target so the sphere wanders
+       across the fixed background as sections scroll past.
+       Uses a keyframe path interpolated in onUpdate so multiple
+       sections never fight over the same property.
+    ─────────────────────────────────────────────────────── */
+    (function() {
+      // Wait until Three.js App is ready (initialises async)
+      function tryUniverseTravel() {
+        const app = window._heroThree;
+        if (!app || !app.controls || !app.nucleus) {
+          requestAnimationFrame(tryUniverseTravel);
+          return;
+        }
+
+        const ctrl    = app.controls;
+        const nucleus = app.nucleus;
+        const sphereBg = app.sphereBg;
+
+        // Keyframes: [scrollProgress 0–1, targetX, targetY, nucleusScaleX]
+        // Progress is approximate based on typical page layout
+        const KF = [
+          [0.00,   0,    0,   1.00],  // hero — centered
+          [0.22,  28,  -14,   1.08],  // entering solutions — sphere drifts right/down
+          [0.42,  20,  -18,   1.12],  // mid solutions
+          [0.55, -22,    8,   1.06],  // entering services — swings left/up
+          [0.72, -26,   12,   1.02],  // mid services
+          [0.85,   6,   -6,   0.96],  // entering contact — re-centers, slightly smaller
+          [1.00,   0,    0,   0.92],  // bottom
+        ];
+
+        function lerp(a, b, t) { return a + (b - a) * t; }
+        function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+        ScrollTrigger.create({
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 2.5,
+          onUpdate(self) {
+            const p = self.progress;
+            let from = KF[0], to = KF[KF.length - 1];
+            for (let i = 0; i < KF.length - 1; i++) {
+              if (p >= KF[i][0] && p <= KF[i + 1][0]) {
+                from = KF[i]; to = KF[i + 1]; break;
+              }
+            }
+            const span = to[0] - from[0];
+            const t = span < 0.001 ? 1 : smoothstep((p - from[0]) / span);
+
+            ctrl.target.x = lerp(from[1], to[1], t);
+            ctrl.target.y = lerp(from[2], to[2], t);
+
+            const sc = lerp(from[3], to[3], t);
+            nucleus.scale.set(sc, sc, sc);
+            if (sphereBg) sphereBg.scale.set(sc, sc, sc);
+          }
+        });
+      }
+      tryUniverseTravel();
+    })();
   </script>
 
   <script>
