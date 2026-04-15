@@ -1304,7 +1304,19 @@
       .srv-icon { width: 48px; height: 48px; margin-bottom: 1rem; }
 
       /* ── LOADER ──────────────────────────────────────────── */
-      /* Keep default justify-content: center — centers entire stage (orbit + text) */
+      /* Absolutely center the orbit at 50%/50% — eliminates any flex offset */
+      .loader-stage {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      /* UI text hangs below the orbit wrap */
+      .loader-ui {
+        position: absolute;
+        top: calc(min(82vw, 380px) + 8px);
+        left: 50%; transform: translateX(-50%);
+        width: max-content; padding-top: 0;
+      }
       /* Scale the entire orbit stage to fit mobile viewport */
       .loader-orbit-wrap {
         width: min(82vw, 380px);
