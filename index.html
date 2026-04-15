@@ -343,6 +343,72 @@
       opacity: 0; pointer-events: none; z-index: 9;
     }
 
+    /* ─── SCROLL PROGRESS BAR ───────────────────────────── */
+    #scroll-prog {
+      position: fixed; top: 0; left: 0;
+      height: 2px; width: 0%;
+      background: linear-gradient(90deg, rgba(212,168,83,0.3), #D4A853, #F2CC72, #D4A853);
+      z-index: 1001; pointer-events: none;
+      box-shadow: 0 0 10px rgba(212,168,83,0.8), 0 0 20px rgba(212,168,83,0.4);
+      will-change: width;
+    }
+
+    /* ─── SECTION WARP OVERLAY ───────────────────────────── */
+    #sec-warp {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 55% 55% at 50% 50%,
+        rgba(212,168,83,0.12) 0%,
+        rgba(6,6,13,0.92) 55%,
+        #000008 100%);
+      opacity: 0; pointer-events: none; z-index: 150;
+    }
+
+    /* ─── SOL CARD CLIP REVEAL ───────────────────────────── */
+    .sol-card {
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(0) !important;
+    }
+    .sol-card.revealed {
+      clip-path: inset(0 0 0% 0);
+      transition: clip-path 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    /* ─── SPLIT HEADING CLIP ─────────────────────────────── */
+    .s-title-wrap { overflow: hidden; }
+    .s-title-inner {
+      display: block;
+      transform: translateY(100%);
+      transition: transform 0s;
+    }
+    .s-title-inner.revealed {
+      transform: translateY(0);
+      transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── PARALLAX NEBULA LAYERS ─────────────────────────── */
+    .nebula-par {
+      position: absolute; inset: 0;
+      pointer-events: none; will-change: transform;
+    }
+
+    /* ─── SECTION NUMBER ACCENT ──────────────────────────── */
+    .sec-num {
+      position: absolute; right: 5rem; top: 9rem;
+      font-family: var(--ff-display); font-weight: 700;
+      font-size: 11rem; line-height: 1;
+      color: rgba(212,168,83,0.035);
+      letter-spacing: -0.04em;
+      pointer-events: none; user-select: none;
+      will-change: transform;
+    }
+
+    /* ─── CONTACT SPLIT REVEAL ───────────────────────────── */
+    .ct-split-left  { overflow: hidden; }
+    .ct-split-right { overflow: hidden; }
+    .ct-split-left  > * { transform: translateX(-50px); opacity: 0; }
+    .ct-split-right > * { transform: translateX( 50px); opacity: 0; }
+
     /* ─── NAVBAR ─────────────────────────────────────────── */
     #nav {
       position: fixed; top: 0; left: 0; right: 0;
@@ -1380,6 +1446,11 @@
   <div id="grain" aria-hidden="true"></div>
 
   <!-- ─── LOADER ──────────────────────────────────────────── -->
+  <!-- Scroll progress bar -->
+  <div id="scroll-prog"></div>
+  <!-- Section warp overlay -->
+  <div id="sec-warp"></div>
+
   <div id="loader" role="status" aria-label="Loading">
 
     <canvas id="loader-stars"></canvas>
@@ -1486,9 +1557,11 @@
 
   <!-- ─── SOLUTIONS ────────────────────────────────────────── -->
   <section id="solutions">
+    <div class="nebula-par" id="sol-nebula"></div>
+    <div class="sec-num" id="sol-num">01</div>
     <div class="sol-header">
       <p class="s-label" data-i18n="sol-label">The Problem Space</p>
-      <h2 class="s-title" data-i18n="sol-title">CHALLENGES<br>WE ELIMINATE</h2>
+      <div class="s-title-wrap"><span class="s-title-inner"><h2 class="s-title" data-i18n="sol-title">CHALLENGES<br>WE ELIMINATE</h2></span></div>
     </div>
 
     <div class="sol-grid">
@@ -2502,19 +2575,83 @@
 
 
 
-    /* SOLUTIONS REVEAL */
-    gsap.from('#solutions .s-label, #solutions .s-title', {
-      opacity: 0, y: 28, duration: 0.8, stagger: 0.14, ease: 'power3.out',
-      scrollTrigger: { trigger: '#solutions', start: 'top 72%' }
+    /* ── SCROLL PROGRESS BAR ── */
+    const progBar = document.getElementById('scroll-prog');
+    window.addEventListener('scroll', () => {
+      const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+      progBar.style.width = pct + '%';
+    }, { passive: true });
+
+    /* ── HERO EXIT WARP FLASH ── */
+    ScrollTrigger.create({
+      trigger: '#solutions',
+      start: 'top 85%',
+      end: 'top 40%',
+      scrub: true,
+      onUpdate(self) {
+        const p = self.progress;
+        // Gold nebula flares up as hero gives way to solutions, then fades
+        const peak = p < 0.5 ? p * 2 : (1 - p) * 2;
+        document.getElementById('sec-warp').style.opacity = peak * 0.55;
+      }
     });
 
-    ScrollTrigger.batch('.sol-card', {
-      onEnter: batch => gsap.from(batch, {
-        opacity: 0, y: 45, duration: 0.8, stagger: 0.1, ease: 'power3.out'
-      }),
-      start: 'top 82%',
-      once: true
+    /* ── SOLUTIONS: SECTION HEADER ── */
+    ScrollTrigger.create({
+      trigger: '#solutions',
+      start: 'top 78%',
+      once: true,
+      onEnter() {
+        gsap.to('#solutions .s-label', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' });
+        // Clip-path heading reveal
+        document.querySelector('.s-title-inner')?.classList.add('revealed');
+      }
     });
+
+    /* ── SOL NUM PARALLAX ── */
+    gsap.to('#sol-num', {
+      y: -120,
+      ease: 'none',
+      scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: 1.2 }
+    });
+
+    /* ── SOL CARDS: CLIP-PATH STAGGER REVEAL ── */
+    const solCards = gsap.utils.toArray('.sol-card');
+    solCards.forEach((card, i) => {
+      ScrollTrigger.create({
+        trigger: card,
+        start: 'top 88%',
+        once: true,
+        onEnter() {
+          gsap.delayedCall(i * 0.07, () => card.classList.add('revealed'));
+
+          // Sol number flares gold when card reveals
+          const num = card.querySelector('.sol-num');
+          if (num) {
+            gsap.delayedCall(i * 0.07 + 0.5, () => {
+              gsap.fromTo(num,
+                { color: 'rgba(212,168,83,0.1)' },
+                { color: 'rgba(212,168,83,0.9)', duration: 0.5, ease: 'power2.out',
+                  onComplete: () => gsap.to(num, { color: 'rgba(212,168,83,0.1)', duration: 1.2, ease: 'power2.inOut' })
+                }
+              );
+            });
+          }
+        }
+      });
+    });
+
+    /* ── SOLUTIONS NEBULA PARALLAX ── */
+    (() => {
+      const nebula = document.getElementById('sol-nebula');
+      if (!nebula) return;
+      nebula.style.background = 'radial-gradient(ellipse 70% 55% at 50% 40%, rgba(124,58,237,0.14) 0%, transparent 65%)';
+      gsap.to(nebula, {
+        yPercent: -30,
+        ease: 'none',
+        scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: 1 }
+      });
+    })();
 
     /* ── SERVICES: 3D ROULETTE CAROUSEL ── */
     (function() {
@@ -2728,21 +2865,70 @@
         }
       });
 
-      gsap.from('.srv-header .s-label, .srv-header .s-title, .srv-hint', {
-        opacity: 0, y: 24, stagger: 0.12, duration: 0.75, ease: 'power3.out',
-        scrollTrigger: { trigger: '#services', start: 'top 80%' }
+      gsap.fromTo('.srv-header .s-label',
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+          scrollTrigger: { trigger: '#services', start: 'top 80%', once: true }
+        }
+      );
+      gsap.fromTo('.srv-header .s-title',
+        { clipPath: 'inset(0 0 100% 0)' },
+        { clipPath: 'inset(0 0 0% 0)', duration: 1.0, ease: 'expo.out',
+          scrollTrigger: { trigger: '#services', start: 'top 78%', once: true }
+        }
+      );
+      gsap.fromTo('.srv-hint',
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.4,
+          scrollTrigger: { trigger: '#services', start: 'top 78%', once: true }
+        }
+      );
+      // Warp flash on services entrance
+      ScrollTrigger.create({
+        trigger: '#services',
+        start: 'top 85%',
+        end: 'top 45%',
+        scrub: true,
+        onUpdate(self) {
+          const p = self.progress;
+          const peak = p < 0.5 ? p * 2 : (1 - p) * 2;
+          document.getElementById('sec-warp').style.opacity = peak * 0.4;
+        }
       });
     })();
 
-    /* CONTACT REVEAL */
-    gsap.from('.ct-grid > div:first-child > *', {
-      opacity: 0, x: -35, duration: 0.85, stagger: 0.13, ease: 'power3.out',
-      scrollTrigger: { trigger: '#contact', start: 'top 72%' }
+    /* ── CONTACT REVEAL: cinematic split entrance ── */
+    // Warp flash as contact enters
+    ScrollTrigger.create({
+      trigger: '#contact',
+      start: 'top 85%',
+      end: 'top 45%',
+      scrub: true,
+      onUpdate(self) {
+        const p = self.progress;
+        const peak = p < 0.5 ? p * 2 : (1 - p) * 2;
+        document.getElementById('sec-warp').style.opacity = peak * 0.45;
+      }
     });
 
-    gsap.from('.ct-right > *', {
-      opacity: 0, x: 35, duration: 0.85, stagger: 0.13, ease: 'power3.out',
-      scrollTrigger: { trigger: '#contact', start: 'top 72%' }
+    // Left column: each child slides in from left
+    gsap.utils.toArray('.ct-grid > div:first-child > *').forEach((el, i) => {
+      gsap.fromTo(el,
+        { x: -60, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.0, ease: 'expo.out', delay: i * 0.12,
+          scrollTrigger: { trigger: '#contact', start: 'top 72%', once: true }
+        }
+      );
+    });
+
+    // Right column: each child slides from right
+    gsap.utils.toArray('.ct-right > *').forEach((el, i) => {
+      gsap.fromTo(el,
+        { x: 60, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.0, ease: 'expo.out', delay: i * 0.12,
+          scrollTrigger: { trigger: '#contact', start: 'top 72%', once: true }
+        }
+      );
     });
   </script>
 
