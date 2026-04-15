@@ -51,7 +51,7 @@
     /* ── FIXED LAYERS ───────────────────────────────────── */
     #star-cv  { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
     #gl-wrap  { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-    #flash    { position: fixed; inset: 0; z-index: 200; background: #fff; opacity: 0; pointer-events: none; }
+    #flash    { position: fixed; inset: 0; z-index: 200; background: #000008; opacity: 0; pointer-events: none; }
 
     /* ── NAV ────────────────────────────────────────────── */
     #enav {
@@ -260,6 +260,12 @@
         0 0 40px 14px rgba(255,100,10,0.4);
       transform: scale(0); opacity: 0;
       z-index: 5; pointer-events: none;
+    }
+
+    /* Stats explicitly centered */
+    .stats {
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     /* ── SCENE 4 ─ THE REACH ────────────────────────────── */
@@ -580,10 +586,10 @@
       const geo = new THREE.IcosahedronGeometry(20, 22);
       const origPos = new Float32Array(geo.attributes.position.array);
       const mat = new THREE.MeshPhongMaterial({
-        color:    new THREE.Color('#080220'),
-        emissive: new THREE.Color('#0d0630'),
-        shininess: 90,
-        specular:  new THREE.Color('#D4A853'),
+        color:     new THREE.Color('#06001a'),
+        emissive:  new THREE.Color('#08002a'),
+        shininess: 18,
+        specular:  new THREE.Color('#2a1a00'),
       });
       const nucleus = new THREE.Mesh(geo, mat);
       scene.add(nucleus);
@@ -858,27 +864,27 @@
         // Flash transition to scene 4
         gsap.set('#flash', { opacity: map(p, 0.93, 1, 0, 1) });
       },
-      onLeave: () => {
-        setDot(3);
-        // Start scene 4 entrance after the flash
-        gsap.to('#flash', { opacity: 0, duration: 1.2, ease: 'power2.out', delay: 0.1 });
-        gsap.to(S, { wrapOp: 0.25, scale: 0.35, ringOp: 0.4, noiseAmp: 1, dotOp: 0,
-                     duration: 1.6, ease: 'power2.inOut', delay: 0.3 });
-      },
+      onLeave: () => setDot(3),
     });
 
     /* ── SCROLL: SCENE 4 (THE REACH) ────────────────────── */
     ScrollTrigger.create({
       trigger: '#w4', start: 'top top', end: 'bottom bottom',
       scrub: 1.4,
-      onEnter:     () => setDot(3),
+      onEnter() {
+        setDot(3);
+        // Fade out the transition overlay and bring sphere back small
+        gsap.to('#flash', { opacity: 0, duration: 1.0, ease: 'power2.out' });
+        gsap.to(S, { wrapOp: 0.22, scale: 0.32, ringOp: 0.35, noiseAmp: 1.2, dotOp: 0,
+                     duration: 1.5, ease: 'power2.inOut' });
+      },
       onEnterBack: () => setDot(3),
       onUpdate(self) {
         const p = self.progress;
-        gsap.set('#s4eye', { opacity: map(p, 0,    0.25, 0, 1) });
-        gsap.set('#s4hed', { opacity: map(p, 0.05, 0.32, 0, 1), y: map(p, 0.05, 0.32, 50, 0) });
-        gsap.set('#obw',   { opacity: map(p, 0.2,  0.55, 0, 1) });
-        gsap.set('#s4foot',{ opacity: map(p, 0.55, 0.8,  0, 1) });
+        gsap.set('#s4eye', { opacity: map(p, 0,    0.22, 0, 1) });
+        gsap.set('#s4hed', { opacity: map(p, 0.06, 0.30, 0, 1), y: map(p, 0.06, 0.30, 55, 0) });
+        gsap.set('#obw',   { opacity: map(p, 0.18, 0.50, 0, 1) });
+        gsap.set('#s4foot',{ opacity: map(p, 0.50, 0.75, 0, 1) });
       },
     });
 
